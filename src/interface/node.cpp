@@ -121,7 +121,7 @@ class NodeImpl : public Node
             LOCK(::cs_main);
             tip = ::chainActive.Tip();
         }
-        return GuessVerificationProgress(::Params().TxData(), tip);
+        return GuessVerificationProgress(Params().TxData(), tip);
     }
     bool isInitialBlockDownload() override { return IsInitialBlockDownload(); }
     bool getReindex() override { return ::fReindex; }
