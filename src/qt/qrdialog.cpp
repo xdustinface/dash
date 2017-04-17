@@ -113,17 +113,6 @@ QRDialog::~QRDialog()
     delete ui;
 }
 
-void QRDialog::setModel(OptionsModel *model)
-{
-    this->model = model;
-
-    if (model)
-        connect(model, SIGNAL(displayUnitChanged(int)), this, SLOT(update()));
-
-    // update the display unit if necessary
-    update();
-}
-
 void QRDialog::setInfo(QString strWindowtitle, QString strQRCode, QString strTextInfo, QString strQRCodeTitle)
 {
     this->strWindowtitle = strWindowtitle;
@@ -135,9 +124,6 @@ void QRDialog::setInfo(QString strWindowtitle, QString strQRCode, QString strTex
 
 void QRDialog::update()
 {
-    if(!model)
-        return;
-
     setWindowTitle(strWindowtitle);
     ui->button_saveImage->setEnabled(false);
     if (strTextInfo.isEmpty()) {
