@@ -44,7 +44,7 @@
 #include <boost/algorithm/string/replace.hpp>
 
 static CCriticalSection cs_wallets;
-static std::vector<CWallet*> vpwallets GUARDED_BY(cs_wallets);
+std::vector<CWallet*> vpwallets GUARDED_BY(cs_wallets);
 
 bool AddWallet(CWallet* wallet)
 {

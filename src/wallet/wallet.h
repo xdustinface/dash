@@ -37,6 +37,9 @@
 #include <utility>
 #include <vector>
 
+typedef CWallet* CWalletRef;
+extern std::vector<CWalletRef> vpwallets;
+
 bool AddWallet(CWallet* wallet);
 bool RemoveWallet(CWallet* wallet);
 bool HasWallets();

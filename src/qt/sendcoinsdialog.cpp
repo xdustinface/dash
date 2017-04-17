@@ -15,6 +15,7 @@
 #include <qt/sendcoinsentry.h>
 
 #include <base58.h>
+#include <interface/node.h>
 #include <wallet/coincontrol.h>
 #include <validation.h> // mempool and minRelayTxFee
 #include <ui_interface.h>
@@ -189,8 +190,9 @@ void SendCoinsDialog::setModel(WalletModel *_model)
             }
         }
 
-        setBalance(_model->getBalance(), _model->getUnconfirmedBalance(), _model->getImmatureBalance(), _model->getAnonymizedBalance(),
-                   _model->getWatchBalance(), _model->getWatchUnconfirmedBalance(), _model->getWatchImmatureBalance());
+        interface::WalletBalances balances = _model->wallet().getBalances();
+        setBalance(balances.balance, balances.unconfirmed_balance, balances.immature_balance, balances.anonymized_balance,
+                   balances.watch_only_balance, balances.unconfirmed_watch_only_balance, balances.immature_watch_only_balance);
         connect(_model, SIGNAL(balanceChanged(CAmount,CAmount,CAmount,CAmount,CAmount,CAmount,CAmount)), this, SLOT(setBalance(CAmount,CAmount,CAmount,CAmount,CAmount,CAmount,CAmount)));
         connect(_model->getOptionsModel(), SIGNAL(displayUnitChanged(int)), this, SLOT(updateDisplayUnit()));
         updateDisplayUnit();
@@ -228,7 +230,7 @@ void SendCoinsDialog::setModel(WalletModel *_model)
             settings.remove("nSmartFeeSliderPosition");
         }
         if (settings.value("nConfTarget").toInt() == 0)
-            ui->confTargetSelector->setCurrentIndex(getIndexForConfTarget(model->getDefaultConfirmTarget()));
+            ui->confTargetSelector->setCurrentIndex(getIndexForConfTarget(model->node().getTxConfirmTarget()));
         else
             ui->confTargetSelector->setCurrentIndex(getIndexForConfTarget(settings.value("nConfTarget").toInt()));
     }
@@ -421,7 +423,7 @@ void SendCoinsDialog::send(QList<SendCoinsRecipient> recipients)
     if (ctrl.IsUsingPrivateSend()) {
         // append number of inputs
         questionString.append("<hr />");
-        int nInputs = currentTransaction.getTransaction()->vin.size();
+        int nInputs = currentTransaction.getWtx()->get().vin.size();
         questionString.append(tr("This transaction will consume %n input(s)", "", nInputs));
 
         // warn about potential privacy issues when spending too many inputs at once
@@ -470,7 +472,7 @@ void SendCoinsDialog::send(QList<SendCoinsRecipient> recipients)
         accept();
         CoinControlDialog::coinControl()->UnSelectAll();
         coinControlUpdateLabels();
-        Q_EMIT coinsSent(currentTransaction.getTransaction()->GetHash());
+        Q_EMIT coinsSent(currentTransaction.getWtx()->get().GetHash());
     }
     fNewRecipientAllowed = true;
 }
@@ -638,8 +640,7 @@ void SendCoinsDialog::setBalance(const CAmount& balance, const CAmount& unconfir
 
 void SendCoinsDialog::updateDisplayUnit()
 {
-    setBalance(model->getBalance(), model->getUnconfirmedBalance(), model->getImmatureBalance(), model->getAnonymizedBalance(),
-                   model->getWatchBalance(), model->getWatchUnconfirmedBalance(), model->getWatchImmatureBalance());
+    setBalance(model->wallet().getBalance(), 0, 0, model->wallet().getAnonymizedBalance(), 0, 0, 0);
     coinControlUpdateLabels();
     ui->customFee->setDisplayUnit(model->getOptionsModel()->getDisplayUnit());
     updateMinFeeLabel();
@@ -728,9 +729,9 @@ void SendCoinsDialog::useAvailableBalance(SendCoinsEntry* entry)
     // Calculate available amount to send.
     CAmount amount;
     if (fPrivateSend) {
-        amount = model->getAnonymizedBalance();
+        amount = model->wallet().getAnonymizedBalance();
     } else {
-        amount = model->getBalance(&coin_control);
+        amount = model->wallet().getAvailableBalance(coin_control);
     }
 
     for (int i = 0; i < ui->entries->count(); ++i) {
@@ -931,7 +932,7 @@ void SendCoinsDialog::coinControlChangeEdited(const QString& text)
         }
         else // Valid address
         {
-            if (!model->IsSpendable(dest)) {
+            if (!model->wallet().isSpendable(dest)) {
                 ui->labelCoinControlChangeLabel->setText(tr("Warning: Unknown change address"));
 
                 // confirmation dialog
