@@ -114,27 +114,6 @@ UniValue mnsync(const JSONRPCRequest& request)
     return "failure";
 }
 
-class DescribeAddressVisitor : public boost::static_visitor<UniValue>
-{
-public:
-
-    explicit DescribeAddressVisitor() {}
-
-    UniValue operator()(const CNoDestination &dest) const { return UniValue(UniValue::VOBJ); }
-
-    UniValue operator()(const CKeyID &keyID) const {
-        UniValue obj(UniValue::VOBJ);
-        obj.pushKV("isscript", false);
-        return obj;
-    }
-
-    UniValue operator()(const CScriptID &scriptID) const {
-        UniValue obj(UniValue::VOBJ);
-        obj.pushKV("isscript", true);
-        return obj;
-    }
-};
-
 #ifdef ENABLE_WALLET
 class DescribeWalletAddressVisitor : public boost::static_visitor<UniValue>
 {
@@ -176,6 +155,15 @@ public:
         return obj;
     }
 };
+
+UniValue DescribeWalletAddress(CWallet* pwallet, const CTxDestination& dest)
+{
+    UniValue ret(UniValue::VOBJ);
+    UniValue detail = DescribeAddress(dest);
+    ret.pushKVs(detail);
+    ret.pushKVs(boost::apply_visitor(DescribeWalletAddressVisitor(pwallet), dest));
+    return ret;
+}
 #endif
 
 /*
@@ -315,10 +303,8 @@ UniValue validateaddress(const JSONRPCRequest& request)
         isminetype mine = pwallet ? IsMine(*pwallet, dest) : ISMINE_NO;
         ret.pushKV("ismine", bool(mine & ISMINE_SPENDABLE));
         ret.pushKV("iswatchonly", bool(mine & ISMINE_WATCH_ONLY));
-        UniValue detail = boost::apply_visitor(DescribeAddressVisitor(), dest);
+        UniValue detail = DescribeWalletAddress(pwallet, dest);
         ret.pushKVs(detail);
-        UniValue wallet_detail = boost::apply_visitor(DescribeWalletAddressVisitor(pwallet), dest);
-        ret.pushKVs(wallet_detail);
         if (pwallet && pwallet->mapAddressBook.count(dest)) {
             ret.pushKV("account", pwallet->mapAddressBook[dest].name);
         }
@@ -347,6 +333,8 @@ UniValue validateaddress(const JSONRPCRequest& request)
                 ret.pushKV("hdchainid", hdChainCurrent.GetID().GetHex());
             }
         }
+#else
+        ret.pushKvs = DescribeAddress(dest);
 #endif
     }
     return ret;
