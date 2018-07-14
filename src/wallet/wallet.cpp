@@ -5565,7 +5565,7 @@ void CMerkleTx::SetMerkleBranch(const CBlockIndex* pindex, int posInBlock)
     nIndex = posInBlock;
 }
 
-int CMerkleTx::GetDepthInMainChain(const CBlockIndex* &pindexRet) const
+int CMerkleTx::GetDepthInMainChain() const
 {
     int nResult;
 
@@ -5579,7 +5579,6 @@ int CMerkleTx::GetDepthInMainChain(const CBlockIndex* &pindexRet) const
     if (!pindex || !chainActive.Contains(pindex))
         return 0;
 
-    pindexRet = pindex;
     return ((nIndex == -1) ? (-1) : 1) * (chainActive.Height() - pindex->nHeight + 1);
 }
 
