@@ -79,9 +79,14 @@ private:
         COLUMN_PRIVATESEND_ROUNDS,
         COLUMN_DATE,
         COLUMN_CONFIRMATIONS,
-        COLUMN_TXHASH,
-        COLUMN_VOUT_INDEX,
     };
+
+    enum
+    {
+        TxHashRole = Qt::UserRole,
+        VOutRole
+    };
+
     friend class CCoinControlWidgetItem;
 
     enum class Mode {
