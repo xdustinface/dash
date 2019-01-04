@@ -108,7 +108,6 @@ QList<TransactionRecord> TransactionRecord::decomposeTransaction(const interface
             TransactionRecord sub(hash, nTime);
             // Payment to self by default
             sub.type = TransactionRecord::SendToSelf;
-            sub.strAddress = "";
 
             if(mapValue["DS"] == "1")
             {
@@ -163,8 +162,14 @@ QList<TransactionRecord> TransactionRecord::decomposeTransaction(const interface
                 }
             }
 
-            CAmount nChange = wtx.change;
+            std::string address;
+            for (auto it = wtx.txout_address.begin(); it != wtx.txout_address.end(); ++it) {
+                if (it != wtx.txout_address.begin()) address += ", ";
+                address += EncodeDestination(*it);
+            }
+            sub.strAddress = address;
 
+            CAmount nChange = wtx.change;
             sub.debit = -(nDebit - nChange);
             sub.credit = nCredit - nChange;
             parts.append(sub);
