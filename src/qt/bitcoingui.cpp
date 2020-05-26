@@ -611,19 +611,10 @@ void BitcoinGUI::createToolBars()
         toolbar->setMovable(false); // remove unused icon in upper left corner
         overviewAction->setChecked(true);
 
-        // Add Dash logo on the right side
-        QWidget* spacer = new QWidget();
-        spacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-        toolbar->addWidget(spacer);
-
         QLabel *logoLabel = new QLabel();
-        QString logoImage = ":/images/dash_logo_toolbar";
-        if (!GUIUtil::dashThemeActive()) {
-            logoImage = ":/images/dash_logo_toolbar_blue";
-        }
+        logoLabel->setObjectName("lblToolbarLogo");
+        logoLabel->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
 
-        QPixmap logoPixmap(logoImage);
-        logoLabel->setPixmap(logoPixmap);
         toolbar->addWidget(logoLabel);
 
         /** Create additional container for toolbar and walletFrame and make it the central widget.

@@ -62,6 +62,13 @@ QToolBar > QToolButton:disabled {
     color: #444;
 }
 
+QToolBar QLabel#lblToolbarLogo {
+    background-color: #008de4;
+    padding: 12px;
+    image: url(':/images/dash_logo_toolbar');
+    height: 2.5em;
+}
+
 /******************************************************
 ModalOverlay
 ******************************************************/
