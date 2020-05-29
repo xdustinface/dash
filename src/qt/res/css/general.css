@@ -116,65 +116,52 @@ QRadioButton::indicator:unchecked:disabled {
 }
 
 /******************************************************
-QCheckBox & QTreeWidget::indicator checkboxes
+QCheckBox
 ******************************************************/
 
 QCheckBox{
     background-color: transparent;
     min-height:20px;
 }
-QTreeWidget::indicator,
 QCheckBox::indicator {
     width: 15px;
     height: 15px;
     margin-right: 5px;
 }
 
-QTreeWidget::indicator:unchecked,
 QCheckBox::indicator:unchecked {
     image: url(':/images/checkbox_normal');
 }
-QTreeWidget::indicator:hover:unchecked,
 QCheckBox::indicator:hover:unchecked {
     image: url(':/images/checkbox_normal_hover');
 }
-QTreeWidget::indicator:unchecked:pressed,
 QCheckBox::indicator:unchecked:pressed {
     image: url(':/images/checkbox_normal_pressed');
 }
-QTreeWidget::indicator:unchecked:disabled,
 QCheckBox::indicator:unchecked:disabled {
     image: url(':/images/checkbox_normal_disabled');
 }
-QTreeWidget::indicator:checked,
 QCheckBox::indicator:checked {
     image: url(':/images/checkbox_checked');
 }
-QTreeWidget::indicator:checked:hover,
 QCheckBox::indicator:checked:hover {
     image: url(':/images/checkbox_checked_hover');
 }
-QTreeWidget::indicator:checked:pressed,
 QCheckBox::indicator:checked:pressed {
     image: url(':/images/checkbox_checked_pressed');
 }
-QTreeWidget::indicator:checked:disabled,
 QCheckBox::indicator:checked:disabled {
     image: url(':/images/checkbox_checked_disabled');
 }
-QTreeWidget::indicator:indeterminate,
 QCheckBox::indicator:indeterminate {
     image: url(':/images/checkbox_partly_checked');
 }
-QTreeWidget::indicator:indeterminate:hover,
 QCheckBox::indicator:indeterminate:hover {
     image: url(':/images/checkbox_partly_checked_hover');
 }
-QTreeWidget::indicator:indeterminate:pressed,
 QCheckBox::indicator:indeterminate:pressed {
     image: url(':/images/checkbox_partly_checked_pressed');
 }
-QTreeWidget::indicator:indeterminate:disabled,
 QCheckBox::indicator:indeterminate:disabled {
     image: url(':/images/checkbox_partly_checked_disabled');
 }
@@ -301,6 +288,9 @@ QTreeWidget
 
 QTreeWidget {
     background-color: transparent;
+    alternate-background-color: transparent;
+    outline:0;
+    border:0px;
 }
 QTreeWidget::branch::closed:has-children {
     padding: 0 -2px 0 2px;
@@ -318,6 +308,47 @@ QTreeWidget::branch::open:hover {
     padding: 0 -2px 0 2px;
     image: url(':/images/arrow_down_hover');
 }
+QTreeWidget::indicator {
+    width: 15px;
+    height: 15px;
+    margin-right: 5px;
+}
+QTreeWidget::indicator:unchecked {
+    image: url(':/images/checkbox_normal');
+}
+QTreeWidget::indicator:hover:unchecked {
+    image: url(':/images/checkbox_normal_hover');
+}
+QTreeWidget::indicator:unchecked:pressed {
+    image: url(':/images/checkbox_normal_pressed');
+}
+QTreeWidget::indicator:unchecked:disabled {
+    image: url(':/images/checkbox_normal_disabled');
+}
+QTreeWidget::indicator:checked {
+    image: url(':/images/checkbox_checked');
+}
+QTreeWidget::indicator:checked:hover {
+    image: url(':/images/checkbox_checked_hover');
+}
+QTreeWidget::indicator:checked:pressed {
+    image: url(':/images/checkbox_checked_pressed');
+}
+QTreeWidget::indicator:checked:disabled {
+    image: url(':/images/checkbox_checked_disabled');
+}
+QTreeWidget::indicator:indeterminate {
+    image: url(':/images/checkbox_partly_checked');
+}
+QTreeWidget::indicator:indeterminate:hover {
+    image: url(':/images/checkbox_partly_checked_hover');
+}
+QTreeWidget::indicator:indeterminate:pressed {
+    image: url(':/images/checkbox_partly_checked_pressed');
+}
+QTreeWidget::indicator:indeterminate:disabled {
+    image: url(':/images/checkbox_partly_checked_disabled');
+}
 
 /******************************************************
 *******************************************************
@@ -327,6 +358,99 @@ Below each section should be for a specific UI class/file
 not only Qt standard elements
 *******************************************************
 ******************************************************/
+
+/******************************************************
+CoinControlDialog
+******************************************************/
+
+QDialog#CoinControlDialog .QLabel#labelCoinControlQuantityText { /* Coin Control Quantity Label */
+    min-height:30px;
+    padding-left:15px;
+}
+QDialog#CoinControlDialog .QLabel#labelCoinControlQuantity { /* Coin Control Quantity */
+    min-height:30px;
+}
+QDialog#CoinControlDialog .QLabel#labelCoinControlBytesText { /* Coin Control Bytes Label */
+    padding-left:15px;
+}
+QDialog#CoinControlDialog .QLabel#labelCoinControlBytes { /* Coin Control Bytes */
+}
+QDialog#CoinControlDialog .QLabel#labelCoinControlAmountText { /* Coin Control Amount Label */
+    min-height:30px;
+    padding-left:15px;
+}
+QDialog#CoinControlDialog .QLabel#labelCoinControlAmount { /* Coin Control Amount */
+    min-height:30px;
+}
+QDialog#CoinControlDialog .QLabel#labelCoinControlPriorityText { /* Coin Control Priority Label */
+    padding-left:15px;
+}
+QDialog#CoinControlDialog .QLabel#labelCoinControlPriority { /* Coin Control Priority */
+}
+QDialog#CoinControlDialog .QLabel#labelCoinControlFeeText { /* Coin Control Fee Label */
+    min-height:30px;
+    padding-left:15px;
+}
+QDialog#CoinControlDialog .QLabel#labelCoinControlFee { /* Coin Control Fee */
+    min-height:30px;
+}
+QDialog#CoinControlDialog .QLabel#labelCoinControlLowOutputText { /* Coin Control Low Output Label */
+    padding-left:15px;
+}
+QDialog#CoinControlDialog .QLabel#labelCoinControlLowOutput { /* Coin Control Low Output */
+}
+QDialog#CoinControlDialog .QLabel#labelCoinControlAfterFeeText { /* Coin Control After Fee Label */
+    min-height:30px;
+    padding-left:15px;
+}
+QDialog#CoinControlDialog .QLabel#labelCoinControlAfterFee { /* Coin Control After Fee */
+    min-height:30px;
+}
+QDialog#CoinControlDialog .QLabel#labelCoinControlChangeText { /* Coin Control Change Label */
+    padding-left:15px;
+}
+QDialog#CoinControlDialog .QLabel#labelCoinControlChange { /* Coin Control Change */
+
+}
+
+QDialog#CoinControlDialog .QFrame#frame .QPushButton#pushButtonSelectAll { /* (un)select all button */
+    padding-left:10px;
+    padding-right:10px;
+    min-height:25px;
+}
+QDialog#CoinControlDialog .QFrame#frame .QPushButton#pushButtonToggleLock { /* Toggle lock state button */
+    padding-left:10px;
+    padding-right:10px;
+    min-height:25px;
+}
+
+QDialog#CoinControlDialog .QDialogButtonBox#buttonBox QPushButton { /* Coin Control 'OK' button */
+}
+
+QDialog#CoinControlDialog QHeaderView::section:first { /* Bug Fix: the number "1" displays in this table for some reason... */
+    color:transparent;
+}
+
+QDialog#CoinControlDialog .CoinControlTreeWidget#treeWidget::item {
+}
+QDialog#CoinControlDialog .CoinControlTreeWidget#treeWidget::item:selected { /* Coin Control Item (selected) */
+}
+QDialog#CoinControlDialog .CoinControlTreeWidget#treeWidget::item:checked { /* Coin Control Item (checked) */
+}
+
+QDialog#CoinControlDialog .CoinControlTreeWidget#treeWidget::branch:selected { /* Coin Control Branch Icon */
+    background-repeat:no-repeat;
+    background-position:center;
+}
+QDialog#CoinControlDialog .CoinControlTreeWidget#treeWidget::branch:checked { /* Coin Control Branch Icon */
+    background-repeat:no-repeat;
+    background-position:center;
+}
+
+QDialog#CoinControlDialog .CoinControlTreeWidget#treeWidget::seperator {
+
+}
+
 
 /******************************************************
 MasternodeList
