@@ -626,18 +626,11 @@ QDialog#HelpMessageDialog QScrollArea * {
 background-color:#ffffff;
 }
 
-/* About Dash Dialog */
-QDialog#AboutDialog {
-background-color:#F8F6F6;
-}
+/******************************************************
+AboutDialog
+******************************************************/
 
-QDialog#AboutDialog QLabel#label, QDialog#AboutDialog QLabel#copyrightLabel, QDialog#AboutDialog QLabel#label_2 { /* About Dash Contents */
-margin-left:10px;
-}
-
-QDialog#AboutDialog QLabel#label_2 { /* Margin for About Dash text */
-margin-right:10px;
-}
+/***** No light.css specific coloring here yet *****/
 
 /* Edit Address Dialog */
 QDialog#EditAddressDialog {

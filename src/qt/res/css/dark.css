@@ -668,18 +668,11 @@ border: 1px solid #333;
 color: #ccc;
 }
 
-/* About Dash Dialog */
-QDialog#AboutDialog {
-background-color: #555;
-}
+/******************************************************
+AboutDialog
+******************************************************/
 
-QDialog#AboutDialog QLabel#label, QDialog#AboutDialog QLabel#copyrightLabel, QDialog#AboutDialog QLabel#label_2 { /* About Dash Contents */
-margin-left:10px;
-}
-
-QDialog#AboutDialog QLabel#label_2 { /* Margin for About Dash text */
-margin-right:10px;
-}
+/***** No dark.css specific coloring here yet *****/
 
 /* Edit Address Dialog */
 QDialog#EditAddressDialog {
