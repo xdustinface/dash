@@ -272,6 +272,10 @@ bool BitcoinCore::baseInitialize()
     {
         return false;
     }
+    if (!GUIUtil::loadFonts())
+    {
+        return false;
+    }
     return true;
 }
 
