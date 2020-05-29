@@ -901,54 +901,11 @@ QWidget#ReceiveCoinsDialog .QFrame#frame QTableView#recentRequestsView::item { /
 color: #aaa;
 }
 
-/* TRANSACTIONS PAGE */
+/******************************************************
+TransactionView
+******************************************************/
 
-TransactionView QLineEdit { /* Filters */
-margin-bottom:2px;
-margin-right:1px;
-min-width:111px;
-text-align:center;
-}
-
-TransactionView QLineEdit#addressWidget { /* Address Filter */
-margin-bottom:2px;
-margin-right:1px;
-min-width:405px;
-text-align:center;
-}
-
-TransactionView QLineEdit#amountWidget { /* Amount Filter */
-margin-bottom:2px;
-margin-right:1px;
-max-width:100px;
-text-align:center;
-}
-
-TransactionView QComboBox {
-margin-bottom:1px;
-margin-right:1px;
-}
-
-QLabel#transactionSumLabel { /* Example of setObjectName for widgets without name */
-color: #ccc;
-font-weight:bold;
-}
-
-QLabel#transactionSum { /* Example of setObjectName for widgets without name */
-color: #ccc;
-}
-
-/* TRANSACTION DETAIL DIALOG */
-
-QDialog#TransactionDescDialog {
-background-color: #555;
-}
-
-QDialog#TransactionDescDialog QTextEdit { /* Contents of Receive Coin Dialog */
-background-color: #444;
-color: #ccc;
-border:1px solid #333;
-}
+/***** No dark.css specific coloring here yet *****/
 
 /* MASTERNODE LIST TAB */
 

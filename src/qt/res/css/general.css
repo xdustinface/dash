@@ -773,3 +773,38 @@ QStackedWidget#SendCoinsEntry .QToolButton#deleteButton {
 
 QStackedWidget#SendCoinsEntry .QLineEdit#addAsLabel { /* Pay To Input Field */
 }
+
+/******************************************************
+TransactionView
+******************************************************/
+
+TransactionView QLineEdit { /* Filters */
+    margin-bottom:2px;
+    margin-right:1px;
+    min-width:111px;
+    text-align:center;
+}
+
+TransactionView QLineEdit#addressWidget { /* Address Filter */
+    margin-bottom:2px;
+    margin-right:1px;
+    min-width:405px;
+    text-align:center;
+}
+
+TransactionView QLineEdit#amountWidget { /* Amount Filter */
+    margin-bottom:2px;
+    margin-right:1px;
+    max-width:100px;
+    text-align:center;
+}
+
+TransactionView QComboBox {
+    margin-bottom:1px;
+    margin-right:1px;
+}
+
+#transactionSumLabel,
+#transactionSum {
+    font-size: 15px;
+}
