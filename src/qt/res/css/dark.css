@@ -711,31 +711,19 @@ OverviewPage RecentTransactions
 
 /***** No dark.css specific coloring here yet *****/
 
-/**! MODAL OVERLAY */
+/******************************************************
+ModalOverlay
+******************************************************/
 
 QWidget#bgWidget { /* The 'frame' overlaying the overview-page */
-background: rgba(0,0,0,220);
-padding-left: 10px;
-padding-right: 10px;
-}
-
-QWidget#bgWidget .QPushButton#warningIcon {
-width:64px;
-height:64px;
-padding:5px;
-background-color:transparent;
+	background:rgba(50, 50, 50, 0.8);
+	color:#616161;
 }
 
 QWidget#contentWidget { /* The actual content with the text/buttons/etc... */
-background-color: #444;
-border-top:0px solid #000;
-margin:0;
-padding-top:20px;
-padding-bottom: 20px;
-}
-
-QWidget#bgWidget .QPushButton#closeButton {
-
+	background-color: #444;
+	border: 1px solid #555;
+	border-radius: 10px;
 }
 
 /******************************************************
