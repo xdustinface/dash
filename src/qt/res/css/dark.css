@@ -651,21 +651,12 @@ QWidget#RPCConsole QWidget#tab_peers QTableView { /* Peers Tables */
 color: #aaa;
 }
 
-/* HELP MENU */
-
-/* Command Line Options Dialog */
-QDialog#HelpMessageDialog {
-background-color: #555;
-}
+/******************************************************
+HelpMessageDialog
+******************************************************/
 
 QDialog#HelpMessageDialog QScrollArea * {
-background-color: #444;
-}
-
-QDialog#HelpMessageDialog QTextEdit {
-background-color: #444;
-border: 1px solid #333;
-color: #ccc;
+	background-color: #555;
 }
 
 /******************************************************

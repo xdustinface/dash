@@ -478,6 +478,19 @@ padding-right:5px;
 }
 
 /******************************************************
+HelpMessageDialog
+******************************************************/
+
+QDialog#HelpMessageDialog {
+}
+
+QDialog#HelpMessageDialog QScrollArea {
+}
+
+QDialog#HelpMessageDialog QTextEdit {
+}
+
+/******************************************************
 MasternodeList
 ******************************************************/
 

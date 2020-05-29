@@ -615,15 +615,12 @@ QWidget#RPCConsole .QGroupBox #line_2 { /* Network Out Line */
 background-color:#ff0000;
 }
 
-/* HELP MENU */
-
-/* Command Line Options Dialog */
-QDialog#HelpMessageDialog {
-background-color:#F8F6F6;
-}
+/******************************************************
+HelpMessageDialog
+******************************************************/
 
 QDialog#HelpMessageDialog QScrollArea * {
-background-color:#ffffff;
+	background-color:#ffffff;
 }
 
 /******************************************************
