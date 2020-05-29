@@ -599,56 +599,16 @@ QDialog#OptionsDialog QGroupBox {
 color: #ccc;
 }
 
-/* TOOLS MENU */
+/******************************************************
+RPCConsole
+******************************************************/
 
 QWidget#RPCConsole { /* RPC Console Dialog Box */
-background-color: #333;
-}
-
-QWidget#RPCConsole QWidget#tab_info QLabel#label_11, QWidget#RPCConsole QWidget#tab_info QLabel#label_10 { /* Margin between Network and Block Chain headers */
-qproperty-alignment: 'AlignBottom';
-min-height:25px;
-min-width:180px;
-}
-
-QWidget#RPCConsole QWidget#tab_info QPushButton#openDebugLogfileButton {
-max-width:60px;
-}
-
-QWidget#RPCConsole QWidget#tab_console QTextEdit#messagesWidget { /* Console Messages Window */
-background-color: transparent;
-border: 0;
-}
-
-QWidget#RPCConsole QWidget#tab_console QLineEdit#lineEdit { /* Console Input */
-}
-
-QWidget#RPCConsole QWidget#tab_console QPushButton#clearButton,
-QWidget#RPCConsole QWidget#tab_console QPushButton#fontSmallerButton,
-QWidget#RPCConsole QWidget#tab_console QPushButton#fontBiggerButton { /* Console Font and Clear Buttons */
-background-color:transparent;
-padding-left:10px;
-padding-right:10px;
-}
-
-QWidget#RPCConsole QWidget#tab_console QPushButton#promptIcon { /* Prompt Icon */
-background-color:transparent;
-}
-
-QWidget#RPCConsole QWidget#tab_nettraffic .QGroupBox#groupBox #line { /* Network In Line */
-background-color:#00ff00;
-}
-
-QWidget#RPCConsole QWidget#tab_nettraffic .QGroupBox#groupBox #line_2 { /* Network Out Line */
-background-color:#ff0000;
-}
-
-QWidget#RPCConsole QWidget#tab_peers QLabel#peerHeading { /* Peers Info Header */
-color: #1c75bc;
+	background-color: #333;
 }
 
 QWidget#RPCConsole QWidget#tab_peers QTableView { /* Peers Tables */
-color: #aaa;
+	color: #aaa;
 }
 
 /******************************************************

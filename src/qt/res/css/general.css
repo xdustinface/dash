@@ -855,6 +855,53 @@ QWidget#ReceiveCoinsDialog .QFrame#frame QTableView#recentRequestsView::item { /
 }
 
 /******************************************************
+RPCConsole
+******************************************************/
+
+QWidget#RPCConsole { /* RPC Console Dialog Box */
+}
+
+QWidget#RPCConsole QWidget#tab_info QLabel#label_11, QWidget#RPCConsole QWidget#tab_info QLabel#label_10 { /* Margin between Network and Block Chain headers */
+    qproperty-alignment: 'AlignBottom';
+    min-height:25px;
+    min-width:180px;
+}
+
+QWidget#RPCConsole QWidget#tab_peers  QLabel#peerHeading { /* Peers Info Header */
+    color:#1c75bc;
+}
+
+QWidget#RPCConsole QPushButton#openDebugLogfileButton {
+    max-width:60px;
+}
+
+QWidget#RPCConsole QTextEdit#messagesWidget { /* Console Messages Window */
+    background-color:transparent;
+    border:0;
+}
+
+QWidget#RPCConsole QLineEdit#lineEdit { /* Console Input */
+}
+
+QWidget#RPCConsole QPushButton#clearButton, QWidget#RPCConsole QPushButton#fontSmallerButton, QWidget#RPCConsole QPushButton#fontBiggerButton { /* Console Font and Clear Buttons */
+    background-color:transparent;
+    padding-left:10px;
+    padding-right:10px;
+}
+
+QWidget#RPCConsole QPushButton#promptIcon { /* Prompt Icon */
+    background-color:transparent;
+}
+
+QWidget#RPCConsole .QGroupBox #line { /* Network In Line */
+    background-color:#096e03;
+}
+
+QWidget#RPCConsole .QGroupBox #line_2 { /* Network Out Line */
+    background-color:#eb4034;
+}
+
+/******************************************************
 SendCoinsDialog
 ******************************************************/
 
