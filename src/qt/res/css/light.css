@@ -632,17 +632,11 @@ AboutDialog
 
 /***** No light.css specific coloring here yet *****/
 
-/* Edit Address Dialog */
-QDialog#EditAddressDialog {
-background-color:#F8F6F6;
-}
+/******************************************************
+EditAddressDialog
+******************************************************/
 
-QDialog#EditAddressDialog QLabel {
-qproperty-alignment: 'AlignVCenter | AlignRight';
-min-height:27px;
-font-weight:normal;
-padding-right:5px;
-}
+/***** No light.css specific coloring here yet *****/
 
 /******************************************************
 OverviewPage Balances

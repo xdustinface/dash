@@ -674,17 +674,11 @@ AboutDialog
 
 /***** No dark.css specific coloring here yet *****/
 
-/* Edit Address Dialog */
-QDialog#EditAddressDialog {
-background-color: #555;
-}
+/******************************************************
+EditAddressDialog
+******************************************************/
 
-QDialog#EditAddressDialog QLabel {
-qproperty-alignment: 'AlignVCenter | AlignRight';
-min-height:27px;
-font-weight:normal;
-padding-right:5px;
-}
+/***** No dark.css specific coloring here yet *****/
 
 /******************************************************
 OverviewPage Balances
