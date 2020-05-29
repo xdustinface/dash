@@ -655,6 +655,36 @@ QWidget .QFrame#frame .QLabel#labelWatchTotal { /* Watch-only Total Balance */
 }
 
 /******************************************************
+OptionsDialog
+******************************************************/
+
+QDialog#OptionsDialog {
+}
+
+QDialog#OptionsDialog QValueComboBox, QDialog#OptionsDialog QSpinBox {
+}
+
+QDialog#OptionsDialog QValidatedLineEdit, QDialog#OptionsDialog QValidatedLineEdit:disabled, QDialog#OptionsDialog QLineEdit, QDialog#OptionsDialog QLineEdit:disabled {
+    qproperty-alignment: 'AlignVCenter | AlignLeft';
+}
+
+QDialog#OptionsDialog > QLabel {
+    qproperty-alignment: 'AlignVCenter';
+    min-height:20px;
+}
+
+QDialog#OptionsDialog QWidget#tabDisplay QValueComboBox {
+}
+
+QDialog#OptionsDialog QLabel#label_3 { /* Translations Missing? Label */
+    qproperty-alignment: 'AlignVCenter | AlignCenter';
+    padding-bottom:8px;
+}
+
+QDialog#OptionsDialog QGroupBox {
+}
+
+/******************************************************
 OverviewPage PrivateSend
 ******************************************************/
 
