@@ -907,7 +907,9 @@ TransactionView
 
 /***** No dark.css specific coloring here yet *****/
 
-/* MASTERNODE LIST TAB */
+/******************************************************
+MasternodeList
+******************************************************/
 
 QWidget#MasternodeList QTableWidget#tableWidgetMasternodesDIP3 {
 color: #aaa;
