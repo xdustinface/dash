@@ -369,33 +369,12 @@ QWidget#ShutdownWindow {
 background-color: #444;
 }
 
-/*******************************************************/
-/* FILE MENU */
+/******************************************************
+OpenURIDialog
+******************************************************/
 
-/* Dialog: Open URI */
 QDialog#OpenURIDialog {
-background-color: #555;
-}
-
-QDialog#OpenURIDialog QLabel#label { /* URI Label */
-font-weight:bold;
-}
-
-QDialog#OpenURIDialog QPushButton#selectFileButton { /* ... Button */
-background-color: #ddd;
-border: 0;
-color: #444;
-padding-left:10px;
-padding-right:10px;
-}
-
-QDialog#OpenURIDialog QPushButton#selectFileButton:hover {
-background-color: #aaa;
-color: #333;
-}
-
-QDialog#OpenURIDialog QPushButton#selectFileButton:pressed {
-border:1px solid #9e9e9e;
+    background-color: #555;
 }
 
 /******************************************************

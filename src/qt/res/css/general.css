@@ -248,6 +248,7 @@ QWidget#AddressBookPage QPushButton#newAddress,
 QWidget#AddressBookPage QPushButton#copyAddress,
 QWidget#AddressBookPage QPushButton#showAddressQRCode,
 QWidget#AddressBookPage QPushButton#deleteAddress,
+QDialog#OpenURIDialog QPushButton#selectFileButton,
 QDialog#SendCoinsDialog .QPushButton#addButton,
 QDialog#SendCoinsDialog .QPushButton#clearButton,
 QWidget#ReceiveCoinsDialog .QFrame#frame QPushButton#removeRequestButton,
@@ -266,6 +267,7 @@ QWidget#AddressBookPage QPushButton#newAddress:hover,
 QWidget#AddressBookPage QPushButton#copyAddress:hover,
 QWidget#AddressBookPage QPushButton#showAddressQRCode:hover,
 QWidget#AddressBookPage QPushButton#deleteAddress:hover,
+QDialog#OpenURIDialog QPushButton#selectFileButton:hover,
 QDialog#SendCoinsDialog .QPushButton#addButton:hover,
 QDialog#SendCoinsDialog .QPushButton#clearButton:hover,
 QWidget#ReceiveCoinsDialog .QFrame#frame QPushButton#removeRequestButton:hover,
@@ -281,6 +283,7 @@ QWidget#AddressBookPage QPushButton#newAddress:pressed,
 QWidget#AddressBookPage QPushButton#copyAddress:pressed,
 QWidget#AddressBookPage QPushButton#showAddressQRCode:pressed,
 QWidget#AddressBookPage QPushButton#deleteAddress:pressed,
+QDialog#OpenURIDialog QPushButton#selectFileButton:pressed,
 QDialog#SendCoinsDialog .QPushButton#addButton:pressed,
 QDialog#SendCoinsDialog .QPushButton#clearButton:pressed,
 QWidget#ReceiveCoinsDialog .QFrame#frame QPushButton#removeRequestButton:pressed,
@@ -295,6 +298,7 @@ QWidget#AddressBookPage QPushButton#newAddress:disabled,
 QWidget#AddressBookPage QPushButton#copyAddress:disabled,
 QWidget#AddressBookPage QPushButton#showAddressQRCode:disabled,
 QWidget#AddressBookPage QPushButton#deleteAddress:disabled,
+QDialog#OpenURIDialog QPushButton#selectFileButton:disabled,
 QDialog#SendCoinsDialog .QPushButton#addButton:disabled,
 QDialog#SendCoinsDialog .QPushButton#clearButton:disabled,
 QWidget#ReceiveCoinsDialog .QFrame#frame QPushButton#removeRequestButton:disabled,
@@ -577,6 +581,17 @@ QWidget#contentWidget { /* The actual content with the text/buttons/etc... */
 
 QWidget#bgWidget .QPushButton#closeButton {
     margin-right: 50px;
+}
+
+/******************************************************
+OpenURIDialog
+******************************************************/
+
+QDialog#OpenURIDialog {
+}
+
+QDialog#OpenURIDialog QLabel#label { /* URI Label */
+    font-weight:bold;
 }
 
 /******************************************************
