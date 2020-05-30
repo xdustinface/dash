@@ -1,372 +1,259 @@
+/******************************************************
+Common stuff
+******************************************************/
+
 WalletFrame,
 QDialog {
-background-color: #444;
-border-top:0px solid #000;
-margin:0;
-padding-top:20px;
-padding-bottom: 20px;
+	background-color: #444;
 }
 
 QStatusBar {
-background-color: #555;
-color: #ccc;
-}
-
-.QFrame {
-background-color:transparent;
-border:0px solid #fff;
-}
-
-QMenuBar {
-background-color: #333;
-}
-
-QMenuBar::item {
-background-color: #333;
-color: #ccc;
-}
-
-QMenuBar::item:selected {
-background-color: #333;
-color: #1c75bc; /* aka Strong Blue */
-}
-
-QMenu {
-background-color: #555;
-}
-
-QMenu::item {
-color: #ccc;
-}
-
-QMenu::item:selected {
-background-color: #666;
-color: #ddd;
-}
-
-QToolBar {
-background-color: #1c75bc;
-border: 0;
-padding:0;
-margin:0;
-}
-
-QToolBar > QToolButton {
-background-color: #1c75bc;
-border: 0;
-font-size: 14px;
-min-width: 70px;
-min-height: 48%;
-max-height: 48%;
-padding: 0 10px;
-margin: 0;
-color:#f5f5f5;
-}
-
-QTextEdit {
-	border: 1px solid #333;
 	background-color: #555;
 	color: #ccc;
 }
 
-QToolBar > QToolButton:checked {
-border: 0;
-font-weight: bold;
-}
-
-QToolBar > QToolButton:disabled {
-color: #444;
-}
-
-QToolBar > QLabel {
-border: 0;
-margin:10px 0 0 0;
-}
-
 QMessageBox {
-background-color: #555;
+	background-color: #555;
 }
 
-/*******************************************************/
+QWidget { /* override text selection background color for all text widgets */
+	selection-background-color: #999;
+}
 
 QCheckBox,
 QLabel,
 QListView,
 QRadioButton,
 QTreeWidget { /* Base Text Size & Color */
-font-size:12px;
-color: #ccc;
+	color: #ccc;
 }
+
+/******************************************************
+QMenu
+******************************************************/
+
+QMenu {
+	background-color: #555;
+}
+
+QMenu::item {
+	color: #ccc;
+}
+QMenu::item:selected {
+	background-color: #666;
+	color: #ddd;
+}
+
+/******************************************************
+QToolBar / QToolButton
+******************************************************/
+
+/***** No dark.css specific coloring here yet *****/
+
+/******************************************************
+QMenuBar
+******************************************************/
+
+QMenuBar {
+	background-color: #333;
+}
+
+QMenuBar::item:selected {
+	background-color: #333;
+	color: #1c75bc;
+}
+
+/******************************************************
+QTextEdit
+******************************************************/
+
+QTextEdit {
+	border: #333;
+	background-color: #555;
+	color: #ccc;
+}
+
+/******************************************************
+QLineEdit / QValidatedLineEdit / QPlainTextEdit
+******************************************************/
 
 .QValidatedLineEdit, .QLineEdit, QPlainTextEdit { /* Text Entry Fields */
-border: 1px solid #1c75bc;
-font-size:11px;
-min-height:31px;
-outline:0;
-padding: 0px 3px 0px 3px;
-background-color: #333;
-color: #aaa;
-}
-
-.QLineEdit:!focus {
-font-size:12px;
+	background-color:#333;
+	border-color: #1c75bc;
+	color: #aaa;
 }
 
 .QValidatedLineEdit:disabled, .QLineEdit:disabled {
-background-color: #3e3e3e;
+	background-color: #3e3e3e;
 }
 
-QWidget { /* override text selection background color for all text widgets */
-selection-background-color: #999;
-}
-
-/*******************************************************/
-
-QPushButton { /* Global Button Style */
-background-color: #1c75bc;
-border: 0;
-border-radius:8px;
-color:#ffffff;
-font-size:12px;
-font-weight:normal;
-height: 26px;
-padding-left:25px;
-padding-right:25px;
-padding-top:5px;
-padding-bottom:5px;
-}
-
-QPushButton:hover {
-background-color: #005c96; /* aka Dark Blue */
-}
-
-QPushButton:focus {
-border:none;
-outline:none;
-}
-
-QPushButton:pressed {
-border: 1px solid #444;
-}
-
-QPushButton:disabled {
-background-color: #666;
-}
+/******************************************************
+QComboBox
+******************************************************/
 
 QComboBox { /* Dropdown Menus */
-border: 1px solid #1c75bc;
-padding: 0px 5px 0px 5px;
-background: #333;
-min-height:31px;
-color: #aaa;
+	background: #333;
+	border-color: #1c75bc;
+	color: #aaa;
 }
 
 QComboBox:checked {
-background: #3e3e3e;
+	background: #3e3e3e;
 }
 
 QComboBox:editable {
-background: #1c75bc;
-color:#616161;
-border:0px solid transparent;
-}
-
-QComboBox::drop-down {
-width:25px;
-border:0px;
+	background: #1c75bc;
+	color: #616161;
 }
 
 QComboBox QListView {
-color: #aaa;
-background: #555;
-padding: 3px;
+	background-color: #555;
+	color: #aaa;
 }
 
-QComboBox QAbstractItemView::item { margin:4px; }
-
 QComboBox::item {
-color: #aaa;
+	color: #aaa;
 }
 
 QComboBox::item:alternate {
-background:#444;
+	background: #444;
 }
 
 QComboBox::item:selected {
-border:0px solid transparent;
-background: #666;
-color: #ccc;
+	background: #666;
+	color: #ccc;
 }
 
-QComboBox::indicator {
-background-color:transparent;
-selection-background-color:transparent;
-color:transparent;
-selection-color:transparent;
-}
+/******************************************************
+QAbstractSpinBox
+******************************************************/
 
-QAbstractSpinBox {
-border: 1px solid #1c75bc;
-padding: 0px 5px 0px 5px;
-background: #333;
-min-height:31px;
-color: #aaa;
-}
-
-QAbstractSpinBox::up-button {
-subcontrol-origin: border;
-subcontrol-position: top right;
-width:21px;
-background: #333;
-border-left:0px;
-border-right: 1px solid #1c75bc;
-border-top: 1px solid #1c75bc;
-border-bottom:0px;
-padding-right:1px;
-padding-left:5px;
-padding-top:2px;
-}
-
+QAbstractSpinBox,
+QAbstractSpinBox::up-button,
 QAbstractSpinBox::down-button {
-subcontrol-origin: border;
-subcontrol-position: bottom right;
-width:21px;
-background: #333;
-border-top:0px;
-border-left:0px;
-border-right: 1px solid #1c75bc;
-border-bottom: 1px solid #1c75bc;
-padding-right:1px;
-padding-left:5px;
-padding-bottom:2px;
+	background: #333;
+	border-color: #1c75bc;
+	color: #aaa;
 }
 
-/*******************************************************/
-
-QHeaderView { /* Table Header */
-background-color:transparent;
-}
+/******************************************************
+QHeaderView
+******************************************************/
 
 QHeaderView::section { /* Table Header Sections */
-qproperty-alignment:center;
-background-color: #1c75bc;
-color: #ccc;
-min-height:25px;
-font-weight:bold;
-font-size:11px;
-outline:0;
-border: 0px solid #ccc;
-border-right: 1px solid #ccc;
-padding-left:5px;
-padding-right:5px;
-padding-top:2px;
-padding-bottom:2px;
+	background-color: #1c75bc;
+	border-color: #ccc;
+	color: #ccc;
 }
 
-QHeaderView::section:last {
-border-right: 0px solid #333;
-}
-
-.QScrollArea {
-background:transparent;
-border:0px;
-}
+/******************************************************
+QTableView
+******************************************************/
 
 .QTableView { /* Table - has to be selected as a class otherwise it throws off QCalendarWidget */
-border: 0px solid #444;
-background-color: #333;
+	background-color: #333;
 }
 
 QTableView::item { /* Table Item */
-background-color: #333;
-/*color: #aaa;*/ /* Do not do this!!! This breaks tx format from transactiontablemodel.cpp, apply to individual tables instead */
-font-size:12px;
+	background-color: #333;
 }
 
 QTableView::item:selected { /* Table Item Selected */
-background-color: #555;
-color: #ccc;
+	background-color: #555;
+	color: #ccc;
 }
 
-.QTableWidget {
-border: 0px solid #444;
-background-color: #333;
-}
+/******************************************************
+QScrollArea
+******************************************************/
+
+/***** No light.css specific coloring here yet *****/
+
+/******************************************************
+QScrollBar
+******************************************************/
 
 /* Do NOT apply any styles to QScrollBar here,
- * it's OS dependent and should be handled via platform specific code.
+* it's OS dependent and should be handled via platform specific code.
 */
 
-/*******************************************************/
+/******************************************************
+QTableWidget
+******************************************************/
+
+.QTableWidget {
+	background-color: #333;
+}
+
+/******************************************************
+QTabWidget
+******************************************************/
 
 .QTabWidget {
-border-bottom: 1px solid #444;
+	border-color: #444;
 }
 
 .QTabWidget::pane {
-border: 1px solid #333;
-background-color: #444;
+	background-color: #444;
+	border-color: #333;
 }
 
 .QTabWidget QTabBar::tab {
-background-color: #ccc;
-color: #444;
-padding-left:10px;
-padding-right:10px;
-padding-top:5px;
-padding-bottom:5px;
-border-top: 1px solid #333;
+	background-color: #ccc;
+	border-color: #333;
+	color: #444;
 }
 
-.QTabWidget QTabBar::tab:first {
-border-left: 1px solid #333;
-}
-
+.QTabWidget QTabBar::tab:first,
 .QTabWidget QTabBar::tab:last {
-border-right: 1px solid #333;
+	border-color: #333;
 }
 
-.QTabWidget QTabBar::tab:selected{
-background-color: #444;
-color: #ccc;
-}
-
-.QTabWidget QTabBar::tab:hover {
-background-color: #555;
-color: #ccc;
+.QTabWidget QTabBar::tab:selected, .QTabWidget QTabBar::tab:hover {
+	background-color: #555;
+	color: #ccc;
 }
 
 .QTabWidget .QWidget {
-color: #444;
+	color: #444;
 }
 
-.QTabWidget .QWidget QAbstractSpinBox {
+/******************************************************
+QPushButton - Special case, light buttons
+******************************************************/
+
+QWidget#AddressBookPage QPushButton#newAddress:disabled,
+QWidget#AddressBookPage QPushButton#copyAddress:disabled,
+QWidget#AddressBookPage QPushButton#showAddressQRCode:disabled,
+QWidget#AddressBookPage QPushButton#deleteAddress:disabled,
+QDialog#OpenURIDialog QPushButton#selectFileButton:disabled,
+QDialog#SendCoinsDialog .QPushButton#addButton:disabled,
+QDialog#SendCoinsDialog .QPushButton#clearButton:disabled,
+QWidget#ReceiveCoinsDialog .QFrame#frame QPushButton#removeRequestButton:disabled,
+QWidget#ReceiveCoinsDialog .QFrame#frame2 QPushButton#clearButton:disabled,
+QWidget#ReceiveCoinsDialog .QFrame#frame QPushButton#showRequestButton:disabled,
+QDialog#SignVerifyMessageDialog QPushButton#clearButton_SM:disabled,
+QDialog#SignVerifyMessageDialog QPushButton#clearButton_VM:disabled {
+    background-color: #666;
+    border:1px solid #585858;
+	color: #787878;
 }
 
-.QTabWidget .QWidget QAbstractSpinBox::down-button {
-}
-
-.QTabWidget .QWidget QAbstractSpinBox::up-button {
-}
-
-.QTabWidget .QWidget QComboBox {
-}
-
-/* DIALOG BOXES */
+/******************************************************
+QProgressDialog
+******************************************************/
 
 .QProgressDialog {
-background-color: #444;
-color: #ccc;
+	background-color: #444;
+	color: #ccc;
 }
 
-QDialog QWidget { /* Remove Annoying Focus Rectangle */
-outline: 0;
-}
-
-/* SHUTDOWN WINDOW */
+/******************************************************
+ShutdownWindow
+******************************************************/
 
 QWidget#ShutdownWindow {
-background-color: #444;
+	background-color: #444;
 }
 
 /******************************************************
