@@ -372,6 +372,16 @@ QDialog#AboutDialog QLabel#label_2 { /* Margin for About Dash text */
 }
 
 /******************************************************
+AskPassphraseDialog
+******************************************************/
+
+QDialog#AskPassphraseDialog QLabel#passLabel1, QDialog#AskPassphraseDialog QLabel#passLabel2, QDialog#AskPassphraseDialog QLabel#passLabel3 {
+    qproperty-alignment: 'AlignVCenter | AlignRight';
+    min-width:170px;
+    min-height:33px; /* base width of 25px for QLineEdit, plus padding and border */
+}
+
+/******************************************************
 CoinControlDialog
 ******************************************************/
 

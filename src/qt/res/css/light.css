@@ -531,17 +531,12 @@ QWidget#AddressBookPage QHeaderView::section { /* Min width for Windows fix */
 min-width:260px;
 }
 
-/* SETTINGS MENU */
+/******************************************************
+AskPassphraseDialog
+******************************************************/
 
-/* Encrypt Wallet and Change Passphrase Dialog */
 QDialog#AskPassphraseDialog {
-background-color:#F8F6F6;
-}
-
-QDialog#AskPassphraseDialog QLabel#passLabel1, QDialog#AskPassphraseDialog QLabel#passLabel2, QDialog#AskPassphraseDialog QLabel#passLabel3 {
-qproperty-alignment: 'AlignVCenter | AlignRight';
-min-width:170px;
-min-height:33px; /* base width of 25px for QLineEdit, plus padding and border */
+	background-color: #F8F6F6;
 }
 
 /******************************************************
