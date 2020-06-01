@@ -115,9 +115,9 @@ QScrollBar:right-arrow:disabled {
 }
 
 QDialog#HelpMessageDialog QScrollBar:vertical, QDialog#HelpMessageDialog QScrollBar:horizontal {
-   border:0;
+    border:0;
 }
 
 .QTableView { /* Table - has to be selected as a class otherwise it throws off QCalendarWidget */
-   background:transparent;
+    background:transparent;
 }

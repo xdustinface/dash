@@ -1,9 +1,9 @@
 /**
-    Copyright (c) 2020 The Dash Core developers
-    Distributed under the MIT/X11 software license, see the accompanying
-    file COPYING or http://www.opensource.org/licenses/mit-license.php.
+Copyright (c) 2020 The Dash Core developers
+Distributed under the MIT/X11 software license, see the accompanying
+file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-    This file contains style changes used by both dash themes:  "Light" and "Dark"
+This file contains style changes used by both dash themes:  "Light" and "Dark"
 **/
 
 
@@ -13,18 +13,18 @@ Common stuff
 
 WalletFrame,
 QDialog {
-	border:0px;
-	margin:0;
-	padding-top:20px;
-	padding-bottom: 20px;
+    border:0px;
+    margin:0;
+    padding-top:20px;
+    padding-bottom: 20px;
 }
 
 QStatusBar {
 }
 
 .QFrame {
-	background-color:transparent;
-	border:0px;
+    background-color:transparent;
+    border:0px;
 }
 
 QMessageBox {
@@ -35,7 +35,7 @@ QLabel,
 QListView,
 QRadioButton,
 QTreeWidget { /* Base Text Size & Color */
-	font-size:12px;
+    font-size:12px;
 }
 
 /******************************************************
@@ -43,9 +43,9 @@ QAbstractSpinBox
 ******************************************************/
 
 QAbstractSpinBox {
-	border:1px solid red;
-	padding: 0px 5px 0px 5px;
-	min-height:31px;
+    border:1px solid red;
+    padding: 0px 5px 0px 5px;
+    min-height:31px;
 }
 
 QAbstractSpinBox::up-button {
@@ -119,25 +119,25 @@ QComboBox
 ******************************************************/
 
 QComboBox { /* Dropdown Menus */
-	border:1px solid red;
-	padding: 0px 5px 0px 5px;
-	min-height:31px;
+    border:1px solid red;
+    padding: 0px 5px 0px 5px;
+    min-height:31px;
 }
 
 QComboBox:checked {
 }
 
 QComboBox:editable {
-	border:0px solid transparent;
+    border:0px solid transparent;
 }
 
 QComboBox::drop-down {
-	width:25px;
-	border:0px;
+    width:25px;
+    border:0px;
 }
 
 QComboBox QListView {
-	padding: 3px;
+    padding: 3px;
 }
 
 QComboBox QAbstractItemView::item {
@@ -151,14 +151,14 @@ QComboBox::item:alternate {
 }
 
 QComboBox::item:selected {
-	border:0px solid transparent;
+    border:0px solid transparent;
 }
 
 QComboBox::indicator {
-	background-color:transparent;
-	selection-background-color:transparent;
-	color:transparent;
-	selection-color:transparent;
+    background-color:transparent;
+    selection-background-color:transparent;
+    color:transparent;
+    selection-color:transparent;
 }
 
 QComboBox::down-arrow {
@@ -301,24 +301,24 @@ QHeaderView
 ******************************************************/
 
 QHeaderView { /* Table Header */
-	background-color:transparent;
+    background-color:transparent;
 }
 
 QHeaderView::section { /* Table Header Sections */
-	qproperty-alignment:center;
-	min-height:25px;
-	font-weight:bold;
-	font-size:11px;
-	outline:0;
+    qproperty-alignment:center;
+    min-height:25px;
+    font-weight:bold;
+    font-size:11px;
+    outline:0;
     border: 0px solid;
     border-right: 1px solid;
-	padding-left:5px;
-	padding-right:5px;
-	padding-top:2px;
-	padding-bottom:2px;
+    padding-left:5px;
+    padding-right:5px;
+    padding-top:2px;
+    padding-bottom:2px;
 }
 QHeaderView::section:last {
-	border-right: 0px;
+    border-right: 0px;
 }
 
 QHeaderView::down-arrow {
@@ -359,15 +359,15 @@ QHeaderView::up-arrow:hover {
 QLineEdit / QValidatedLineEdit / QPlainTextEdit
 ******************************************************/
 .QValidatedLineEdit, .QLineEdit, QPlainTextEdit { /* Text Entry Fields */
-	border: 1px solid;
-	font-size:11px;
-	min-height:31px;
-	outline:0;
-	padding: 0px 3px 0px 3px;
+    border: 1px solid;
+    font-size:11px;
+    min-height:31px;
+    outline:0;
+    padding: 0px 3px 0px 3px;
 }
 
 .QLineEdit:!focus {
-	font-size:12px;
+    font-size:12px;
 }
 
 .QValidatedLineEdit:disabled, .QLineEdit:disabled {
@@ -489,8 +489,8 @@ QScrollArea
 ******************************************************/
 
 .QScrollArea {
-	background:transparent;
-	border:0px;
+    background:transparent;
+    border:0px;
 }
 
 /******************************************************
@@ -506,11 +506,11 @@ QTableView
 ******************************************************/
 
 .QTableView { /* Table - has to be selected as a class otherwise it throws off QCalendarWidget */
-	border:0px;
+    border:0px;
 }
 
 QTableView::item { /* Table Item */
-	font-size:12px;
+    font-size:12px;
 }
 
 QTableView::item:selected { /* Table Item Selected */
@@ -521,7 +521,7 @@ QTableWidget
 ******************************************************/
 
 .QTableWidget {
-	border: 0px;
+    border: 0px;
 }
 
 /******************************************************
@@ -529,27 +529,27 @@ QTabWidget
 ******************************************************/
 
 .QTabWidget {
-	border-bottom:1px solid;
+    border-bottom:1px solid;
 }
 
 .QTabWidget::pane {
-	border: 1px solid;
+    border: 1px solid;
 }
 
 .QTabWidget QTabBar::tab {
-	padding-left:10px;
-	padding-right:10px;
-	padding-top:5px;
-	padding-bottom:5px;
-	border-top: 1px solid;
+    padding-left:10px;
+    padding-right:10px;
+    padding-top:5px;
+    padding-bottom:5px;
+    border-top: 1px solid;
 }
 
 .QTabWidget QTabBar::tab:first {
-	border-left: 1px solid;
+    border-left: 1px solid;
 }
 
 .QTabWidget QTabBar::tab:last {
-	border-right: 1px solid;
+    border-right: 1px solid;
 }
 
 .QTabWidget QTabBar::tab:selected, .QTabWidget QTabBar::tab:hover {
@@ -563,7 +563,7 @@ QTextEdit
 ******************************************************/
 
 QTextEdit {
-	border:1px solid red;
+    border:1px solid red;
 }
 
 /******************************************************
@@ -676,7 +676,7 @@ QWidget
 ******************************************************/
 
 QWidget { /* Remove Annoying Focus Rectangle */
-	outline: 0;
+    outline: 0;
 }
 
 /******************************************************
@@ -796,7 +796,7 @@ QDialog#CoinControlDialog .QFrame#frame .QPushButton#pushButtonToggleLock { /* T
 QDialog#CoinControlDialog .QDialogButtonBox#buttonBox QPushButton { /* Coin Control 'OK' button */
 }
 
-QDialog#CoinControlDialog QHeaderView::section:first { /* Bug Fix: the number "1" displays in this table for some reason... */
+QDialog#CoinControlDialog QHeaderView::section:first { /* Bug Fix: the number 1 displays in this table for some reason... */
     color:transparent;
 }
 
@@ -828,10 +828,10 @@ QDialog#EditAddressDialog {
 }
 
 QDialog#EditAddressDialog QLabel {
-qproperty-alignment: 'AlignVCenter | AlignRight';
-min-height:27px;
-font-weight:normal;
-padding-right:5px;
+    qproperty-alignment: 'AlignVCenter | AlignRight';
+    min-height:27px;
+    font-weight:normal;
+    padding-right:5px;
 }
 
 /******************************************************
@@ -861,7 +861,7 @@ MasternodeList QLabel#countLabelDIP3 {
 ModalOverlay
 ******************************************************/
 
-QWidget#bgWidget { /* The 'frame' overlaying the overview-page */
+QWidget#bgWidget { /* The frame overlaying the overview-page */
     padding-left:10px;
     padding-right:10px;
 }
