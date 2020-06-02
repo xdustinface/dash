@@ -22,19 +22,26 @@ QScrollBar::handle:horizontal { /* Scroll Bar Slider - horizontal */
     min-width:10px;
 }
 
-QScrollBar::add-page, QScrollBar::sub-page { /* Scroll Bar Background */
-    background:#F8F6F6;
+QScrollBar::add-page,
+QScrollBar::sub-page { /* Scroll Bar Background */
+    background-color: #F8F6F6;
 }
 
-QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical, QScrollBar::add-line:horizontal, QScrollBar::sub-line:horizontal { /* Define Arrow Button Dimensions */
-    background-color:#F8F6F6;
+QScrollBar::add-line:vertical,
+QScrollBar::sub-line:vertical,
+QScrollBar::add-line:horizontal,
+QScrollBar::sub-line:horizontal { /* Define Arrow Button Dimensions */
+    background-color: #F8F6F6;
     border: 1px solid #f2f0f0;
     width:16px;
     height:16px;
 }
 
-QScrollBar::add-line:vertical:pressed, QScrollBar::sub-line:vertical:pressed, QScrollBar::add-line:horizontal:pressed, QScrollBar::sub-line:horizontal:pressed {
-    background-color:#e0e0e0;
+QScrollBar::add-line:vertical:pressed,
+QScrollBar::sub-line:vertical:pressed,
+QScrollBar::add-line:horizontal:pressed,
+QScrollBar::sub-line:horizontal:pressed {
+    background-color: #e0e0e0;
 }
 
 QScrollBar::sub-line:vertical { /* Vertical - top button position */
@@ -57,9 +64,12 @@ QScrollBar::add-line:horizontal { /* Vertical - right button position */
     subcontrol-origin: margin;
 }
 
-QScrollBar:up-arrow, QScrollBar:down-arrow, QScrollBar:left-arrow, QScrollBar:right-arrow { /* Arrows Icon */
-    width:18px;
-    height:18px;
+QScrollBar:up-arrow,
+QScrollBar:down-arrow,
+QScrollBar:left-arrow,
+QScrollBar:right-arrow { /* Arrows Icon */
+    width: 18px;
+    height: 18px;
 }
 
 QScrollBar:up-arrow {
@@ -114,10 +124,7 @@ QScrollBar:right-arrow:disabled {
     border-image: url(':/images/arrow_light_right_hover');
 }
 
-QDialog#HelpMessageDialog QScrollBar:vertical, QDialog#HelpMessageDialog QScrollBar:horizontal {
-    border:0;
-}
-
-.QTableView { /* Table - has to be selected as a class otherwise it throws off QCalendarWidget */
-    background:transparent;
+QDialog#HelpMessageDialog QScrollBar:vertical,
+QDialog#HelpMessageDialog QScrollBar:horizontal {
+    border: 0;
 }

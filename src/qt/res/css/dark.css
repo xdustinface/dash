@@ -77,13 +77,16 @@ QTextEdit {
 QLineEdit / QValidatedLineEdit / QPlainTextEdit
 ******************************************************/
 
-.QValidatedLineEdit, .QLineEdit, QPlainTextEdit { /* Text Entry Fields */
+.QValidatedLineEdit,
+.QLineEdit,
+QPlainTextEdit { /* Text Entry Fields */
     background-color:#333;
     border-color: #1c75bc;
     color: #aaa;
 }
 
-.QValidatedLineEdit:disabled, .QLineEdit:disabled {
+.QValidatedLineEdit:disabled,
+.QLineEdit:disabled {
     background-color: #3e3e3e;
 }
 
@@ -209,7 +212,8 @@ QTabWidget
     border-color: #333;
 }
 
-.QTabWidget QTabBar::tab:selected, .QTabWidget QTabBar::tab:hover {
+.QTabWidget QTabBar::tab:selected,
+.QTabWidget QTabBar::tab:hover {
     background-color: #555;
     color: #ccc;
 }

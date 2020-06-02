@@ -358,7 +358,9 @@ QHeaderView::up-arrow:hover {
 /******************************************************
 QLineEdit / QValidatedLineEdit / QPlainTextEdit
 ******************************************************/
-.QValidatedLineEdit, .QLineEdit, QPlainTextEdit { /* Text Entry Fields */
+.QValidatedLineEdit,
+.QLineEdit,
+QPlainTextEdit { /* Text Entry Fields */
     border: 1px solid;
     font-size:11px;
     min-height:31px;
@@ -370,7 +372,8 @@ QLineEdit / QValidatedLineEdit / QPlainTextEdit
     font-size:12px;
 }
 
-.QValidatedLineEdit:disabled, .QLineEdit:disabled {
+.QValidatedLineEdit:disabled,
+.QLineEdit:disabled {
 }
 
 /******************************************************
@@ -552,7 +555,8 @@ QTabWidget
     border-right: 1px solid;
 }
 
-.QTabWidget QTabBar::tab:selected, .QTabWidget QTabBar::tab:hover {
+.QTabWidget QTabBar::tab:selected,
+.QTabWidget QTabBar::tab:hover {
 }
 
 .QTabWidget .QWidget {
@@ -692,7 +696,9 @@ not only Qt standard elements
 AboutDialog
 ******************************************************/
 
-QDialog#AboutDialog QLabel#label, QDialog#AboutDialog QLabel#copyrightLabel, QDialog#AboutDialog QLabel#label_2 { /* About Dash Contents */
+QDialog#AboutDialog QLabel#label,
+QDialog#AboutDialog QLabel#copyrightLabel,
+QDialog#AboutDialog QLabel#label_2 { /* About Dash Contents */
     margin-left:10px;
 }
 
@@ -722,7 +728,9 @@ QWidget#AddressBookPage QHeaderView::section { /* Min width for Windows fix */
 AskPassphraseDialog
 ******************************************************/
 
-QDialog#AskPassphraseDialog QLabel#passLabel1, QDialog#AskPassphraseDialog QLabel#passLabel2, QDialog#AskPassphraseDialog QLabel#passLabel3 {
+QDialog#AskPassphraseDialog QLabel#passLabel1,
+QDialog#AskPassphraseDialog QLabel#passLabel2,
+QDialog#AskPassphraseDialog QLabel#passLabel3 {
     qproperty-alignment: 'AlignVCenter | AlignRight';
     min-width:170px;
     min-height:33px; /* base width of 25px for QLineEdit, plus padding and border */
@@ -1029,10 +1037,13 @@ OptionsDialog
 QDialog#OptionsDialog {
 }
 
-QDialog#OptionsDialog QValueComboBox, QDialog#OptionsDialog QSpinBox {
+QDialog#OptionsDialog QValueComboBox,
+QDialog#OptionsDialog QSpinBox {
 }
 
-QDialog#OptionsDialog QValidatedLineEdit, QDialog#OptionsDialog QValidatedLineEdit:disabled, QDialog#OptionsDialog QLineEdit, QDialog#OptionsDialog QLineEdit:disabled {
+QDialog#OptionsDialog QValidatedLineEdit,
+QDialog#OptionsDialog QValidatedLineEdit:disabled,
+QDialog#OptionsDialog QLineEdit, QDialog#OptionsDialog QLineEdit:disabled {
     qproperty-alignment: 'AlignVCenter | AlignLeft';
 }
 
@@ -1259,7 +1270,8 @@ RPCConsole
 QWidget#RPCConsole { /* RPC Console Dialog Box */
 }
 
-QWidget#RPCConsole QWidget#tab_info QLabel#label_11, QWidget#RPCConsole QWidget#tab_info QLabel#label_10 { /* Margin between Network and Block Chain headers */
+QWidget#RPCConsole QWidget#tab_info QLabel#label_11,
+QWidget#RPCConsole QWidget#tab_info QLabel#label_10 { /* Margin between Network and Block Chain headers */
     qproperty-alignment: 'AlignBottom';
     min-height:25px;
     min-width:180px;
@@ -1281,7 +1293,9 @@ QWidget#RPCConsole QTextEdit#messagesWidget { /* Console Messages Window */
 QWidget#RPCConsole QLineEdit#lineEdit { /* Console Input */
 }
 
-QWidget#RPCConsole QPushButton#clearButton, QWidget#RPCConsole QPushButton#fontSmallerButton, QWidget#RPCConsole QPushButton#fontBiggerButton { /* Console Font and Clear Buttons */
+QWidget#RPCConsole QPushButton#clearButton,
+QWidget#RPCConsole QPushButton#fontSmallerButton,
+QWidget#RPCConsole QPushButton#fontBiggerButton { /* Console Font and Clear Buttons */
     background-color:transparent;
     padding-left:10px;
     padding-right:10px;
