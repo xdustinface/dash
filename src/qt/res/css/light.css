@@ -4,15 +4,15 @@ Common stuff
 
 WalletFrame,
 QDialog {
-    background-color: #fff;
+    background-color: #f6f6f6;
 }
 
 QStatusBar {
-    background-color:#ffffff;
+    background-color: #ffffff;
 }
 
 QMessageBox {
-    background-color:#F8F6F6;
+    background-color: #f6f6f6;
 }
 
 QWidget { /* override text selection background color for all text widgets */
@@ -23,98 +23,8 @@ QCheckBox,
 QLabel,
 QListView,
 QRadioButton,
-QTreeWidget { /* Base Text Size & Color */
-    color:#333333;
-}
-
-/******************************************************
-QMenu
-******************************************************/
-
-QMenu {
-    background-color:#f8f6f6;
-}
-
-QMenu::item {
-    color:#333;
-}
-
-QMenu::item:selected {
-    background-color: #ffffff;
-    color: #008de4;
-}
-
-/******************************************************
-QToolBar / QToolButton
-******************************************************/
-
-/***** No light.css specific coloring here yet *****/
-
-/******************************************************
-QMenuBar
-******************************************************/
-
-QMenuBar {
-    background-color:#fff;
-}
-
-/******************************************************
-QTextEdit
-******************************************************/
-
-QTextEdit {
-    border-color: #d7d7d7;
-}
-
-/******************************************************
-QLineEdit / QValidatedLineEdit / QPlainTextEdit
-******************************************************/
-
-.QValidatedLineEdit,
-.QLineEdit,
-QPlainTextEdit { /* Text Entry Fields */
-    background-color:#fcfcfc;
-    border-color: #82C3E6;
-}
-
-.QValidatedLineEdit:disabled,
-.QLineEdit:disabled {
-    background-color:#f2f2f2;
-}
-
-/******************************************************
-QComboBox
-******************************************************/
-
-QComboBox { /* Dropdown Menus */
-    background:#fcfcfc;
-    border-color: #82C3E6;
-    color:#818181;
-}
-
-QComboBox:checked {
-    background:#f2f2f2;
-}
-
-QComboBox:editable {
-    background: #1c75bc;
-    color:#616161;
-}
-
-QComboBox QListView {
-    background:#fff;
-}
-
-QComboBox::item {
-    color:#818181;
-}
-
-QComboBox::item:alternate {
-    background:#fff;
-}
-
-QComboBox::item:selected {
-    background:#f2f2f2;
+QTreeWidget {
+    color: #333333;
 }
 
 /******************************************************
@@ -124,9 +34,44 @@ QAbstractSpinBox
 QAbstractSpinBox,
 QAbstractSpinBox::up-button,
 QAbstractSpinBox::down-button {
-    background:#fcfcfc;
+    background-color: #fcfcfc;
     border-color: #82C3E6;
-    color:#818181;
+    color: #818181;
+}
+
+/******************************************************
+QComboBox
+******************************************************/
+
+QComboBox { /* Dropdown Menus */
+    background-color: #fcfcfc;
+    border-color: #82C3E6;
+    color: #818181;
+}
+
+QComboBox:checked {
+    background-color: #f2f2f2;
+}
+
+QComboBox:editable {
+    background-color: #1c75bc;
+    color: #616161;
+}
+
+QComboBox QListView {
+    background-color: #fff;
+}
+
+QComboBox::item {
+    color: #818181;
+}
+
+QComboBox::item:alternate {
+    background-color: #fff;
+}
+
+QComboBox::item:selected {
+    background-color: #f2f2f2;
 }
 
 /******************************************************
@@ -136,74 +81,56 @@ QHeaderView
 QHeaderView::section { /* Table Header Sections */
     background-color: #008de4;
     border-color: #fff;
-    color:#fff;
+    color: #fff;
 }
 
 /******************************************************
-QTableView
+QLineEdit / QValidatedLineEdit / QPlainTextEdit
 ******************************************************/
 
-QTableView::item { /* Table Item */
-    background-color:#fcfcfc;
+.QValidatedLineEdit,
+.QLineEdit,
+QPlainTextEdit { /* Text Entry Fields */
+    background-color: #fcfcfc;
+    border-color: #82C3E6;
 }
 
-QTableView::item:selected { /* Table Item Selected */
-    background-color:#f0f0f0;
-    color:#333;
+.QValidatedLineEdit:disabled,
+.QLineEdit:disabled {
+    background-color: #f2f2f2;
 }
 
 /******************************************************
-QScrollArea
+QMenu
 ******************************************************/
 
-/***** No light.css specific coloring here yet *****/
+QMenu {
+    background-color: #f6f6f6;
+}
+
+QMenu::item {
+    color: #333;
+}
+
+QMenu::item:selected {
+    background-color: #ffffff;
+    color: #008de4;
+}
 
 /******************************************************
-QScrollBar
+QMenuBar
 ******************************************************/
 
-/* Do NOT apply any styles to QScrollBar here,
-* it's OS dependent and should be handled via platform specific code.
-*/
+QMenuBar {
+    background-color: #fff;
+}
 
 /******************************************************
-QTableWidget
+QProgressDialog
 ******************************************************/
 
-/***** No light.css specific coloring here yet *****/
-
-/******************************************************
-QTabWidget
-******************************************************/
-
-.QTabWidget {
-    border-color: #333;
-}
-
-.QTabWidget::pane {
-    background-color:#fff;
-    border-color: #d7d7d7;
-}
-
-.QTabWidget QTabBar::tab {
-    background-color:#f2f0f0;
-    border-color: #d7d7d7;
-    color:#333;
-}
-
-.QTabWidget QTabBar::tab:first,
-.QTabWidget QTabBar::tab:last {
-    border-color: #d7d7d7;
-}
-
-.QTabWidget QTabBar::tab:selected,
-.QTabWidget QTabBar::tab:hover {
-    background-color:#ffffff;
-    color:#333;
-}
-
-.QTabWidget .QWidget {
-    color:#333;
+.QProgressDialog {
+    background-color: #f6f6f6;
 }
 
 /******************************************************
@@ -223,81 +150,126 @@ QWidget#ReceiveCoinsDialog .QFrame#frame QPushButton#showRequestButton:disabled,
 QDialog#SignVerifyMessageDialog QPushButton#clearButton_SM:disabled,
 QDialog#SignVerifyMessageDialog QPushButton#clearButton_VM:disabled {
     background-color: #e2e2e2;
-    border:1px solid #d2d2d2;
+    border-color: #d2d2d2;
     color: #d2d2d2;
 }
 
 /******************************************************
-QProgressDialog
+QRadioButton
 ******************************************************/
 
-.QProgressDialog {
-    background-color: #F8F6F6;
+/***** No light.css specific coloring here yet *****/
+
+/******************************************************
+QScrollArea
+******************************************************/
+
+/***** No light.css specific coloring here yet *****/
+
+/******************************************************
+QScrollBar
+******************************************************/
+
+/* Do NOT apply any styles to QScrollBar here,
+* it's OS dependent and should be handled via platform specific code.
+*/
+
+/******************************************************
+QTableView
+******************************************************/
+
+.QTableView { /* Table - has to be selected as a class otherwise it throws off QCalendarWidget */
+    background-color: #fff;
+}
+
+QTableView::item { /* Table Item */
+    background-color: #fcfcfc;
+}
+
+QTableView::item:selected { /* Table Item Selected */
+    background-color: #f0f0f0;
+    color: #333;
 }
 
 /******************************************************
-ShutdownWindow
+QTableWidget
 ******************************************************/
 
-QWidget#ShutdownWindow {
-    background-color: #F8F6F6;
+QTableWidget {
+    background-color: #fff;
 }
 
 /******************************************************
-OpenURIDialog
+QTabWidget
 ******************************************************/
 
-QDialog#OpenURIDialog {
-    background-color:#F8F6F6;
+.QTabWidget {
+    border-color: #333;
+}
+
+.QTabWidget::pane {
+    background-color: #fff;
+    border-color: #d7d7d7;
+}
+
+.QTabWidget QTabBar::tab {
+    background-color: #f2f0f0;
+    border-color: #d7d7d7;
+    color: #333;
+}
+
+.QTabWidget QTabBar::tab:first,
+.QTabWidget QTabBar::tab:last {
+    border-color: #d7d7d7;
+}
+
+.QTabWidget QTabBar::tab:selected,
+.QTabWidget QTabBar::tab:hover {
+    background-color: #ffffff;
+    color: #333;
+}
+
+.QTabWidget .QWidget {
+    color: #333;
 }
 
 /******************************************************
-SignVerifyMessageDialog
+QTextEdit
 ******************************************************/
 
-QDialog#SignVerifyMessageDialog {
-    background-color:#F8F6F6;
+QTextEdit {
+    border-color: #d7d7d7;
 }
 
 /******************************************************
-AddressBookPage
+QToolBar / QToolButton
 ******************************************************/
 
-QWidget#AddressBookPage {
-    background-color:#F8F6F6;
+/***** No light.css specific coloring here yet *****/
+
+/******************************************************
+QTreeWidget
+******************************************************/
+
+QTreeWidget {
+    background-color: #fff;
 }
 
 /******************************************************
-AskPassphraseDialog
+QWidget
 ******************************************************/
 
-QDialog#AskPassphraseDialog {
-    background-color: #F8F6F6;
-}
+/***** No light.css specific coloring here yet *****/
+
 
 /******************************************************
-OptionsDialog
+*******************************************************
+STYLING OF SPECIFIC CUSTOM UI PARTS
+
+Below each section should be for a specific UI class/file
+not only Qt standard elements
+*******************************************************
 ******************************************************/
-
-QDialog#OptionsDialog {
-    background-color:#F8F6F6;
-}
-
-/******************************************************
-RPCConsole
-******************************************************/
-
-QWidget#RPCConsole { /* RPC Console Dialog Box */
-    background-color:#F8F6F6;
-}
-
-/******************************************************
-HelpMessageDialog
-******************************************************/
-
-QDialog#HelpMessageDialog QScrollArea * {
-    background-color:#ffffff;
-}
 
 /******************************************************
 AboutDialog
@@ -306,10 +278,93 @@ AboutDialog
 /***** No light.css specific coloring here yet *****/
 
 /******************************************************
+AddressBookPage
+******************************************************/
+
+QWidget#AddressBookPage {
+    background-color: #f6f6f6;
+}
+
+/******************************************************
+AskPassphraseDialog
+******************************************************/
+
+QDialog#AskPassphraseDialog {
+    background-color: #f6f6f6;
+}
+
+/******************************************************
+CoinControlDialog
+******************************************************/
+
+QDialog#CoinControlDialog .CoinControlTreeWidget#treeWidget::item:selected { /* Coin Control Item (selected) */
+    background-color: #f7f7f7;
+    color: #333;
+}
+
+QDialog#CoinControlDialog .CoinControlTreeWidget#treeWidget::item:checked { /* Coin Control Item (checked) */
+    background-color: #f7f7f7;
+    color: #333;
+}
+
+QDialog#CoinControlDialog .CoinControlTreeWidget#treeWidget::branch:selected { /* Coin Control Branch Icon */
+    background-color: #f7f7f7;
+    color: #333;
+}
+
+QDialog#CoinControlDialog .CoinControlTreeWidget#treeWidget::branch:checked { /* Coin Control Branch Icon */
+    background-color: #f7f7f7;
+    color: #333;
+}
+
+/******************************************************
 EditAddressDialog
 ******************************************************/
 
 /***** No light.css specific coloring here yet *****/
+
+/******************************************************
+HelpMessageDialog
+******************************************************/
+
+QDialog#HelpMessageDialog QScrollArea * {
+    background-color: #ffffff;
+}
+
+/******************************************************
+MasternodeList
+******************************************************/
+
+/***** No light.css specific coloring here yet *****/
+
+/******************************************************
+ModalOverlay
+******************************************************/
+
+QWidget#bgWidget { /* The frame overlaying the overview-page */
+    background-color: #ccfafafa;
+}
+
+QWidget#contentWidget { /* The actual content with the text/buttons/etc... */
+    background-color: #fff;
+    border-color: #ccc;
+}
+
+/******************************************************
+OpenURIDialog
+******************************************************/
+
+QDialog#OpenURIDialog {
+    background-color: #f6f6f6;
+}
+
+/******************************************************
+OptionsDialog
+******************************************************/
+
+QDialog#OptionsDialog {
+    background-color: #f6f6f6;
+}
 
 /******************************************************
 OverviewPage Balances
@@ -330,17 +385,17 @@ OverviewPage RecentTransactions
 /***** No light.css specific coloring here yet *****/
 
 /******************************************************
-ModalOverlay
+ReceiveCoinsDialog
 ******************************************************/
 
-QWidget#bgWidget { /* The frame overlaying the overview-page */
-    background:rgba(250, 250, 250, 0.8);
-}
+/***** No light.css specific coloring here yet *****/
 
-QWidget#contentWidget { /* The actual content with the text/buttons/etc... */
-    background-color: #fff;
-    border: 1px solid #ccc;
-    border-radius: 10px;
+/******************************************************
+RPCConsole
+******************************************************/
+
+QWidget#RPCConsole { /* RPC Console Dialog Box */
+    background-color: #f6f6f6;
 }
 
 /******************************************************
@@ -348,14 +403,7 @@ SendCoinsDialog
 ******************************************************/
 
 QDialog#SendCoinsDialog QLabel#labelBalance {
-    margin-left:0px;
-    padding-left:0px;
-    color:#333333;
-    /* font-weight:bold;
-    border-radius:5px;
-    padding-top:20px;
-    padding-bottom:20px; */
-    min-height:27px;
+    color: #333333;
 }
 
 /******************************************************
@@ -367,43 +415,23 @@ QStackedWidget#SendCoinsEntry .QFrame#SendCoins > .QLabel { /* Send Coin Entry L
 }
 
 /******************************************************
-CoinControlDialog
+SignVerifyMessageDialog
 ******************************************************/
 
-QDialog#CoinControlDialog .CoinControlTreeWidget#treeWidget::item:selected { /* Coin Control Item (selected) */
-    background-color:#f7f7f7;
-    color:#333;
-}
-
-QDialog#CoinControlDialog .CoinControlTreeWidget#treeWidget::item:checked { /* Coin Control Item (checked) */
-    background-color:#f7f7f7;
-    color:#333;
-}
-
-QDialog#CoinControlDialog .CoinControlTreeWidget#treeWidget::branch:selected { /* Coin Control Branch Icon */
-    background-color:#f7f7f7;
-    color:#333;
-}
-
-QDialog#CoinControlDialog .CoinControlTreeWidget#treeWidget::branch:checked { /* Coin Control Branch Icon */
-    background-color:#f7f7f7;
-    color:#333;
+QDialog#SignVerifyMessageDialog {
+    background-color: #f6f6f6;
 }
 
 /******************************************************
-ReceiveCoinsDialog
+ShutdownWindow
 ******************************************************/
 
-/***** No light.css specific coloring here yet *****/
+QWidget#ShutdownWindow {
+    background-color: #f6f6f6;
+}
 
 /******************************************************
 TransactionView
-******************************************************/
-
-/***** No light.css specific coloring here yet *****/
-
-/******************************************************
-MasternodeList
 ******************************************************/
 
 /***** No light.css specific coloring here yet *****/

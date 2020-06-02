@@ -1,40 +1,45 @@
+
+/******************************************************
+QScrollBar
+******************************************************/
+
 QScrollBar:vertical { /* Vertical Scroll Bar Attributes */
-    border:0;
-    background:#ffffff;
-    width:18px;
+    border: 0;
+    background-color: #ffffff;
+    width: 18px;
     margin: 18px 0px 18px 0px;
 }
 
 QScrollBar:horizontal { /* Horizontal Scroll Bar Attributes */
-    border:0;
-    background:#ffffff;
-    height:18px;
+    border: 0;
+    background-color: #ffffff;
+    height: 18px;
     margin: 0px 18px 0px 18px;
 }
 
 QScrollBar::handle:vertical { /* Scroll Bar Slider - vertical */
-    background:#e0e0e0;
-    min-height:10px;
+    background-color: #e0e0e0;
+    min-height: 10px;
 }
 
 QScrollBar::handle:horizontal { /* Scroll Bar Slider - horizontal */
-    background:#e0e0e0;
-    min-width:10px;
+    background-color: #e0e0e0;
+    min-width: 10px;
 }
 
 QScrollBar::add-page,
 QScrollBar::sub-page { /* Scroll Bar Background */
-    background-color: #F8F6F6;
+    background-color: #f6f6f6;
 }
 
 QScrollBar::add-line:vertical,
 QScrollBar::sub-line:vertical,
 QScrollBar::add-line:horizontal,
 QScrollBar::sub-line:horizontal { /* Define Arrow Button Dimensions */
-    background-color: #F8F6F6;
+    background-color: #f6f6f6;
     border: 1px solid #f2f0f0;
-    width:16px;
-    height:16px;
+    width: 16px;
+    height: 16px;
 }
 
 QScrollBar::add-line:vertical:pressed,
@@ -45,22 +50,22 @@ QScrollBar::sub-line:horizontal:pressed {
 }
 
 QScrollBar::sub-line:vertical { /* Vertical - top button position */
-    subcontrol-position:top;
+    subcontrol-position: top;
     subcontrol-origin: margin;
 }
 
 QScrollBar::add-line:vertical { /* Vertical - bottom button position */
-    subcontrol-position:bottom;
+    subcontrol-position: bottom;
     subcontrol-origin: margin;
 }
 
 QScrollBar::sub-line:horizontal { /* Vertical - left button position */
-    subcontrol-position:left;
+    subcontrol-position: left;
     subcontrol-origin: margin;
 }
 
 QScrollBar::add-line:horizontal { /* Vertical - right button position */
-    subcontrol-position:right;
+    subcontrol-position: right;
     subcontrol-origin: margin;
 }
 

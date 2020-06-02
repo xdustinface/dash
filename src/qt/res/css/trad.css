@@ -1,15 +1,25 @@
-/* MODAL OVERLAY */
+/******************************************************
+ModalOverlay
+******************************************************/
 
 QWidget#bgWidget { /* The frame overlaying the overview-page */
-    background: rgba(0,0,0,220);
+    padding-left: 10px;
+    padding-right: 10px;
+    background-color: #fafafacc;
 }
 
 QWidget#contentWidget { /* The actual content with the text/buttons/etc... */
-    background: rgba(255,255,255,240);
+    background-color: #fff;
+    margin: 0;
+    padding-top: 20px;
+    padding-bottom: 20px;
+    border: 1px solid;
     border-radius: 6px;
 }
 
-/* OVERVIEW SCREEN */
+/******************************************************
+OverviewPage
+******************************************************/
 
 QWidget .QFrame#frame .QLabel#labelWalletStatus, /* Wallet Sync Status */
 QWidget .QFrame#framePrivateSend .QLabel#labelPrivateSendSyncStatus, /* PrivateSend Sync Status */
@@ -17,11 +27,13 @@ QWidget .QFrame#frame_2 .QLabel#labelTransactionsStatus { /* Recent Transactions
     color: red;
 }
 
-/* SEND DIALOG */
+/******************************************************
+SendCoinsDialog
+******************************************************/
 
 QDialog#SendCoinsDialog QLabel#labelBalance {
-    margin-left:0px;
-    padding-left:0px;
+    margin-left: 0px;
+    padding-left: 0px;
 }
 
 QDialog#SendCoinsDialog .QFrame#frameCoinControl .QLabel#labelCoinControlInsuffFunds { /* Insufficient Funds Label */
