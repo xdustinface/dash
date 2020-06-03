@@ -16,6 +16,12 @@ general.css may become overwritten by changes in this file.
 Loaded in GUIUtil::loadStyleSheet() in guitil.cpp.
 **/
 
+/* do not modify! section updated by update_colors.py
+<colors>
+
+</colors>
+*/
+
 /******************************************************
 QScrollBar
 ******************************************************/
