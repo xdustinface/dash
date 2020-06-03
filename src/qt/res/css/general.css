@@ -3,9 +3,30 @@ Copyright (c) 2020 The Dash Core developers
 Distributed under the MIT/X11 software license, see the accompanying
 file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-This file contains style changes used by both dash themes:  "Light" and "Dark"
-**/
+---------------------------------------------------------------------
 
+A full theme is a combination of up to three css files. They are all getting
+loaded and combined in `GUIUtil::loadStyleSheet()` in guitil.cpp.
+
+Hierarchy:
+
+*   general.css - base layout: Loaded first if selected theme is not "Traditional" (trad.css)
+*   scrollbars.css - custom scrollbars: Loaded second only for windows/linux if general.css is loaded
+*   <theme.css> - theme css file:  Always loaded and loaded last.
+
+To replace <theme.css> there are currently the following themes available:
+
+*   Dark (dark.css)
+*   Light (light.css)
+*   Traditional (trad.css)
+
+NOTE: This file is only the base layout which is getting
+shared between all full themes (e.g. Dark or Light). It may contain
+color changes as long as they fit into all other themes. If an ui element
+requires theme based coloring the appropriate css element can be picked
+here to overwrite its colors (background-color, border-color, color)
+in the <theme.css> file.
+**/
 
 /******************************************************
 Common stuff

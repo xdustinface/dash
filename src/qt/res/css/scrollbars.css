@@ -1,3 +1,20 @@
+/**
+Copyright (c) 2020 The Dash Core developers
+Distributed under the MIT/X11 software license, see the accompanying
+file COPYING or http://www.opensource.org/licenses/mit-license.php.
+
+---------------------------------------------------------------------
+
+This file contains style to customize the scrollbars. It's only loaded
+for dash themes (dark/light) and also only by windwos and linux,
+not by macOS clients.
+
+NOTE: This file is getting appended to the general.css while its
+getting loaded in GUIUtil::loadStyleSheet(). Thus changes made in
+general.css may become overwritten by changes in this file.
+
+Loaded in GUIUtil::loadStyleSheet() in guitil.cpp.
+**/
 
 /******************************************************
 QScrollBar
