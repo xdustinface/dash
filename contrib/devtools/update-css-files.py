@@ -1,8 +1,7 @@
-#!/usr/bin/python3
+#!/usr/bin/env python3
 #
-# update_colors.py updates the color files in css/colors and the `<colors></colors>`
-# section in all css files.
-# file.
+# update-css-files.py creates color analyse files in css/colors and updates the
+# `<colors></colors>` section in all css files.
 #
 # Copyright (c) 2020 The Dash Core developers
 # Distributed under the MIT/X11 software license, see the accompanying
@@ -14,13 +13,11 @@ import re
 import subprocess
 import sys
 
-USAGE = 'USAGE: ' + Path(__file__).name + '\n\nPARAMETER:\n\n'
-
 MATCH_REPLACE = '<colors>.+?</colors>'
 MATCH_COLORS = '#(?:[0-9a-f]{2}){2,4}|#(?:[0-9a-f]{1}){3}'
 
 def error(msg):
-    exit('\nERROR: ' + msg + "\n\n" + USAGE)
+    exit('\nERROR: {}\n'.format(msg))
 
 def parse_css(file_css):
     # Temporarily
@@ -150,49 +147,27 @@ def create_color_file(content, commit):
 
     return str_result
 
-def run(path, create_color_files=True):
-
-    p = Path(path)
-
-    if not p.exists():
-        error("Path doesn't exist: {}".format(Path(path).absolute()))
-
-    if not len(list(p.glob('*.css'))):
-        error("No .css files found in {}".format(Path(path).absolute()))
-
-    parsed = [parse_css(x) for x in p.glob('*.css') if x.is_file()]
-    commit = subprocess.check_output(['git', '-C', p.absolute(), 'rev-parse', '--short', 'HEAD']).decode("utf-8")
-
-    if create_color_files:
-
-        for f in parsed:
-
-            str_result = create_color_file(f, commit)
-
-            if str_result is not None:
-                p = Path(__file__).parent / Path('colors/' + f['fileName'] + '_css_colors.txt')
-                p.write_text(str_result)
-
-                print('\n{}.css -> {} created!'.format(f['fileName'], p.name))
-            else:
-                print('\n{}.css -> No colors found..'.format(f['fileName'] + ".css"))
-
-    return parsed
-
-
 if __name__ == '__main__':
 
     if len(sys.argv) > 1:
         error('No argument required!')
 
-    path = str(Path(__file__).parent.absolute())
+    path = Path(__file__).parent.absolute() /  Path('../../src/qt/res/css/')
     commit = subprocess.check_output(['git', '-C', path, 'rev-parse', '--short', 'HEAD']).decode("utf-8")
-    result = run(path)
 
-    for r in result:
+    if not path.exists():
+        error("Path doesn't exist: {}".format(Path(path).absolute()))
 
-        file_path = path + '/' + r['fileName'] + '.css'
-        css_content = Path(file_path).read_text()
+    if not len(list(path.glob('*.css'))):
+        error("No .css files found in {}".format(Path(path).absolute()))
+
+    results = [parse_css(x) for x in path.glob('*.css') if x.is_file()]
+
+    for r in results:
+
+        # Update the css file
+        css_file = path / Path(r['fileName'] + '.css')
+        css_content = css_file.read_text()
         to_replace = re.findall(MATCH_REPLACE, css_content, re.DOTALL)
 
         str_result = "\n# Used colors in {}.css for commit {}\n".format(r['fileName'], commit)
@@ -200,8 +175,16 @@ if __name__ == '__main__':
             str_result += c[0] + '\n'
 
         str_replace = "<colors>\n{}\n</colors>".format(str_result)
-
         css_content = css_content.replace(to_replace[0], str_replace)
-
-        css_file = Path(r['fileName'] + '.css')
         css_file.write_text(css_content)
+
+        # Write the <css>_color.txt files
+        str_result = create_color_file(r, commit)
+
+        if str_result is not None:
+            color_file = path / Path('colors/' + r['fileName'] + '_css_colors.txt')
+            color_file.write_text(str_result)
+
+            print('\n{}.css -> {} created!'.format(r['fileName'], str(color_file.resolve())))
+        else:
+            print('\n{}.css -> No colors found..'.format(r['fileName'] + ".css"))
