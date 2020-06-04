@@ -165,6 +165,13 @@ if __name__ == '__main__':
 
     results = [parse_css(x) for x in css_folder_path.glob('*.css') if x.is_file()]
 
+    colors_folder_path = css_folder_path / Path('colors/')
+    if not colors_folder_path.is_dir():
+        try:
+            colors_folder_path.mkdir()
+        except Exception:
+            error("Can't create new folder: {}".format(colors_folder_path))
+
     for r in results:
 
         # Update the css file
@@ -184,7 +191,7 @@ if __name__ == '__main__':
         str_result = create_color_file(r, commit)
 
         if str_result is not None:
-            color_file = css_folder_path / Path('colors/' + r['fileName'] + '_css_colors.txt')
+            color_file = colors_folder_path / Path(r['fileName'] + '_css_colors.txt')
             color_file.write_text(str_result)
 
             print('\n{}.css -> {} created!'.format(r['fileName'], color_file))
