@@ -152,8 +152,6 @@ if __name__ == '__main__':
     if len(sys.argv) > 1:
         error('No argument required!')
 
-    commit = subprocess.check_output(['git', '-C', css_folder_path, 'rev-parse', '--short', 'HEAD']).decode("utf-8")
-
     try:
         css_folder_path = Path(__file__).parent.absolute() / Path('../../src/qt/res/css/')
         css_folder_path = css_folder_path.resolve(strict=True)
@@ -171,6 +169,8 @@ if __name__ == '__main__':
             colors_folder_path.mkdir()
         except Exception:
             error("Can't create new folder: {}".format(colors_folder_path))
+
+    commit = subprocess.check_output(['git', '-C', css_folder_path, 'rev-parse', '--short', 'HEAD']).decode("utf-8")
 
     for r in results:
 
