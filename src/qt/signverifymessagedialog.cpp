@@ -64,6 +64,8 @@ SignVerifyMessageDialog::SignVerifyMessageDialog(const PlatformStyle *_platformS
     
     GUIUtil::setFont({ui->signatureOut_SM}, QFont::Light, true);
     GUIUtil::setFont({ui->statusLabel_SM, ui->statusLabel_VM}, GUIUtil::getFontWeightBold());
+
+    GUIUtil::disableMacFocusRect(this);
 }
 
 SignVerifyMessageDialog::~SignVerifyMessageDialog()

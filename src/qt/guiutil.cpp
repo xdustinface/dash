@@ -1273,6 +1273,23 @@ QFont getFontBold()
     return getFont(getFontWeightBold());
 }
 
+void disableMacFocusRect(const QWidget* w)
+{
+    // TODO: Evaluate maybe wrapping this later into some "theme handler" or so..
+#ifdef Q_OS_MAC
+    if (!dashThemeActive()) {
+        //Only set fonts for dash specific themes.
+        return;
+    }
+
+    for (const auto& c : w->findChildren<QWidget*>()) {
+        c->setAttribute(Qt::WA_MacShowFocusRect, false);
+    }
+#else
+    return;
+#endif
+}
+
 bool dashThemeActive()
 {
     QSettings settings;

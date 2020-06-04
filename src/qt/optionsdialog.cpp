@@ -38,6 +38,8 @@ OptionsDialog::OptionsDialog(QWidget *parent, bool enableWallet) :
 
     GUIUtil::setFont({ui->statusLabel}, GUIUtil::getFontWeightBold());
 
+    GUIUtil::disableMacFocusRect(this);
+
     /* Main elements init */
     ui->databaseCache->setMinimum(nMinDbCache);
     ui->databaseCache->setMaximum(nMaxDbCache);
