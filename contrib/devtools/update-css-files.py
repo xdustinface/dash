@@ -14,7 +14,7 @@ import subprocess
 import sys
 
 MATCH_REPLACE = '<colors>.+?</colors>'
-MATCH_COLORS = '#(?:[0-9a-f]{2}){2,4}|#(?:[0-9a-f]{1}){3}'
+MATCH_COLORS = '#(?:[0-9a-fA-F]{2}){2,4}|#(?:[0-9a-f]{1}){3}'
 
 def error(msg):
     exit('\nERROR: {}\n'.format(msg))
