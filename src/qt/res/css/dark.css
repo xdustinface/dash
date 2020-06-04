@@ -63,16 +63,55 @@ QTreeWidget { /* Base Text Size & Color */
 }
 
 /******************************************************
-QAbstractSpinBox
+User-input widget style
 ******************************************************/
 
+BitcoinAmountField,
 QAbstractSpinBox,
-QAbstractSpinBox::up-button,
-QAbstractSpinBox::down-button {
-    background-color: #333;
+QComboBox,
+QPlainTextEdit,
+QLineEdit {
+    background-color: #2d2d2e;
+    border-color: #205a96;
+    color: #aaa;
+}
+
+BitcoinAmountField:hover:!focus,
+QAbstractSpinBox:hover:!focus,
+QComboBox:hover:!focus,
+QPlainTextEdit:hover:!focus,
+QLineEdit:hover:!focus {
+    background-color: #2d2d2e;
     border-color: #1c75bc;
     color: #aaa;
 }
+
+
+BitcoinAmountField:focus,
+QAbstractSpinBox:focus,
+QComboBox:checked,
+QComboBox:focus,
+QPlainTextEdit:focus,
+QLineEdit:focus {
+    background-color: #39393b;
+    border-color: #1c75bc;
+}
+
+BitcoinAmountField:disabled,
+QAbstractSpinBox:disabled,
+QComboBox:disabled,
+QPlainTextEdit:disabled,
+QLineEdit:disabled {
+    background-color: #363637;
+    border-color: #585858;
+    color: #585858;
+}
+
+/******************************************************
+QAbstractSpinBox
+******************************************************/
+
+/***** No dark.css specific coloring here yet *****/
 
 /******************************************************
 QCalendarWidget
@@ -126,23 +165,8 @@ QCalendarWidget QAbstractItemView:disabled {
 QComboBox
 ******************************************************/
 
-QComboBox { /* Dropdown Menus */
-    background-color: #333;
-    border-color: #1c75bc;
-    color: #aaa;
-}
-
-QComboBox:checked {
-    background-color: #3e3e3e;
-}
-
-QComboBox:editable {
-    background-color: #1c75bc;
-    color: #616161;
-}
-
 QComboBox QListView {
-    background-color: #555;
+    background-color: #39393b;
     color: #aaa;
 }
 
@@ -183,18 +207,7 @@ QHeaderView::section { /* Table Header Sections */
 QLineEdit / QValidatedLineEdit / QPlainTextEdit
 ******************************************************/
 
-.QValidatedLineEdit,
-.QLineEdit,
-QPlainTextEdit { /* Text Entry Fields */
-    background-color: #333;
-    border-color: #1c75bc;
-    color: #aaa;
-}
-
-.QValidatedLineEdit:disabled,
-.QLineEdit:disabled {
-    background-color: #3e3e3e;
-}
+/***** No dark.css specific coloring here yet *****/
 
 /******************************************************
 QMenu
