@@ -84,37 +84,82 @@ QTreeWidget { /* Base Text Size & Color */
 }
 
 /******************************************************
+User-input widget style
+******************************************************/
+
+BitcoinAmountField,
+QAbstractSpinBox,
+QComboBox,
+QPlainTextEdit,
+QLineEdit {
+    border: 1px solid red;
+    border-color: red;
+    border-radius: 8px;
+    font-size: 13px;
+    height: 33px;
+    min-height: 33px;
+    max-height: 33px;
+    /* min-width: 60px; */
+    outline: 0;
+    padding: 0px 8px 0px 8px;
+}
+
+BitcoinAmountField:hover:!focus,
+QAbstractSpinBox:hover:!focus,
+QComboBox:hover:!focus,
+QPlainTextEdit:hover:!focus,
+QLineEdit:hover:!focus {
+    border: 2px solid red;
+    border-color: #1c75bc;
+}
+
+BitcoinAmountField:hover:!focus,
+QAbstractSpinBox:hover:!focus,
+QPlainTextEdit:hover:!focus,
+QLineEdit:hover:!focus {
+    /* Use the negative padding to counteract the border
+    QComboBox is excluded here since this would mess
+    with its dropdown menu */
+    padding: -1px 7px -1px 7px;
+}
+
+BitcoinAmountField:focus,
+QAbstractSpinBox:focus,
+QComboBox:focus,
+QPlainTextEdit:focus,
+QLineEdit:focus {
+    border: 2px solid red;
+    border-color: #1c75bc;
+    /* Use the negative padding to counteract the border */
+    padding: -1px 7px -1px 7px;
+}
+
+BitcoinAmountField:disabled,
+QAbstractSpinBox:disabled,
+QComboBox:disabled,
+QPlainTextEdit:disabled,
+QLineEdit:disabled {
+}
+
+/******************************************************
 QAbstractSpinBox
 ******************************************************/
 
 QAbstractSpinBox {
-    border: 1px solid red;
-    padding: 0px 5px 0px 5px;
-    min-height: 31px;
 }
 
 QAbstractSpinBox::up-button {
-    subcontrol-origin: border;
-    subcontrol-position: top right;
-    width: 21px;
+    background-color: #00000000;
+    width: 20px;
     border: 0px;
-    border-top: 1px solid;
-    border-right: 1px solid;
-    padding-right: 1px;
-    padding-left: 5px;
-    padding-top: 2px;
+    padding: 2px 1px 0px 5px;
 }
 
 QAbstractSpinBox::down-button {
-    subcontrol-origin: border;
-    subcontrol-position: bottom right;
-    width: 21px;
+    background-color: #00000000;
+    width: 20px;
     border: 0px;
-    border-right: 1px solid;
-    border-bottom: 1px solid;
-    padding-right: 1px;
-    padding-left: 5px;
-    padding-bottom: 2px;
+    padding: 0px 1px 2px 5px;
 }
 
 QAbstractSpinBox::up-arrow {
@@ -253,7 +298,7 @@ QCheckBox
 
 QCheckBox{
     background-color: #00000000;
-    min-height: 20px;
+    min-height: 33px;
 }
 QCheckBox::indicator {
     width: 15px;
@@ -303,9 +348,6 @@ QComboBox
 ******************************************************/
 
 QComboBox { /* Dropdown Menus */
-    border: 1px solid red;
-    padding: 0px 5px 0px 5px;
-    min-height: 31px;
 }
 
 QComboBox:checked {
@@ -444,22 +486,10 @@ QHeaderView::up-arrow:hover {
 /******************************************************
 QLineEdit / QValidatedLineEdit / QPlainTextEdit
 ******************************************************/
+
 .QLineEdit,
 QPlainTextEdit,
 .QValidatedLineEdit { /* Text Entry Fields */
-    border: 1px solid;
-    font-size: 11px;
-    min-height: 31px;
-    outline: 0;
-    padding: 0px 3px 0px 3px;
-}
-
-.QLineEdit:!focus {
-    font-size: 12px;
-}
-
-.QLineEdit:disabled,
-.QValidatedLineEdit:disabled {
 }
 
 /******************************************************
@@ -1089,6 +1119,18 @@ QDialog#AskPassphraseDialog QLabel#passLabel3 {
     qproperty-alignment: 'AlignVCenter | AlignRight';
     min-width: 170px;
     min-height: 33px; /* base width of 25px for QLineEdit, plus padding and border */
+}
+
+/******************************************************
+BitcoinAmountField
+******************************************************/
+
+BitcoinAmountField{
+    /* This is a hacky way to make sure BitcoinAmountField's
+    * shows completely.
+    * TODO: Fix the issue properly.
+    */
+    margin-bottom: 5px;
 }
 
 /******************************************************
