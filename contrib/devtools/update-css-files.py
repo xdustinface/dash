@@ -152,21 +152,21 @@ if __name__ == '__main__':
     if len(sys.argv) > 1:
         error('No argument required!')
 
-    path = Path(__file__).parent.absolute() /  Path('../../src/qt/res/css/')
-    commit = subprocess.check_output(['git', '-C', path, 'rev-parse', '--short', 'HEAD']).decode("utf-8")
+    css_folder_path = Path(__file__).parent.absolute() / Path('../../src/qt/res/css/')
+    commit = subprocess.check_output(['git', '-C', css_folder_path, 'rev-parse', '--short', 'HEAD']).decode("utf-8")
 
-    if not path.exists():
-        error("Path doesn't exist: {}".format(Path(path).absolute()))
+    if not css_folder_path.exists():
+        error("Path doesn't exist: {}".format(Path(css_folder_path).absolute()))
 
-    if not len(list(path.glob('*.css'))):
-        error("No .css files found in {}".format(Path(path).absolute()))
+    if not len(list(css_folder_path.glob('*.css'))):
+        error("No .css files found in {}".format(Path(css_folder_path).absolute()))
 
-    results = [parse_css(x) for x in path.glob('*.css') if x.is_file()]
+    results = [parse_css(x) for x in css_folder_path.glob('*.css') if x.is_file()]
 
     for r in results:
 
         # Update the css file
-        css_file = path / Path(r['fileName'] + '.css')
+        css_file = css_folder_path / Path(r['fileName'] + '.css')
         css_content = css_file.read_text()
         to_replace = re.findall(MATCH_REPLACE, css_content, re.DOTALL)
 
@@ -182,7 +182,7 @@ if __name__ == '__main__':
         str_result = create_color_file(r, commit)
 
         if str_result is not None:
-            color_file = path / Path('colors/' + r['fileName'] + '_css_colors.txt')
+            color_file = css_folder_path / Path('colors/' + r['fileName'] + '_css_colors.txt')
             color_file.write_text(str_result)
 
             print('\n{}.css -> {} created!'.format(r['fileName'], str(color_file.resolve())))
