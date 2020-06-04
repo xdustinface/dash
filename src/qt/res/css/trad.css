@@ -27,7 +27,7 @@ ModalOverlay
 QWidget#bgWidget { /* The frame overlaying the overview-page */
     padding-left: 10px;
     padding-right: 10px;
-    background-color: #fafafacc;
+    background-color: #ccfafafa;
 }
 
 QWidget#contentWidget { /* The actual content with the text/buttons/etc... */
