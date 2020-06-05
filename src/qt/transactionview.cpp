@@ -69,6 +69,7 @@ TransactionView::TransactionView(const PlatformStyle *platformStyle, QWidget *pa
     instantsendWidget->addItem(tr("All"), TransactionFilterProxy::InstantSendFilter_All);
     instantsendWidget->addItem(tr("Locked by InstantSend"), TransactionFilterProxy::InstantSendFilter_Yes);
     instantsendWidget->addItem(tr("Not locked by InstantSend"), TransactionFilterProxy::InstantSendFilter_No);
+    instantsendWidget->setObjectName("instantsendWidget");
     hlayout->addWidget(instantsendWidget);
 
     dateWidget = new QComboBox(this);
