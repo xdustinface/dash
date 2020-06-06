@@ -175,7 +175,11 @@ QString dateTimeStr(qint64 nTime)
 
 QFont fixedPitchFont()
 {
-    return QFontDatabase::systemFont(QFontDatabase::FixedFont);
+    if (dashThemeActive()) {
+        return getFontNormal();
+    } else {
+        return QFontDatabase::systemFont(QFontDatabase::FixedFont);
+    }
 }
 
 // Just some dummy data to generate a convincing random-looking (but consistent) address
@@ -200,7 +204,7 @@ void setupAddressWidget(QValidatedLineEdit *widget, QWidget *parent, bool fAllow
 {
     parent->setFocusProxy(widget);
 
-    widget->setFont(fixedPitchFont());
+    GUIUtil::setFixedPitchFont({widget});
     // We don't want translators to use own addresses in translations
     // and this is the only place, where this address is supplied.
     widget->setPlaceholderText(QObject::tr("Enter a Dash address (e.g. %1)").arg(
@@ -1120,6 +1124,14 @@ void setFont(const std::vector<QWidget*> &vecWidgets, QFont::Weight weight, bool
 
     for (auto it : vecWidgets) {
         it->setFont(font);
+    }
+}
+
+void setFixedPitchFont(const std::vector<QWidget *> &vecWidgets)
+{
+    // TODO: Evaluate maybe wrapping this later into some "theme handler" or so..
+    for (auto it : vecWidgets) {
+        it->setFont(fixedPitchFont());
     }
 }
 
