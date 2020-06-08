@@ -1019,6 +1019,12 @@ const std::vector<QString> listThemes()
     return vecRet;
 }
 
+const QString getDefaultTheme()
+{
+    // TODO: Evaluate maybe wrapping this later into some "theme handler" or so..
+    return defaultTheme;
+}
+
 void loadStyleSheet(QWidget* widget, bool fDebugWidget)
 {
     // TODO: Evaluate maybe wrapping this later into some "theme handler" or so..
@@ -1031,16 +1037,6 @@ void loadStyleSheet(QWidget* widget, bool fDebugWidget)
     if (stylesheet.get() == nullptr || (gArgs.GetBoolArg("-debug-ui", false) && isStyleSheetDirectoryCustom())) {
 
         stylesheet = std::make_unique<QString>();
-
-        QSettings settings;
-        QDir themes(":css");
-        QString theme = settings.value("theme", "").toString();
-
-        // Make sure settings are pointing to an existent theme
-        if (!isStyleSheetDirectoryCustom() && (theme.isEmpty() || !themes.exists(theme))) {
-            theme = defaultTheme;
-            settings.setValue("theme", theme);
-        }
 
         auto loadFile = [](const QString& name)
         {
@@ -1058,7 +1054,7 @@ void loadStyleSheet(QWidget* widget, bool fDebugWidget)
 #endif
         }
 
-        loadFile(theme);
+        loadFile(QSettings().value("theme", getDefaultTheme()).toString());
     }
 
     if (widget) widget->setStyleSheet(*stylesheet.get());
