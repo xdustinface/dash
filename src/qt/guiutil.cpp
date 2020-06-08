@@ -123,6 +123,11 @@ QFont::Weight fontWeightBold = defaultFontWeightBold;
 // Scale value for text sizes
 int fontScale = defaultFontScale;
 
+#ifdef Q_OS_MAC
+// Contains all widgets where the macOS focus rect has been disabled.
+static std::set<QWidget*> setRectsDisabled;
+#endif
+
 static const std::map<ThemedColor, QColor> themedColors = {
     { ThemedColor::DEFAULT, QColor(0, 0, 0) },
     { ThemedColor::UNCONFIRMED, QColor(128, 128, 128) },
@@ -1317,13 +1322,30 @@ void disableMacFocusRect(const QWidget* w)
 {
     // TODO: Evaluate maybe wrapping this later into some "theme handler" or so..
 #ifdef Q_OS_MAC
-    if (!dashThemeActive()) {
-        //Only set fonts for dash specific themes.
-        return;
-    }
-
     for (const auto& c : w->findChildren<QWidget*>()) {
-        c->setAttribute(Qt::WA_MacShowFocusRect, false);
+        if (c->testAttribute(Qt::WA_MacShowFocusRect)) {
+            c->setAttribute(Qt::WA_MacShowFocusRect, !dashThemeActive());
+            setRectsDisabled.emplace(c);
+        }
+    }
+#else
+    return;
+#endif
+}
+
+void updateMacFocusRects()
+{
+    // TODO: Evaluate maybe wrapping this later into some "theme handler" or so..
+#ifdef Q_OS_MAC
+    QWidgetList allWidgets = QApplication::allWidgets();
+    auto it = setRectsDisabled.begin();
+    while (it != setRectsDisabled.end()) {
+        if (allWidgets.contains(*it)) {
+            (*it)->setAttribute(Qt::WA_MacShowFocusRect, !dashThemeActive());
+            ++it;
+        } else {
+            it = setRectsDisabled.erase(it);
+        }
     }
 #else
     return;
