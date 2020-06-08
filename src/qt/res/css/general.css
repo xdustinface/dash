@@ -1637,7 +1637,7 @@ TransactionView
 TransactionView QLineEdit { /* Filters */
     margin-bottom: 2px;
     margin-right: 1px;
-    min-width: 111px;
+    min-width: 101px;
     text-align: center;
 }
 
@@ -1651,8 +1651,13 @@ TransactionView QLineEdit#addressWidget { /* Address Filter */
 TransactionView QLineEdit#amountWidget { /* Amount Filter */
     margin-bottom: 2px;
     margin-right: 1px;
-    max-width: 100px;
+    min-width: 101px;
+    max-width: 101px;
     text-align: center;
+}
+
+TransactionView QComboBox#instantsendWidget:down-arrow { /* InstantSend Filter */
+    margin-right: -5px;
 }
 
 TransactionView QComboBox {
@@ -1662,5 +1667,8 @@ TransactionView QComboBox {
 
 #transactionSumLabel,
 #transactionSum {
+    qproperty-alignment: 'AlignLeading | AlignLeft';
     font-size: 15px;
+    min-height: 30px;
+    margin-top: 15px;
 }
