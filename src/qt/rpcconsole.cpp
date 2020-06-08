@@ -461,9 +461,6 @@ RPCConsole::RPCConsole(const PlatformStyle *_platformStyle, QWidget *parent) :
 {
     ui->setupUi(this);
 
-    /* Open CSS when configured */
-    this->setStyleSheet(GUIUtil::loadStyleSheet());
-
     GUIUtil::setFont({ui->label_9,
                       ui->labelNetwork,
                       ui->label_10,
