@@ -100,6 +100,7 @@ HelpMessageDialog::HelpMessageDialog(QWidget *parent, HelpMode helpMode) :
         strUsage += HelpMessageOpt("-resetguisettings", tr("Reset all settings changed in the GUI").toStdString());
         if (showDebug) {
             strUsage += HelpMessageOpt("-uiplatform", strprintf("Select platform to customize UI for (one of windows, macosx, other; default: %s)", BitcoinGUI::DEFAULT_UIPLATFORM));
+            strUsage += HelpMessageOpt("-debug-ui", "Enable UI debug mode which allows to see live stylesheet updates in the UI if its used together with -custom-css-dir. It also forces some widgets to show up which are usually only visible under certain circumstances. (default: false)");
         }
         strUsage += HelpMessageOpt("-windowtitle=<name>", _("Sets a window title which is appended to \"Dash Core - \""));
 
@@ -210,8 +211,7 @@ ShutdownWindow::ShutdownWindow(QWidget *parent, Qt::WindowFlags f):
 {
     setObjectName("ShutdownWindow");
 
-    /* Open CSS when configured */
-    this->setStyleSheet(GUIUtil::loadStyleSheet());
+    GUIUtil::loadStyleSheet(this, false);
 
     QVBoxLayout *layout = new QVBoxLayout();
     layout->addWidget(new QLabel(
