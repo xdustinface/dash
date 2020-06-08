@@ -1035,7 +1035,7 @@ const QString getDefaultTheme()
     return defaultTheme;
 }
 
-void loadStyleSheet(QWidget* widget, bool fDebugWidget)
+void loadStyleSheet(QWidget* widget, bool fForceUpdate)
 {
     AssertLockNotHeld(cs_css);
     LOCK(cs_css);
@@ -1046,7 +1046,7 @@ void loadStyleSheet(QWidget* widget, bool fDebugWidget)
     bool fDebugCustomStyleSheets = gArgs.GetBoolArg("-debug-ui", false) && isStyleSheetDirectoryCustom();
     bool fStyleSheetChanged = false;
 
-    if (stylesheet == nullptr || fDebugCustomStyleSheets) {
+    if (stylesheet == nullptr || fForceUpdate || fDebugCustomStyleSheets) {
         auto hasModified = [](const std::vector<QString>& vecFiles) -> bool {
             static std::map<const QString, QDateTime> mapLastModified;
 
@@ -1063,7 +1063,7 @@ void loadStyleSheet(QWidget* widget, bool fDebugWidget)
         };
 
         auto loadFiles = [&](const std::vector<QString>& vecFiles) -> bool {
-            if (fDebugCustomStyleSheets && !hasModified(vecFiles)) {
+            if (!fForceUpdate && fDebugCustomStyleSheets && !hasModified(vecFiles)) {
                 return false;
             }
 
@@ -1096,29 +1096,27 @@ void loadStyleSheet(QWidget* widget, bool fDebugWidget)
         fStyleSheetChanged = loadFiles(vecFiles);
     }
 
-    bool fUpdateStyleSheet = fDebugCustomStyleSheets && fStyleSheetChanged;
-
-    if (fDebugWidget) {
-        setWidgets.insert(widget);
-        QWidgetList allWidgets = QApplication::allWidgets();
-        auto it = setWidgets.begin();
-        while (it != setWidgets.end()) {
-            if (!allWidgets.contains(*it)) {
-                it = setWidgets.erase(it);
-                continue;
-            }
-            if (fUpdateStyleSheet && *it != widget) {
-                (*it)->setStyleSheet(*stylesheet);
-            }
-            ++it;
-        }
-    }
+    bool fUpdateStyleSheet = fForceUpdate || (fDebugCustomStyleSheets && fStyleSheetChanged);
 
     if (widget) {
+        setWidgets.insert(widget);
         widget->setStyleSheet(*stylesheet);
     }
 
-    if (!ShutdownRequested() && fDebugCustomStyleSheets) {
+    QWidgetList allWidgets = QApplication::allWidgets();
+    auto it = setWidgets.begin();
+    while (it != setWidgets.end()) {
+        if (!allWidgets.contains(*it)) {
+            it = setWidgets.erase(it);
+            continue;
+        }
+        if (fUpdateStyleSheet && *it != widget) {
+            (*it)->setStyleSheet(*stylesheet);
+        }
+        ++it;
+    }
+
+    if (!ShutdownRequested() && fDebugCustomStyleSheets && !fForceUpdate) {
         QTimer::singleShot(200, [] { loadStyleSheet(); });
     }
 }
@@ -1525,6 +1523,13 @@ bool dashThemeActive()
     QSettings settings;
     QString theme = settings.value("theme", "").toString();
     return theme != traditionalTheme;
+}
+
+void loadTheme(QWidget* widget, bool fForce)
+{
+    loadStyleSheet(widget, fForce);
+    updateFonts();
+    updateMacFocusRects();
 }
 
 void disableMacFocusRect(const QWidget* w)
