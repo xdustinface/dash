@@ -971,6 +971,17 @@ void migrateQtSettings()
     }
 }
 
+const std::vector<QString> listThemes()
+{
+    std::vector<QString> vecThemes;
+    for (const auto& it : mapStyleToTheme) {
+        if (!it.second.isEmpty()) {
+            vecThemes.push_back(it.second);
+        }
+    }
+    return vecThemes;
+}
+
 // Open CSS when configured
 QString loadStyleSheet()
 {
@@ -1006,7 +1017,7 @@ QString loadStyleSheet()
 #endif
         }
 
-        QFile qFileTheme(":themes/" + theme);
+        QFile qFileTheme(":css/" + theme);
         if (qFileTheme.open(QFile::ReadOnly)) {
             stylesheet.get()->append(QLatin1String(qFileTheme.readAll()));
         }

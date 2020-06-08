@@ -230,6 +230,9 @@ namespace GUIUtil
     /** Modify Qt network specific settings on migration */
     void migrateQtSettings();
 
+    /** Return a list of all theme css files */
+    const std::vector<QString> listThemes();
+
     /** Load global CSS theme */
     QString loadStyleSheet();
 
