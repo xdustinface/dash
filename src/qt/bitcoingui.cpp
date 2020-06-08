@@ -150,7 +150,7 @@ BitcoinGUI::BitcoinGUI(const PlatformStyle *_platformStyle, const NetworkStyle *
     setWindowIcon(networkStyle->getTrayAndWindowIcon());
     setWindowTitle(windowTitle);
 
-    rpcConsole = new RPCConsole(_platformStyle, 0);
+    rpcConsole = new RPCConsole(_platformStyle, this);
     helpMessageDialog = new HelpMessageDialog(this, HelpMessageDialog::cmdline);
 #ifdef ENABLE_WALLET
     if(enableWallet)
@@ -1526,8 +1526,7 @@ void BitcoinGUI::showProgress(const QString &title, int nProgress)
 {
     if (nProgress == 0)
     {
-        progressDialog = new QProgressDialog(title, "", 0, 100);
-        GUIUtil::loadStyleSheet(progressDialog, false);
+        progressDialog = new QProgressDialog(title, "", 0, 100, this);
         progressDialog->setWindowModality(Qt::ApplicationModal);
         progressDialog->setMinimumDuration(0);
         progressDialog->setCancelButton(0);
