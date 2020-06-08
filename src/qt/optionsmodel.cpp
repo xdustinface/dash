@@ -510,10 +510,8 @@ bool OptionsModel::setData(const QModelIndex & index, const QVariant & value, in
             break;
 #endif // ENABLE_WALLET
         case Theme:
-            if (settings.value("theme") != value) {
-                settings.setValue("theme", value);
-                setRestartRequired(true);
-            }
+            // Set in OptionsDialog::updateTheme slot now
+            // to allow instant theme changes.
             break;
         case Language:
             if (settings.value("language") != value) {

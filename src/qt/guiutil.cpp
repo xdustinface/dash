@@ -1025,16 +1025,20 @@ const QString getDefaultTheme()
     return defaultTheme;
 }
 
-void loadStyleSheet(QWidget* widget, bool fDebugWidget)
+void loadStyleSheet(QWidget* widget, bool fForceUpdate)
 {
     // TODO: Evaluate maybe wrapping this later into some "theme handler" or so..
     AssertLockNotHeld(cs_css);
     LOCK(cs_css);
 
     static std::unique_ptr<QString> stylesheet;
+    static uint256 hashStyle;
     static std::set<QWidget*> setWidgets;
 
-    if (stylesheet.get() == nullptr || (gArgs.GetBoolArg("-debug-ui", false) && isStyleSheetDirectoryCustom())) {
+    bool fDebugUI = gArgs.GetBoolArg("-debug-ui", false) && GUIUtil::isStyleSheetDirectoryCustom();
+    bool fStyleSheetChanged = false;
+
+    if (stylesheet == nullptr || fForceUpdate || fDebugUI) {
 
         stylesheet = std::make_unique<QString>();
 
@@ -1042,7 +1046,7 @@ void loadStyleSheet(QWidget* widget, bool fDebugWidget)
         {
             QFile qFile(QString(stylesheetDirectory + "/" + "%1%2").arg(name).arg(isStyleSheetDirectoryCustom() ? ".css" : ""));
             if (qFile.open(QFile::ReadOnly)) {
-                stylesheet.get()->append(QLatin1String(qFile.readAll()));
+                stylesheet->append(QLatin1String(qFile.readAll()));
             }
         };
 
@@ -1054,30 +1058,42 @@ void loadStyleSheet(QWidget* widget, bool fDebugWidget)
 #endif
         }
 
-        loadFile(QSettings().value("theme", getDefaultTheme()).toString());
-    }
+        loadFile(GUIUtil::getActiveTheme());
 
-    if (widget) widget->setStyleSheet(*stylesheet.get());
-
-    if (!ShutdownRequested() && fDebugWidget && gArgs.IsArgSet("-debug-ui") && GUIUtil::isStyleSheetDirectoryCustom()) {
-
-        if (widget) {
-            auto ret = setWidgets.insert(widget);
-            (*ret.first)->setStyleSheet(*stylesheet.get());
-        }
-
-        QWidgetList allWidgets = QApplication::allWidgets();
-        auto it = setWidgets.begin();
-        while (it != setWidgets.end()) {
-            if (!allWidgets.contains(*it)) {
-                it = setWidgets.erase(it);
-            } else {
-                (*it)->setStyleSheet(*stylesheet.get());
-                ++it;
+        if (hashStyle.IsNull()) {
+            hashStyle = Hash(stylesheet->begin(), stylesheet->end());
+        } else {
+            uint256 hashStyleTmp = Hash(stylesheet->begin(), stylesheet->end());
+            if (hashStyle != hashStyleTmp) {
+                hashStyle = hashStyleTmp;
+                fStyleSheetChanged = true;
             }
         }
+    }
 
-        QTimer::singleShot(1000, []{ GUIUtil::loadStyleSheet(); });
+    if (widget) {
+        widget->setStyleSheet(*stylesheet);
+        setWidgets.insert(widget);
+        widget->setStyleSheet(*stylesheet);
+    }
+
+    bool fUpdateStyleSheet = (fForceUpdate || fDebugUI) && fStyleSheetChanged;
+
+    QWidgetList allWidgets = QApplication::allWidgets();
+    auto it = setWidgets.begin();
+    while (it != setWidgets.end()) {
+        if (!allWidgets.contains(*it)) {
+            it = setWidgets.erase(it);
+            continue;
+        }
+        if (fUpdateStyleSheet && *it != widget) {
+            (*it)->setStyleSheet(*stylesheet);
+        }
+        ++it;
+    }
+
+    if (!ShutdownRequested() && fDebugUI && !fForceUpdate) {
+        QTimer::singleShot(200, []{ GUIUtil::loadStyleSheet(); });
     }
 }
 
@@ -1424,11 +1440,17 @@ void updateMacFocusRects()
 #endif
 }
 
+QString getActiveTheme()
+{
+    // TODO: Evaluate maybe wrapping this later into some "theme handler" or so..
+    QSettings settings;
+    return settings.value("theme", GUIUtil::getDefaultTheme()).toString();
+}
+
 bool dashThemeActive()
 {
-    QSettings settings;
-    QString theme = settings.value("theme", "").toString();
-    return theme != traditionalTheme;
+    // TODO: Evaluate maybe wrapping this later into some "theme handler" or so..
+    return getActiveTheme() != traditionalTheme;
 }
 
 void setClipboard(const QString& str)
@@ -1581,6 +1603,14 @@ void ClickableLabel::mouseReleaseEvent(QMouseEvent *event)
 void ClickableProgressBar::mouseReleaseEvent(QMouseEvent *event)
 {
     Q_EMIT clicked(event->pos());
+}
+
+void loadTheme(QWidget* widget, bool fForce)
+{
+    // TODO: Evaluate maybe wrapping this later into some "theme handler" or so..
+    GUIUtil::loadStyleSheet(widget, fForce);
+    GUIUtil::updateFonts();
+    GUIUtil::updateMacFocusRects();
 }
 
 } // namespace GUIUtil

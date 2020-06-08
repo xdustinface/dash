@@ -246,10 +246,10 @@ namespace GUIUtil
     /** Return the name of the default theme `*/
     const QString getDefaultTheme();
 
-    /** Updates the widgets stylesheet and adds it to the list of ui debug elements
-        if fDebugWidget is true. Beeing on that list means the stylesheet of the
-        widget gets updated if the related css files has been changed if -debug-ui mode is active. */
-    void loadStyleSheet(QWidget* widget = nullptr, bool fDebugWidget = true);
+    /** Updates the widgets stylesheet and adds it to the list of ui debug elements.
+    Beeing on that list means the stylesheet of the widget gets updated if the
+    related css files has been changed if -debug-ui mode is active. */
+    void loadStyleSheet(QWidget* widget = nullptr, bool fForceUpdate = false);
 
     /** Application font weight for normal text. May be overwritten by -font-weight-normal. */
     extern QFont::Weight fontWeightNormal;
@@ -295,6 +295,10 @@ namespace GUIUtil
     /** Workaround to set a fixed pitch font in traditional theme while keeping track of font updates */
     void setFixedPitchFont(const std::vector<QWidget*>& vecWidgets);
 
+    /** Update the font of all widgets where a custom font has been set with
+        GUIUtil::setFont */
+    void updateFonts();
+
     /** Get a properly weighted QFont object with the font Montserrat
         Use ExtraLight as default as this lines up with the default in css. */
     QFont getFont(QFont::Weight weight, bool fItalic = false);
@@ -305,8 +309,14 @@ namespace GUIUtil
     /** Get the default bold QFont */
     QFont getFontBold();
 
-    /** Check if a dash specific theme is activated (light/dark) */
+    /** Return the name of the currently active theme.*/
+    QString getActiveTheme();
+
+    /** Check if a dash specific theme is activated (light/dark).*/
     bool dashThemeActive();
+
+    /** Load the theme and update all UI elements according to the appearance settings. */
+    void loadTheme(QWidget* widget = nullptr, bool fForce = true);
 
     /** Disable the OS default focus rect for macOS because we have custom focus rects
      * set in the css files */
