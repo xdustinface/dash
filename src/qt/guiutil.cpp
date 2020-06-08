@@ -1025,6 +1025,11 @@ const std::vector<QString> listThemes()
     return vecThemes;
 }
 
+const QString getDefaultTheme()
+{
+    return defaultTheme;
+}
+
 void loadStyleSheet(QWidget* widget, bool fDebugWidget)
 {
     AssertLockNotHeld(cs_css);

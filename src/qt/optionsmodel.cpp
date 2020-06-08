@@ -85,7 +85,7 @@ void OptionsModel::Init(bool resetSettings)
     strThirdPartyTxUrls = settings.value("strThirdPartyTxUrls", "").toString();
 
     if (!settings.contains("theme"))
-        settings.setValue("theme", "");
+        settings.setValue("theme", GUIUtil::getDefaultTheme());
 
 #ifdef ENABLE_WALLET
     if (!settings.contains("fCoinControlFeatures"))
