@@ -132,6 +132,11 @@ static std::set<QWidget*> setFixedPitchFontUpdates;
 // Contains all widgets where a non-default fontsize has been seet with GUIUtil::setFont
 static std::map<QWidget*, int> mapFontSizeUpdates;
 
+#ifdef Q_OS_MAC
+// Contains all widgets where the macOS focus rect has been disabled.
+static std::set<QWidget*> setRectsDisabled;
+#endif
+
 static const std::map<ThemedColor, QColor> themedColors = {
     { ThemedColor::DEFAULT, QColor(85, 85, 85) },
     { ThemedColor::UNCONFIRMED, QColor(128, 128, 128) },
@@ -1528,6 +1533,23 @@ void disableMacFocusRect(const QWidget* w)
     for (const auto& c : w->findChildren<QWidget*>()) {
         if (c->testAttribute(Qt::WA_MacShowFocusRect)) {
             c->setAttribute(Qt::WA_MacShowFocusRect, !dashThemeActive());
+            setRectsDisabled.emplace(c);
+        }
+    }
+#endif
+}
+
+void updateMacFocusRects()
+{
+#ifdef Q_OS_MAC
+    QWidgetList allWidgets = QApplication::allWidgets();
+    auto it = setRectsDisabled.begin();
+    while (it != setRectsDisabled.end()) {
+        if (allWidgets.contains(*it)) {
+            (*it)->setAttribute(Qt::WA_MacShowFocusRect, !dashThemeActive());
+            ++it;
+        } else {
+            it = setRectsDisabled.erase(it);
         }
     }
 #endif

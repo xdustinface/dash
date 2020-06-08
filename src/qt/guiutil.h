@@ -342,6 +342,9 @@ namespace GUIUtil
      * set in the css files */
     void disableMacFocusRect(const QWidget* w);
 
+    /** Enable/Disable the macOS focus rects depending on the current theme. */
+    void updateMacFocusRects();
+
     /* Convert QString to OS specific boost path through UTF-8 */
     fs::path qstringToBoostPath(const QString &path);
 
