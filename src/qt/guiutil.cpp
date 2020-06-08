@@ -54,6 +54,7 @@
 #include <QLineEdit>
 #include <QSettings>
 #include <QTextDocument> // for Qt::mightBeRichText
+#include <QTimer>
 #include <QThread>
 #include <QUrlQuery>
 #include <QMouseEvent>
@@ -80,6 +81,7 @@ void ForceActivation();
 
 namespace GUIUtil {
 
+static CCriticalSection cs_css;
 // The default stylesheet directory
 const static QString defaultStylesheetDirectory = ":css";
 // The actual stylesheet directory
@@ -1017,13 +1019,16 @@ const std::vector<QString> listThemes()
     return vecRet;
 }
 
-// Open CSS when configured
-QString loadStyleSheet()
+void loadStyleSheet(QWidget* widget, bool fDebugWidget)
 {
     // TODO: Evaluate maybe wrapping this later into some "theme handler" or so..
-    static std::unique_ptr<QString> stylesheet;
+    AssertLockNotHeld(cs_css);
+    LOCK(cs_css);
 
-    if (stylesheet.get() == nullptr) {
+    static std::unique_ptr<QString> stylesheet;
+    static std::set<QWidget*> setWidgets;
+
+    if (stylesheet.get() == nullptr || (gArgs.GetBoolArg("-debug-ui", false) && isStyleSheetDirectoryCustom())) {
 
         stylesheet = std::make_unique<QString>();
 
@@ -1056,7 +1061,28 @@ QString loadStyleSheet()
         loadFile(theme);
     }
 
-    return *stylesheet.get();
+    if (widget) widget->setStyleSheet(*stylesheet.get());
+
+    if (!ShutdownRequested() && fDebugWidget && gArgs.IsArgSet("-debug-ui") && GUIUtil::isStyleSheetDirectoryCustom()) {
+
+        if (widget) {
+            auto ret = setWidgets.insert(widget);
+            (*ret.first)->setStyleSheet(*stylesheet.get());
+        }
+
+        QWidgetList allWidgets = QApplication::allWidgets();
+        auto it = setWidgets.begin();
+        while (it != setWidgets.end()) {
+            if (!allWidgets.contains(*it)) {
+                it = setWidgets.erase(it);
+            } else {
+                (*it)->setStyleSheet(*stylesheet.get());
+                ++it;
+            }
+        }
+
+        QTimer::singleShot(1000, []{ GUIUtil::loadStyleSheet(); });
+    }
 }
 
 bool weightFromArg(int nArg, QFont::Weight& weight)
@@ -1352,7 +1378,9 @@ QFont getFont(QFont::Weight weight, bool fItalic)
         font.setWeight(weight > QFont::Normal ? QFont::Bold : QFont::Normal);
         font.setStyle(fItalic ? QFont::StyleItalic : QFont::StyleNormal);
     }
-    qDebug() << "GUIUtil::getFont() - " << font.toString() << " family: " << font.family() << ", style: " << font.styleName() << " match: " << font.exactMatch();
+    if (gArgs.IsArgSet("-debug-ui")) {
+        qDebug() << __func__ << ": font size: " << font.pointSizeF() << " family: " << font.family() << ", style: " << font.styleName() << " match: " << font.exactMatch();
+    }
     return font;
 }
 

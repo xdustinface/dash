@@ -51,8 +51,7 @@ CoinControlDialog::CoinControlDialog(const PlatformStyle *_platformStyle, QWidge
 {
     ui->setupUi(this);
 
-    /* Open CSS when configured */
-    this->setStyleSheet(GUIUtil::loadStyleSheet());
+    GUIUtil::loadStyleSheet(this);
 
     GUIUtil::setFont({ui->labelCoinControlQuantityText,
                       ui->labelCoinControlBytesText,
@@ -237,7 +236,7 @@ void CoinControlDialog::buttonToggleLockClicked()
     else{
         QMessageBox msgBox;
         msgBox.setObjectName("lockMessageBox");
-        msgBox.setStyleSheet(GUIUtil::loadStyleSheet());
+        GUIUtil::loadStyleSheet(this, false);
         msgBox.setText(tr("Please switch to \"List mode\" to use this function."));
         msgBox.exec();
     }
