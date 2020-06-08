@@ -727,6 +727,44 @@ int main(int argc, char *argv[])
         GUIUtil::setFontScale(nScale);
     }
 
+    if (gArgs.IsArgSet("-custom-css-dir")) {
+
+        fs::path path = fs::path(gArgs.GetArg("-custom-css-dir", ""));
+        std::vector<QString> vecRequiredCSSFiles = GUIUtil::listStyleSheets();
+        QString strMissing;
+
+        if (!fs::is_directory(path)) {
+            QMessageBox::critical(0, QObject::tr(PACKAGE_NAME),
+                                  QObject::tr("Error: Invalid custom css directory path: %1.").arg(QString::fromStdString(path.string())));
+            return EXIT_FAILURE;
+        }
+
+        for (auto it = fs::directory_iterator(path); it != fs::directory_iterator(); ++it) {
+
+            if (fs::is_regular_file(*it) && it->path().extension() == ".css") {
+                std::string test = it->path().filename().string();
+                auto css = std::find(vecRequiredCSSFiles.begin(), vecRequiredCSSFiles.end(),
+                                     QString::fromStdString(test));
+
+                if (css != vecRequiredCSSFiles.end()) {
+                    vecRequiredCSSFiles.erase(css);
+                } else {
+                    strMissing += QString::fromStdString(it->path().filename().string()) + "\n";
+                }
+            }
+        }
+
+        if (vecRequiredCSSFiles.size()) {
+            QMessageBox::critical(0, QObject::tr(PACKAGE_NAME),
+                                  QObject::tr("Error: %1 CSS file(s) missig in custom css directory.\n\n%2")
+                                  .arg(vecRequiredCSSFiles.size())
+                                  .arg(strMissing));
+            return EXIT_FAILURE;
+        }
+
+        GUIUtil::setStyleSheetDirectory(QString::fromStdString(path.string()));
+    }
+
     // Subscribe to global signals from core
     uiInterface.InitMessage.connect(InitMessage);
 

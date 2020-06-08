@@ -87,6 +87,7 @@ HelpMessageDialog::HelpMessageDialog(QWidget *parent, HelpMode helpMode) :
             strUsage += HelpMessageOpt("-allowselfsignedrootcertificates", strprintf("Allow self signed root certificates (default: %u)", DEFAULT_SELFSIGNED_ROOTCERTS));
         }
         strUsage += HelpMessageOpt("-choosedatadir", strprintf(tr("Choose data directory on startup (default: %u)").toStdString(), DEFAULT_CHOOSE_DATADIR));
+        strUsage += HelpMessageOpt("-custom-css-dir", tr("Choose custom css directory on startup (default: internal directory)").toStdString());
         strUsage += HelpMessageOpt("-font-scale", tr("Set a scale factor which gets applied to the base font size. Possible range -100 (smallest fonts) to 100 (largest fonts). (default: 0)").toStdString());
         strUsage += HelpMessageOpt("-font-weight-bold", strprintf(tr("Set the font weight for bold texts. Possible range 0 (Thin or Weight 100) to 8 (Black or Weight 900) (default: %d)").toStdString(), GUIUtil::weightToArg(GUIUtil::getFontWeightBoldDefault())));
         strUsage += HelpMessageOpt("-font-weight-normal", strprintf(tr("Set the font weight for normal texts. Possible range 0 (Thin or Weight 100) to 8 (Black or Weight 900) (default: %d)").toStdString(), GUIUtil::weightToArg(GUIUtil::getFontWeightNormalDefault())));

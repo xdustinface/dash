@@ -80,12 +80,22 @@ void ForceActivation();
 
 namespace GUIUtil {
 
+// The default stylesheet directory
+const static QString defaultStylesheetDirectory = ":css";
+// The actual stylesheet directory
+static QString stylesheetDirectory = defaultStylesheetDirectory;
 // The name of the traditional theme
 static const QString traditionalTheme = "Traditional";
 // The theme to set by default if settings are missing or incorrect
 static const QString defaultTheme = "Light";
 // The prefix a theme name should have if we want to apply dark colors and styles to it
 static const QString darkThemePrefix = "Dark";
+// Mapping css file => theme.
+static const std::map<QString, QString> mapStyleToTheme {{"general.css", ""},
+                                                         {"dark.css", "Dark"},
+                                                         {"light.css", "Light"},
+                                                         {"traditional.css", "Traditional"},
+                                                         {"scrollbars.css", ""}};
 
 /** Font related default values.
 *   TODO: Evaluate maybe wrapping this later into some "theme handler" or so..
@@ -966,6 +976,28 @@ void migrateQtSettings()
     }
 }
 
+void setStyleSheetDirectory(const QString& path)
+{
+    // TODO: Evaluate maybe wrapping this later into some "theme handler" or so..
+    stylesheetDirectory = path;
+}
+
+bool isStyleSheetDirectoryCustom()
+{
+    // TODO: Evaluate maybe wrapping this later into some "theme handler" or so..
+    return stylesheetDirectory != defaultStylesheetDirectory;
+}
+
+const std::vector<QString> listStyleSheets()
+{
+    // TODO: Evaluate maybe wrapping this later into some "theme handler" or so..
+    std::vector<QString> vecRet;
+    for (const auto& it : mapStyleToTheme) {
+        vecRet.push_back(it.first);
+    }
+    return vecRet;
+}
+
 const std::vector<QString> listThemes()
 {
     // TODO: Evaluate maybe wrapping this later into some "theme handler" or so..
@@ -979,6 +1011,7 @@ const std::vector<QString> listThemes()
 // Open CSS when configured
 QString loadStyleSheet()
 {
+    // TODO: Evaluate maybe wrapping this later into some "theme handler" or so..
     static std::unique_ptr<QString> stylesheet;
 
     if (stylesheet.get() == nullptr) {
@@ -986,35 +1019,32 @@ QString loadStyleSheet()
         stylesheet = std::make_unique<QString>();
 
         QSettings settings;
-        QDir themes(":themes");
+        QDir themes(":css");
         QString theme = settings.value("theme", "").toString();
 
         // Make sure settings are pointing to an existent theme
-        if (theme.isEmpty() || !themes.exists(theme)) {
+        if (!isStyleSheetDirectoryCustom() && (theme.isEmpty() || !themes.exists(theme))) {
             theme = defaultTheme;
             settings.setValue("theme", theme);
         }
 
+        auto loadFile = [](const QString& name)
+        {
+            QFile qFile(QString(stylesheetDirectory + "/" + "%1%2").arg(name).arg(isStyleSheetDirectoryCustom() ? ".css" : ""));
+            if (qFile.open(QFile::ReadOnly)) {
+                stylesheet.get()->append(QLatin1String(qFile.readAll()));
+            }
+        };
+
         // If light/dark theme is used load general styles first
         if (dashThemeActive()) {
-            QFile qFileGeneral(":css/general");
-            if (qFileGeneral.open(QFile::ReadOnly)) {
-                stylesheet.get()->append(QLatin1String(qFileGeneral.readAll()));
-            }
-
+            loadFile("general");
 #ifndef Q_OS_MAC
-            // Apply some styling to scrollbars
-            QFile qFileScrollbars(QString(":/css/scrollbars"));
-            if (qFileScrollbars.open(QFile::ReadOnly)) {
-                stylesheet.get()->append(QLatin1String(qFileScrollbars.readAll()));
-            }
+            loadFile("scrollbars");
 #endif
         }
 
-        QFile qFileTheme(":css/" + theme);
-        if (qFileTheme.open(QFile::ReadOnly)) {
-            stylesheet.get()->append(QLatin1String(qFileTheme.readAll()));
-        }
+        loadFile(theme);
     }
 
     return *stylesheet.get();
