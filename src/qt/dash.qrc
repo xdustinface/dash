@@ -59,7 +59,7 @@
         <file alias="scrollbars">res/css/scrollbars.css</file>
         <file alias="Dark">res/css/dark.css</file>
         <file alias="Light">res/css/light.css</file>
-        <file alias="Traditional">res/css/trad.css</file>
+        <file alias="Traditional">res/css/traditional.css</file>
     </qresource>
     <qresource prefix="/fonts">
         <file alias="Montserrat-Black">res/fonts/Montserrat/Montserrat-Black.otf</file>
