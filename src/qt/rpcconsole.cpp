@@ -450,7 +450,7 @@ void RPCExecutor::request(const QString &command)
 }
 
 RPCConsole::RPCConsole(const PlatformStyle *_platformStyle, QWidget *parent) :
-    QWidget(parent),
+    QWidget(parent, Qt::Window),
     ui(new Ui::RPCConsole),
     clientModel(0),
     historyPtr(0),
