@@ -387,6 +387,24 @@ QMenuBar::item:selected {
 }
 
 /******************************************************
+QProgressBar
+******************************************************/
+
+QProgressBar {
+    background-color: red;
+    color: #00000000;
+    border: 0px solid red;
+    border-radius: 4px;
+    min-height: 10px;
+    max-height: 10px;
+}
+
+QProgressBar::chunk {
+    background-color: red;
+    border-radius: 4px;
+}
+
+/******************************************************
 QProgressDialog
 ******************************************************/
 
