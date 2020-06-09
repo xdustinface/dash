@@ -760,6 +760,11 @@ QWidget#RPCConsole QWidget#tab_peers QTableView { /* Peers Tables */
 SendCoinsDialog
 ******************************************************/
 
+QDialog#SendCoinsDialog .QFrame#frameCoinControl,
+QDialog#SendCoinsDialog #scrollArea {
+    border-color: #39393b;
+}
+
 QDialog#SendCoinsDialog QLabel#labelBalance {
     color: #ccc;
 }
