@@ -302,6 +302,9 @@ void OverviewPage::setWalletModel(WalletModel *model)
         // explicitly update PS frame and transaction list to reflect actual settings
         updateAdvancedPSUI(model->getOptionsModel()->getShowAdvancedPSUI());
 
+        // Initialize PS UI
+        privateSendStatus(true);
+
         if(!privateSendClient.fEnablePrivateSend) return;
 
         connect(model->getOptionsModel(), SIGNAL(privateSendRoundsChanged()), this, SLOT(updatePrivateSendProgress()));
@@ -467,11 +470,21 @@ void OverviewPage::updateAdvancedPSUI(bool fShowAdvancedPSUI) {
     ui->labelPrivateSendLastMessage->setVisible(fShowAdvancedPSUI);
 }
 
-void OverviewPage::privateSendStatus()
+void OverviewPage::privateSendStatus(bool fForce)
 {
-    if(!masternodeSync.IsBlockchainSynced() || ShutdownRequested()) return;
+    if(!fForce && (!masternodeSync.IsBlockchainSynced() || ShutdownRequested())) return;
 
     if(!walletModel) return;
+
+    auto tempWidgets = {ui->labelSubmittedDenomText,
+                              ui->labelSubmittedDenom,
+                              ui->labelPrivateSendLastMessage};
+
+    auto setWidgetsVisible = [tempWidgets](bool fVisible) {
+        for (const auto& it : tempWidgets) {
+            it->setVisible(fVisible);
+        }
+    };
 
     static int64_t nLastDSProgressBlockTime = 0;
     int nBestHeight = clientModel->getNumBlocks();
@@ -493,6 +506,7 @@ void OverviewPage::privateSendStatus()
         }
 
         ui->labelPrivateSendLastMessage->setText("");
+        setWidgetsVisible(false);
         ui->togglePrivateSend->setText(tr("Start Mixing"));
 
         QString strEnabled = tr("Disabled");
@@ -578,6 +592,7 @@ void OverviewPage::privateSendStatus()
     if(s != ui->labelPrivateSendLastMessage->text())
         LogPrint(BCLog::PRIVATESEND, "OverviewPage::privateSendStatus -- Last PrivateSend message: %s\n", strStatus.toStdString());
 
+    setWidgetsVisible(true);
     ui->labelPrivateSendLastMessage->setText(s);
 
     ui->labelSubmittedDenom->setText(QString(privateSendClient.GetSessionDenoms().c_str()));
