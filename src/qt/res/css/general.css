@@ -1116,7 +1116,7 @@ QWidget .QFrame#frame .QLabel#label_5 { /* Wallet Label */
 
 QWidget .QFrame#frame .QLabel#labelWalletStatus { /* Wallet Sync Status */
     qproperty-alignment: 'AlignVCenter | AlignLeft';
-    color: #ff4500;
+    color: #a84832;
     margin-left: 3px;
 }
 
@@ -1230,7 +1230,7 @@ QWidget .QFrame#framePrivateSend .QLabel#labelPrivateSendHeader { /* PrivateSend
 
 QWidget .QFrame#framePrivateSend .QLabel#labelPrivateSendSyncStatus { /* PrivateSend Sync Status */
     qproperty-alignment: 'AlignVCenter | AlignLeft';
-    color: #ff4500;
+    color: #a84832;
     margin-left: 2px;
     padding-right: 5px;
 }
@@ -1329,7 +1329,7 @@ QWidget .QFrame#frame_2 .QLabel#label_4 { /* Recent Transactions Label */
 
 QWidget .QFrame#frame_2 .QLabel#labelTransactionsStatus { /* Recent Transactions Sync Status */
     qproperty-alignment: 'AlignBottom | AlignRight';
-    color: #ff4500;
+    color: #a84832;
     min-width: 93px;
     margin-top: 0;
     margin-left: 16px;
@@ -1407,7 +1407,7 @@ QWidget#RPCConsole .QGroupBox #line { /* Network In Line */
 }
 
 QWidget#RPCConsole .QGroupBox #line_2 { /* Network Out Line */
-    background-color: #eb4034;
+    background-color: #a84832;
 }
 
 /******************************************************
@@ -1444,7 +1444,7 @@ QDialog#SendCoinsDialog .QFrame#frameCoinControl .QLabel#labelCoinControlChangeL
 }
 
 QDialog#SendCoinsDialog .QFrame#frameCoinControl .QLabel#labelCoinControlInsuffFunds { /* Insufficient Funds Label */
-    color: red;
+    color: #a84832;
 }
 
 QDialog#SendCoinsDialog .QScrollArea#scrollArea .QWidget#scrollAreaWidgetContents { /* Send To Widget */
