@@ -183,6 +183,78 @@ QProgressDialog
 QPushButton - Special case, light buttons
 ******************************************************/
 
+QPushButton {
+    background-color: #008de4;
+    color: #ffffff;
+}
+
+QPushButton:hover {
+    background-color: #047ac2;
+}
+
+QPushButton:pressed {
+    background-color: #1f5383;
+    border: 1px solid #444;
+}
+
+QPushButton:disabled {
+    background-color: #e7e7e7;
+    border-color: #d2d2d2;
+    color: #c2c2c2;
+}
+
+/******************************************************
+QPushButton - Special case, light buttons
+******************************************************/
+
+QWidget#AddressBookPage QPushButton#newAddress,
+QWidget#AddressBookPage QPushButton#copyAddress,
+QWidget#AddressBookPage QPushButton#showAddressQRCode,
+QWidget#AddressBookPage QPushButton#deleteAddress,
+QDialog#OpenURIDialog QPushButton#selectFileButton,
+QDialog#SendCoinsDialog .QPushButton#addButton,
+QDialog#SendCoinsDialog .QPushButton#clearButton,
+QWidget#ReceiveCoinsDialog .QFrame#frame QPushButton#removeRequestButton,
+QWidget#ReceiveCoinsDialog .QFrame#frame2 QPushButton#clearButton,
+QWidget#ReceiveCoinsDialog .QFrame#frame QPushButton#showRequestButton,
+QDialog#SignVerifyMessageDialog QPushButton#clearButton_SM,
+QDialog#SignVerifyMessageDialog QPushButton#clearButton_VM {
+    background-color: #c7c7c7;
+    color: #333;
+}
+
+QWidget#AddressBookPage QPushButton#newAddress:hover,
+QWidget#AddressBookPage QPushButton#copyAddress:hover,
+QWidget#AddressBookPage QPushButton#showAddressQRCode:hover,
+QWidget#AddressBookPage QPushButton#deleteAddress:hover,
+QDialog#OpenURIDialog QPushButton#selectFileButton:hover,
+QDialog#SendCoinsDialog .QPushButton#addButton:hover,
+QDialog#SendCoinsDialog .QPushButton#clearButton:hover,
+QWidget#ReceiveCoinsDialog .QFrame#frame QPushButton#removeRequestButton:hover,
+QWidget#ReceiveCoinsDialog .QFrame#frame2 QPushButton#clearButton:hover,
+QWidget#ReceiveCoinsDialog .QFrame#frame QPushButton#showRequestButton:hover,
+QDialog#SignVerifyMessageDialog QPushButton#clearButton_SM:hover,
+QDialog#SignVerifyMessageDialog QPushButton#clearButton_VM:hover {
+    background-color: #a7a7a7;
+    color: #333;
+}
+
+QWidget#AddressBookPage QPushButton#newAddress:pressed,
+QWidget#AddressBookPage QPushButton#copyAddress:pressed,
+QWidget#AddressBookPage QPushButton#showAddressQRCode:pressed,
+QWidget#AddressBookPage QPushButton#deleteAddress:pressed,
+QDialog#OpenURIDialog QPushButton#selectFileButton:pressed,
+QDialog#SendCoinsDialog .QPushButton#addButton:pressed,
+QDialog#SendCoinsDialog .QPushButton#clearButton:pressed,
+QWidget#ReceiveCoinsDialog .QFrame#frame QPushButton#removeRequestButton:pressed,
+QWidget#ReceiveCoinsDialog .QFrame#frame2 QPushButton#clearButton:pressed,
+QWidget#ReceiveCoinsDialog .QFrame#frame QPushButton#showRequestButton:pressed,
+QDialog#SignVerifyMessageDialog QPushButton#clearButton_SM:pressed,
+QDialog#SignVerifyMessageDialog QPushButton#clearButton_VM:pressed {
+    background-color: #c7c7c7;
+    color: #333;
+}
+
 QWidget#AddressBookPage QPushButton#newAddress:disabled,
 QWidget#AddressBookPage QPushButton#copyAddress:disabled,
 QWidget#AddressBookPage QPushButton#showAddressQRCode:disabled,
@@ -195,9 +267,9 @@ QWidget#ReceiveCoinsDialog .QFrame#frame2 QPushButton#clearButton:disabled,
 QWidget#ReceiveCoinsDialog .QFrame#frame QPushButton#showRequestButton:disabled,
 QDialog#SignVerifyMessageDialog QPushButton#clearButton_SM:disabled,
 QDialog#SignVerifyMessageDialog QPushButton#clearButton_VM:disabled {
-    background-color: #e2e2e2;
+    background-color: #e7e7e7;
     border-color: #d2d2d2;
-    color: #d2d2d2;
+    color: #c2c2c2;
 }
 
 /******************************************************

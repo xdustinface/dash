@@ -43,16 +43,16 @@ Common stuff
 
 WalletFrame,
 QDialog {
-    background-color: #444;
+    background-color: #2f2f31;
 }
 
 QStatusBar {
-    background-color: #555;
+    background-color: #39393b;
     color: #ccc;
 }
 
 QMessageBox {
-    background-color: #444;
+    background-color: #2f2f30;
 }
 
 QWidget { /* override text selection background color for all text widgets */
@@ -121,7 +121,7 @@ QHeaderView
 ******************************************************/
 
 QHeaderView::section { /* Table Header Sections */
-    background-color: #1c75bc;
+    background-color: #205a96;
     border-color: #ccc;
     color: #ccc;
 }
@@ -169,7 +169,7 @@ QMenuBar {
 
 QMenuBar::item:selected {
     background-color: #333;
-    color: #1c75bc;
+    color: #205a96;
 }
 
 /******************************************************
@@ -182,8 +182,84 @@ QProgressDialog
 }
 
 /******************************************************
+QPushButton
+******************************************************/
+
+QPushButton {
+    background-color: #205a96;
+    color: #ccc;
+}
+
+QPushButton:hover {
+    background-color: #27507a;
+}
+
+QPushButton:focus {
+    border: none;
+    outline: none;
+}
+
+QPushButton:pressed {
+    background-color: #205a96;
+}
+
+QPushButton:disabled {
+    background-color: #39393b;
+    border-color: #585858;
+    color: #585858;
+}
+
+/******************************************************
 QPushButton - Special case, light buttons
 ******************************************************/
+
+QWidget#AddressBookPage QPushButton#newAddress,
+QWidget#AddressBookPage QPushButton#copyAddress,
+QWidget#AddressBookPage QPushButton#showAddressQRCode,
+QWidget#AddressBookPage QPushButton#deleteAddress,
+QDialog#OpenURIDialog QPushButton#selectFileButton,
+QDialog#SendCoinsDialog .QPushButton#addButton,
+QDialog#SendCoinsDialog .QPushButton#clearButton,
+QWidget#ReceiveCoinsDialog .QFrame#frame QPushButton#removeRequestButton,
+QWidget#ReceiveCoinsDialog .QFrame#frame2 QPushButton#clearButton,
+QWidget#ReceiveCoinsDialog .QFrame#frame QPushButton#showRequestButton,
+QDialog#SignVerifyMessageDialog QPushButton#clearButton_SM,
+QDialog#SignVerifyMessageDialog QPushButton#clearButton_VM {
+    background-color: #f6f6f6;
+    color: #585858;
+}
+
+QWidget#AddressBookPage QPushButton#newAddress:hover,
+QWidget#AddressBookPage QPushButton#copyAddress:hover,
+QWidget#AddressBookPage QPushButton#showAddressQRCode:hover,
+QWidget#AddressBookPage QPushButton#deleteAddress:hover,
+QDialog#OpenURIDialog QPushButton#selectFileButton:hover,
+QDialog#SendCoinsDialog .QPushButton#addButton:hover,
+QDialog#SendCoinsDialog .QPushButton#clearButton:hover,
+QWidget#ReceiveCoinsDialog .QFrame#frame QPushButton#removeRequestButton:hover,
+QWidget#ReceiveCoinsDialog .QFrame#frame2 QPushButton#clearButton:hover,
+QWidget#ReceiveCoinsDialog .QFrame#frame QPushButton#showRequestButton:hover,
+QDialog#SignVerifyMessageDialog QPushButton#clearButton_SM:hover,
+QDialog#SignVerifyMessageDialog QPushButton#clearButton_VM:hover {
+    background-color: #c7c7c7;
+    color: #333;
+}
+
+QWidget#AddressBookPage QPushButton#newAddress:pressed,
+QWidget#AddressBookPage QPushButton#copyAddress:pressed,
+QWidget#AddressBookPage QPushButton#showAddressQRCode:pressed,
+QWidget#AddressBookPage QPushButton#deleteAddress:pressed,
+QDialog#OpenURIDialog QPushButton#selectFileButton:pressed,
+QDialog#SendCoinsDialog .QPushButton#addButton:pressed,
+QDialog#SendCoinsDialog .QPushButton#clearButton:pressed,
+QWidget#ReceiveCoinsDialog .QFrame#frame QPushButton#removeRequestButton:pressed,
+QWidget#ReceiveCoinsDialog .QFrame#frame2 QPushButton#clearButton:pressed,
+QWidget#ReceiveCoinsDialog .QFrame#frame QPushButton#showRequestButton:pressed,
+QDialog#SignVerifyMessageDialog QPushButton#clearButton_SM:pressed,
+QDialog#SignVerifyMessageDialog QPushButton#clearButton_VM:pressed {
+    background-color: #f6f6f6;
+    color: #585858;
+}
 
 QWidget#AddressBookPage QPushButton#newAddress:disabled,
 QWidget#AddressBookPage QPushButton#copyAddress:disabled,
@@ -197,9 +273,9 @@ QWidget#ReceiveCoinsDialog .QFrame#frame2 QPushButton#clearButton:disabled,
 QWidget#ReceiveCoinsDialog .QFrame#frame QPushButton#showRequestButton:disabled,
 QDialog#SignVerifyMessageDialog QPushButton#clearButton_SM:disabled,
 QDialog#SignVerifyMessageDialog QPushButton#clearButton_VM:disabled {
-    background-color: #666;
+    background-color: #39393b;
     border-color: #585858;
-    color: #787878;
+    color: #585858;
 }
 
 /******************************************************
@@ -482,7 +558,7 @@ ModalOverlay
 
 QWidget#bgWidget { /* The frame overlaying the overview-page */
     background-color: #cc323232;
-    color: #616161;
+    color: #585858;
 }
 
 QWidget#contentWidget { /* The actual content with the text/buttons/etc... */
