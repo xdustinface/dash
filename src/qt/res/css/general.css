@@ -1686,19 +1686,16 @@ QWidget#RPCConsole .QGroupBox #line_2 { /* Network Out Line */
 SendCoinsDialog
 ******************************************************/
 
-QDialog#SendCoinsDialog .QFrame#frameCoinControl { /* Coin Control Section */
-
+QDialog#SendCoinsDialog .QFrame#frameCoinControl,
+QDialog#SendCoinsDialog #scrollArea  { /* Coin Control Section */
+    border-bottom: 1px solid red;
 }
 
 QDialog#SendCoinsDialog .QFrame#frameCoinControl .QPushButton#pushButtonCoinControl { /* Coin Control Inputs Button */
-    padding-left: 10px;
-    padding-right: 10px;
-    min-height: 25px;
 }
 
 QDialog#SendCoinsDialog .QFrame#frameCoinControl .QLabel#labelCoinControlFeatures { /* Coin Control Header */
-    color: #999;
-    font-size: 14px;
+    font-size: 16px;
 }
 
 QDialog#SendCoinsDialog .QFrame#frameCoinControl .QWidget#widgetCoinControl { /* Coin Control Inputs */
@@ -1712,7 +1709,6 @@ QDialog#SendCoinsDialog .QFrame#frameCoinControl .QValidatedLineEdit#lineEditCoi
 }
 
 QDialog#SendCoinsDialog .QFrame#frameCoinControl .QLabel#labelCoinControlChangeLabel { /* Custom Change Address Validation Label */
-    qproperty-margin: -6;
     margin-right: 112px;
 }
 
@@ -1724,17 +1720,12 @@ QDialog#SendCoinsDialog .QScrollArea#scrollArea .QWidget#scrollAreaWidgetContent
     background-color: #00000000;
 }
 
-/* This QLabel uses name = "label" which conflicts with Address Book -> New Address */
-/* To maximize backwards compatibility this formatting has been removed */
-
-QDialog#SendCoinsDialog QLabel#label {
-    min-height: 27px;
-}
-
+QDialog#SendCoinsDialog QLabel#labelBalanceText,
 QDialog#SendCoinsDialog QLabel#labelBalance {
-    margin-left: 0px;
-    padding-left: 0px;
-    min-height: 27px;
+    qproperty-alignment: 'AlignLeading | AlignLeft';
+    min-height: 20px;
+    max-height: 20px;
+    font-size: 15px;
 }
 
 #checkboxSubtractFeeFromAmount {

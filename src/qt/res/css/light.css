@@ -730,6 +730,11 @@ QWidget#RPCConsole { /* RPC Console Dialog Box */
 SendCoinsDialog
 ******************************************************/
 
+QDialog#SendCoinsDialog .QFrame#frameCoinControl,
+QDialog#SendCoinsDialog #scrollArea {
+    border-color: #ccc;
+}
+
 QDialog#SendCoinsDialog QLabel#labelBalance {
     color: #333333;
 }
