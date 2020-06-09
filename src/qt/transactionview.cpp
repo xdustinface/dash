@@ -722,6 +722,14 @@ bool TransactionView::eventFilter(QObject *obj, QEvent *event)
              return true;
         }
     }
+    if (event->type() == QEvent::Show) {
+        //Give the search field the first focus on startup
+        static bool fGotFirstFocus = false;
+        if (!fGotFirstFocus){
+            search_widget->setFocus();
+            fGotFirstFocus = true;
+        }
+    }
     return QWidget::eventFilter(obj, event);
 }
 
