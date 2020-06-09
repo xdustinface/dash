@@ -68,7 +68,7 @@ QDialog {
 }
 
 .QFrame {
-    background-color: transparent;
+    background-color: #00000000;
     border: 0px;
 }
 
@@ -167,7 +167,7 @@ QCheckBox
 ******************************************************/
 
 QCheckBox{
-    background-color: transparent;
+    background-color: #00000000;
     min-height: 20px;
 }
 QCheckBox::indicator {
@@ -227,7 +227,7 @@ QComboBox:checked {
 }
 
 QComboBox:editable {
-    border: 0px solid transparent;
+    border: 0px solid #00000000;
 }
 
 QComboBox::drop-down {
@@ -250,14 +250,14 @@ QComboBox::item:alternate {
 }
 
 QComboBox::item:selected {
-    border: 0px solid transparent;
+    border: 0px solid #00000000;
 }
 
 QComboBox::indicator {
-    background-color: transparent;
-    selection-background-color: transparent;
-    color: transparent;
-    selection-color: transparent;
+    background-color: #00000000;
+    selection-background-color: #00000000;
+    color: #00000000;
+    selection-color: #00000000;
 }
 
 QComboBox::down-arrow {
@@ -286,7 +286,7 @@ QHeaderView
 ******************************************************/
 
 QHeaderView { /* Table Header */
-    background-color: transparent;
+    background-color: #00000000;
 }
 
 QHeaderView::section { /* Table Header Sections */
@@ -615,7 +615,7 @@ QRadioButton
 ******************************************************/
 
 QRadioButton {
-    background-color: transparent;
+    background-color: #00000000;
 }
 QRadioButton::indicator {
     width: 15px;
@@ -652,7 +652,7 @@ QScrollArea
 ******************************************************/
 
 .QScrollArea {
-    background-color: transparent;
+    background-color: #00000000;
     border: 0px;
 }
 
@@ -670,7 +670,7 @@ QTableView
 
 .QTableView { /* Table - has to be selected as a class otherwise it throws off QCalendarWidget */
     border: 0px;
-    background-color: transparent;
+    background-color: #00000000;
 }
 
 QTableView::item { /* Table Item */
@@ -747,7 +747,7 @@ QToolBar {
 }
 
 QToolBar > QToolButton {
-    background-color: transparent;
+    background-color: #00000000;
     border: none;
     min-height: 50px;
     max-height: 50px;
@@ -779,8 +779,8 @@ QTreeWidget
 ******************************************************/
 
 QTreeWidget {
-    background-color: transparent;
-    alternate-background-color: transparent;
+    background-color: #00000000;
+    alternate-background-color: #00000000;
     outline: 0;
     border: 0px;
 }
@@ -972,7 +972,7 @@ QDialog#CoinControlDialog .QDialogButtonBox#buttonBox QPushButton { /* Coin Cont
 }
 
 QDialog#CoinControlDialog QHeaderView::section:first { /* Bug Fix: the number 1 displays in this table for some reason... */
-    color: transparent;
+    color: #00000000;
 }
 
 QDialog#CoinControlDialog .CoinControlTreeWidget#treeWidget::item {
@@ -1053,7 +1053,7 @@ QWidget#bgWidget { /* The frame overlaying the overview-page */
 }
 
 QWidget#bgWidget .QPushButton#warningIcon {
-    background-color: transparent;
+    background-color: #00000000;
     width: 64px;
     height: 64px;
     padding: 5px;
@@ -1249,7 +1249,7 @@ OverviewPage PrivateSend
 ******************************************************/
 
 QWidget .QFrame#framePrivateSend { /* PrivateSend Widget */
-    background-color: transparent;
+    background-color: #00000000;
     max-width: 451px;
     min-width: 451px;
     max-height: 350px;
@@ -1425,7 +1425,7 @@ QWidget#RPCConsole QPushButton#openDebugLogfileButton {
 }
 
 QWidget#RPCConsole QTextEdit#messagesWidget { /* Console Messages Window */
-    background-color: transparent;
+    background-color: #00000000;
     border: 0;
 }
 
@@ -1435,13 +1435,13 @@ QWidget#RPCConsole QLineEdit#lineEdit { /* Console Input */
 QWidget#RPCConsole QPushButton#clearButton,
 QWidget#RPCConsole QPushButton#fontSmallerButton,
 QWidget#RPCConsole QPushButton#fontBiggerButton { /* Console Font and Clear Buttons */
-    background-color: transparent;
+    background-color: #00000000;
     padding-left: 10px;
     padding-right: 10px;
 }
 
 QWidget#RPCConsole QPushButton#promptIcon { /* Prompt Icon */
-    background-color: transparent;
+    background-color: #00000000;
 }
 
 QWidget#RPCConsole .QGroupBox #line { /* Network In Line */
@@ -1491,7 +1491,7 @@ QDialog#SendCoinsDialog .QFrame#frameCoinControl .QLabel#labelCoinControlInsuffF
 }
 
 QDialog#SendCoinsDialog .QScrollArea#scrollArea .QWidget#scrollAreaWidgetContents { /* Send To Widget */
-    background-color: transparent;
+    background-color: #00000000;
 }
 
 /* This QLabel uses name = "label" which conflicts with Address Book -> New Address */
@@ -1516,7 +1516,7 @@ SendCoinsEntry
 ******************************************************/
 
 QStackedWidget#SendCoinsEntry .QFrame#SendCoins > .QLabel { /* Send Coin Entry Labels */
-    background-color: transparent;
+    background-color: #00000000;
     min-width: 50px;
     font-size: 15px;
     min-height: 25px;
@@ -1531,7 +1531,7 @@ QStackedWidget#SendCoinsEntry .QValidatedLineEdit#payTo { /* Pay To Input Field 
 }
 
 QStackedWidget#SendCoinsEntry .QToolButton { /* General Settings for Pay To Icons */
-    background-color: transparent;
+    background-color: #00000000;
     padding-left: 5px;
     padding-right: 5px;
     border: 0;
@@ -1562,7 +1562,7 @@ QDialog#SignVerifyMessageDialog {
 }
 
 QDialog#SignVerifyMessageDialog QPushButton#addressBookButton_SM { /* Address Book Button */
-    background-color: transparent;
+    background-color: #00000000;
     padding-left: 10px;
     padding-right: 10px;
 }
@@ -1572,7 +1572,7 @@ QDialog#SignVerifyMessageDialog QPlainTextEdit { /* Message Signing Text */
 }
 
 QDialog#SignVerifyMessageDialog QPushButton#pasteButton_SM { /* Paste Button */
-    background-color: transparent;
+    background-color: #00000000;
     padding-left: 15px;
 }
 
@@ -1581,13 +1581,13 @@ QDialog#SignVerifyMessageDialog QLineEdit:!focus { /* Font Hack */
 }
 
 QDialog#SignVerifyMessageDialog QPushButton#copySignatureButton_SM { /* Copy Button */
-    background-color: transparent;
+    background-color: #00000000;
     padding-left: 10px;
     padding-right: 10px;
 }
 
 QDialog#SignVerifyMessageDialog QPushButton#addressBookButton_VM { /* Verify Message - Address Book Button */
-    background-color: transparent;
+    background-color: #00000000;
     border: 0;
     padding-left: 10px;
     padding-right: 10px;
