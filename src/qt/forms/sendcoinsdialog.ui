@@ -1136,7 +1136,7 @@
         <number>3</number>
        </property>
        <item>
-        <widget class="QLabel" name="label">
+        <widget class="QLabel" name="labelBalanceText">
          <property name="text">
           <string>Balance:</string>
          </property>
