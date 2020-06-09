@@ -76,7 +76,7 @@ SendCoinsDialog::SendCoinsDialog(const PlatformStyle *_platformStyle, QWidget *p
                       ui->labelFeeHeadline,
                       ui->fallbackFeeWarningLabel,
                       ui->labelBalance,
-                      ui->label
+                      ui->labelBalanceText
                      }, GUIUtil::getFontWeightBold());
 
     if (!_platformStyle->getImagesOnButtons()) {
