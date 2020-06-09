@@ -669,6 +669,32 @@ QScrollBar
 */
 
 /******************************************************
+QSlider
+******************************************************/
+
+QSlider::groove:horizontal {
+    background: #0000000;
+    height: 12px;
+    border-radius: 4px;
+}
+
+QSlider::add-page:horizontal,
+QSlider::sub-page:horizontal {
+    height: 12px;
+    border-radius: 4px;
+}
+
+QSlider::handle:horizontal {
+margin-left: 5px;
+margin-right: 5px;
+background-color: #205a96;
+width: 23px;
+margin-top: -5px;
+margin-bottom: -5px;
+border-radius: 11px;
+}
+
+/******************************************************
 QTableView
 ******************************************************/
 

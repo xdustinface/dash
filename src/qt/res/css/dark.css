@@ -379,6 +379,23 @@ QScrollBar
 */
 
 /******************************************************
+QSlider
+******************************************************/
+
+QSlider::handle:horizontal {
+	background-color: #205a96;
+}
+QSlider::handle:horizontal:hover {
+	background-color: #27507a;
+}
+QSlider::sub-page:horizontal {
+	background-color: #c7c7c7;
+}
+QSlider::add-page:horizontal {
+	background-color: #c7c7c7;
+}
+
+/******************************************************
 QTableView
 ******************************************************/
 
