@@ -53,10 +53,6 @@ QDialog {
     background-color: #f6f6f6;
 }
 
-QStatusBar {
-    background-color: #ffffff;
-}
-
 QMessageBox {
     background-color: #f6f6f6;
 }
@@ -449,6 +445,15 @@ QSlider::sub-page:horizontal {
 }
 QSlider::add-page:horizontal {
 	background-color: #c7c7c7;
+}
+
+/******************************************************
+QStatusBar
+******************************************************/
+
+QStatusBar {
+    background-color: #ffffff;
+    color: #333;
 }
 
 /******************************************************
