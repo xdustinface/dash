@@ -460,6 +460,20 @@ QTextEdit {
 QToolBar / QToolButton
 ******************************************************/
 
+QToolBar {
+    background-color: #008de4;
+}
+
+QToolBar > QToolButton {
+    background-color: #00000000;
+    color: #ffffff;
+}
+
+QToolBar > QToolButton:hover:!checked {
+    background-color: #047ac2;
+    color: #DCDCDC;
+}
+
 QToolBar > QToolButton:checked {
     background-color: #f6f6f6;
     color: #333333;

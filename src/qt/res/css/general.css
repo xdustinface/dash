@@ -759,7 +759,7 @@ QToolBar / QToolButton
 ******************************************************/
 
 QToolBar {
-    background-color: #008de4;
+    background-color: red;
     border: none;
     width: 100%;
     padding: 0;
@@ -775,19 +775,19 @@ QToolBar > QToolButton {
     min-height: 50px;
     max-height: 50px;
     letter-spacing: 3px;
-    color: #ffffff;
+    color: #ddd;
     width: 100%;
     padding: 1px;
     text-align: center;
 }
 
 QToolBar > QToolButton:hover:!checked {
-    background-color: #005e98;
-    color: #DCDCDC;
+    background-color: red;
+    color: red;
 }
 
 QToolBar > QToolButton:disabled {
-    color: #444;
+    color: red;
 }
 
 QToolBar QLabel#lblToolbarLogo {
