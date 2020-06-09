@@ -72,9 +72,6 @@ QDialog {
     border: 0px;
 }
 
-QStatusBar {
-}
-
 QMessageBox {
 }
 
@@ -792,6 +789,25 @@ width: 23px;
 margin-top: -5px;
 margin-bottom: -5px;
 border-radius: 11px;
+}
+
+/******************************************************
+QStatusBar
+******************************************************/
+
+QStatusBar {
+    padding-left: 10px;
+    padding-right: 10px;
+    min-height: 25px;
+}
+
+QStatusBar QLabel {
+    margin-right: 5px;
+}
+
+QStatusBar #lblStatusBarProgress {
+    margin-left: 5px;
+    margin-right: 5px;
 }
 
 /******************************************************
