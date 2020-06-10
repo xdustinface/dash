@@ -5,6 +5,7 @@
 #ifndef BITCOIN_QT_OPTIONSDIALOG_H
 #define BITCOIN_QT_OPTIONSDIALOG_H
 
+#include <QButtonGroup>
 #include <QDialog>
 #include <QValidator>
 
@@ -44,6 +45,8 @@ public:
     void setMapper();
 
 private Q_SLOTS:
+    /** custom tab buttons clicked */
+    void showPage(int index);
     /* set OK button state (enabled / disabled) */
     void setOkButtonState(bool fState);
     void on_resetButton_clicked();
@@ -67,6 +70,7 @@ private:
     OptionsModel *model;
     QDataWidgetMapper *mapper;
     QString previousTheme;
+    QButtonGroup pageButtons;
 };
 
 #endif // BITCOIN_QT_OPTIONSDIALOG_H
