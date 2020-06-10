@@ -367,6 +367,23 @@ QComboBox::down-arrow:disabled {
 }
 
 /******************************************************
+QGroupBox
+******************************************************/
+
+QGroupBox {
+    background-color:red;
+    color: red;
+    font-size: 16px;
+    padding-top: 20px;
+}
+
+QGroupBox:title {
+    background-color: #00000000;
+    margin-top: 5px;
+    margin-left: 7px;
+}
+
+/******************************************************
 QHeaderView
 ******************************************************/
 
