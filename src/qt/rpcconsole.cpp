@@ -528,6 +528,14 @@ RPCConsole::RPCConsole(const PlatformStyle *_platformStyle, QWidget *parent) :
     ui->peerHeading->setText(tr("Select a peer to view detailed information."));
 
     consoleFontSize = settings.value(fontSizeSettingsKey, QFontInfo(GUIUtil::getFontNormal()).pointSize()).toInt();
+
+    pageButtons.addButton(ui->btnInfo, pageButtons.buttons().size());
+    pageButtons.addButton(ui->btnConsole, pageButtons.buttons().size());
+    pageButtons.addButton(ui->btnNetTraffic, pageButtons.buttons().size());
+    pageButtons.addButton(ui->btnPeers, pageButtons.buttons().size());
+    pageButtons.addButton(ui->btnRepair, pageButtons.buttons().size());
+    connect(&pageButtons, SIGNAL(buttonClicked(int)), this, SLOT(showPage(int)));
+
     clear();
 }
 
@@ -661,7 +669,7 @@ void RPCConsole::setClientModel(ClientModel *model)
         connect(model->getPeerTableModel(), SIGNAL(layoutChanged()), this, SLOT(peerLayoutChanged()));
         // peer table signal handling - cache selected node ids
         connect(model->getPeerTableModel(), SIGNAL(layoutAboutToBeChanged()), this, SLOT(peerLayoutAboutToChange()));
-        
+
         // set up ban table
         ui->banlistWidget->setModel(model->getBanTableModel());
         ui->banlistWidget->verticalHeader()->hide();
@@ -869,7 +877,7 @@ void RPCConsole::clear(bool clearHistory)
 #else
     QString clsKey = "Ctrl-L";
 #endif
-	 
+
     message(CMD_REPLY, (tr("Welcome to the %1 RPC console.").arg(tr(PACKAGE_NAME)) + "<br>" +
                         tr("Use up and down arrows to navigate history, and %1 to clear screen.").arg("<b>"+clsKey+"</b>") + "<br>" +
                         tr("Type %1 for an overview of available commands.").arg("<b>help</b>") + "<br>" +
@@ -965,6 +973,23 @@ void RPCConsole::setInstantSendLockCount(size_t count)
     ui->instantSendLockCount->setText(QString::number(count));
 }
 
+void RPCConsole::showPage(int index)
+{
+    std::vector<QWidget*> vecNormal;
+    QAbstractButton* btnActive = pageButtons.button(index);
+    for (QAbstractButton* button : pageButtons.buttons()) {
+        if (button != btnActive) {
+            vecNormal.push_back(button);
+        }
+    }
+
+    GUIUtil::setFont({btnActive}, GUIUtil::getFontWeightBold());
+    GUIUtil::setFont(vecNormal, GUIUtil::getFontWeightNormal());
+
+    ui->stackedWidgetRPC->setCurrentIndex(index);
+    btnActive->setChecked(true);
+}
+
 void RPCConsole::on_lineEdit_returnPressed()
 {
     QString cmd = ui->lineEdit->text();
@@ -1049,11 +1074,11 @@ void RPCConsole::startExecutor()
     thread.start();
 }
 
-void RPCConsole::on_tabWidget_currentChanged(int index)
+void RPCConsole::on_stackedWidgetRPC_currentChanged(int index)
 {
-    if (ui->tabWidget->widget(index) == ui->tab_console)
+    if (ui->stackedWidgetRPC->widget(index) == ui->pageConsole)
         ui->lineEdit->setFocus();
-    else if (ui->tabWidget->widget(index) != ui->tab_peers)
+    else if (ui->stackedWidgetRPC->widget(index) != ui->pagePeers)
         clearSelectedNode();
 }
 
@@ -1267,7 +1292,7 @@ void RPCConsole::disconnectSelectedNode()
 {
     if(!g_connman)
         return;
-    
+
     // Get selected peer addresses
     QList<QModelIndex> nodes = GUIUtil::getEntryData(ui->peerWidget, PeerTableModel::NetNodeId);
     for(int i = 0; i < nodes.count(); i++)
@@ -1284,7 +1309,7 @@ void RPCConsole::banSelectedNode(int bantime)
 {
     if (!clientModel || !g_connman)
         return;
-    
+
     // Get selected peer addresses
     QList<QModelIndex> nodes = GUIUtil::getEntryData(ui->peerWidget, PeerTableModel::NetNodeId);
     for(int i = 0; i < nodes.count(); i++)
@@ -1349,5 +1374,5 @@ void RPCConsole::showOrHideBanTableIfRequired()
 
 void RPCConsole::setTabFocus(enum TabTypes tabType)
 {
-    ui->tabWidget->setCurrentIndex(tabType);
+    showPage(tabType);
 }
