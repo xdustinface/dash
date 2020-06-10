@@ -83,7 +83,7 @@ public:
 
         if(amount < 0)
         {
-            foreground = GUIUtil::getThemedQColor(GUIUtil::ThemedColor::NEGATIVE);
+            foreground = GUIUtil::getThemedQColor(GUIUtil::ThemedColor::RED);
         }
         else if(!confirmed)
         {
