@@ -796,6 +796,16 @@ void SendCoinsDialog::updateCoinControlState(CCoinControl& ctrl)
     ctrl.m_confirm_target = getConfTargetForIndex(ui->confTargetSelector->currentIndex());
 }
 
+void SendCoinsDialog::changeEvent(QEvent* e)
+{
+    if (e->type() == QEvent::StyleChange)
+    {
+        clear();
+    }
+
+    QWidget::changeEvent(e);
+}
+
 void SendCoinsDialog::setPrivateSend(bool privateSend)
 {
     if (fPrivateSend != privateSend) {
