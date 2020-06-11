@@ -137,7 +137,7 @@ void ReceiveRequestDialog::update()
     ui->btnSaveAs->setEnabled(false);
     QString html;
     html += "<html>";
-    html += "<b>"+tr("Payment information")+"</b><br>";
+    html += "<b>" + tr("Payment information") + "</b><br><br>";
     html += "<b>"+tr("URI")+"</b>: ";
     html += QString("<a style=\"%1\"href=\"").arg(GUIUtil::getThemedStyleQString(GUIUtil::ThemedStyle::TS_COMMAND)) +
             uri + "\">" + GUIUtil::HtmlEscape(uri) + "</a><br>";
