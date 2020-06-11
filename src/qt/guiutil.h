@@ -59,6 +59,8 @@ namespace GUIUtil
         BACKGROUND_WIDGET,
         /* Border color used for some widgets. Its slightly brighter than BACKGROUND_WIDGET. */
         BORDER_WIDGET,
+        /* Pixel color of generated QR codes. */
+        QR_PIXEL,
     };
 
     /* Enumeration of possible "styles" */
