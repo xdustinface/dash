@@ -146,6 +146,7 @@ static const std::map<ThemedColor, QColor> themedColors = {
     { ThemedColor::TX_STATUS_LOCKED, QColor(28, 117, 188) },
     { ThemedColor::BACKGROUND_WIDGET, QColor(234, 234, 236) },
     { ThemedColor::BORDER_WIDGET, QColor(220, 220, 220) },
+    { ThemedColor::QR_PIXEL, QColor(85, 85, 85) },
 };
 
 static const std::map<ThemedColor, QColor> themedDarkColors = {
@@ -160,6 +161,7 @@ static const std::map<ThemedColor, QColor> themedDarkColors = {
     { ThemedColor::TX_STATUS_LOCKED, QColor(28, 117, 188) },
     { ThemedColor::BACKGROUND_WIDGET, QColor(45, 45, 46) },
     { ThemedColor::BORDER_WIDGET, QColor(74, 74, 75) },
+    { ThemedColor::QR_PIXEL, QColor(199, 199, 199) },
 };
 
 static const std::map<ThemedStyle, QString> themedStyles = {
