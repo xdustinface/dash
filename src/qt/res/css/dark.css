@@ -191,7 +191,8 @@ QMenu
 ******************************************************/
 
 QMenu {
-    background-color: #555;
+    background-color: #39393b;
+    border-color: #4a4a4b;
 }
 
 QMenu::item {
@@ -200,6 +201,13 @@ QMenu::item {
 QMenu::item:selected {
     background-color: #666;
     color: #ddd;
+}
+QMenu::item:disabled {
+    color: #585858;
+}
+
+QMenu::separator {
+    background-color: #585858;
 }
 
 /******************************************************
