@@ -726,6 +726,20 @@ QWidget#RPCConsole { /* RPC Console Dialog Box */
     background-color: #f6f6f6;
 }
 
+#rpcAutoCompleter {
+    background-color: #eaeaec;
+    border-color: #dcdcdc;
+}
+
+#rpcAutoCompleter::item {
+    color: #555;
+}
+
+#rpcAutoCompleter::item:selected {
+    background-color: #d2d2d2;
+    color: #555;
+}
+
 /******************************************************
 SendCoinsDialog
 ******************************************************/

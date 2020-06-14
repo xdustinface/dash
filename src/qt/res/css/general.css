@@ -1682,6 +1682,25 @@ QWidget#RPCConsole .QGroupBox #line_2 { /* Network Out Line */
     background-color: #a84832;
 }
 
+#rpcAutoCompleter {
+    border: 1px solid red;
+    background-color: red;
+}
+
+#rpcAutoCompleter QListView {
+    background-color: red;
+}
+
+#rpcAutoCompleter::item {
+    background-color: #00000000;
+    color: red;
+}
+
+#rpcAutoCompleter::item:selected {
+    color: red;
+}
+
+
 /******************************************************
 SendCoinsDialog
 ******************************************************/
