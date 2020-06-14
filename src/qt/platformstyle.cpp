@@ -20,10 +20,10 @@ static const struct {
     /** Extra padding/spacing in transactionview */
     const bool useExtraSpacing;
 } platform_styles[] = {
-    {"macosx", false, false, true},
-    {"windows", true, false, false},
+    {"macosx", false, false, false},
+    {"windows", false, false, false},
     /* Other: linux, unix, ... */
-    {"other", true, false, false}
+    {"other", false, false, false}
 };
 static const unsigned platform_styles_count = sizeof(platform_styles)/sizeof(*platform_styles);
 
