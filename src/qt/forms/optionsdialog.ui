@@ -75,6 +75,16 @@
        </property>
       </widget>
      </item>
+     <item>
+      <widget class="QPushButton" name="btnAppearance">
+       <property name="text">
+        <string>&amp;Appearance</string>
+       </property>
+       <property name="checkable">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
     </layout>
    </item>
    <item>
@@ -729,7 +739,7 @@
          <item>
           <widget class="QLabel" name="langLabel">
            <property name="text">
-            <string>User Interface &amp;language:</string>
+            <string>Language:</string>
            </property>
            <property name="textFormat">
             <enum>Qt::PlainText</enum>
@@ -776,20 +786,6 @@ https://www.transifex.com/projects/p/dash/</string>
           <set>Qt::TextBrowserInteraction</set>
          </property>
         </widget>
-       </item>
-       <item>
-        <layout class="QHBoxLayout" name="horizontalLayout_4_Display" stretch="0,0">
-         <item>
-          <widget class="QLabel" name="themeLabel">
-           <property name="text">
-            <string>User Interface Theme:</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QValueComboBox" name="theme"/>
-         </item>
-        </layout>
        </item>
        <item>
         <widget class="Line" name="line">
@@ -872,6 +868,24 @@ https://www.transifex.com/projects/p/dash/</string>
           </size>
          </property>
         </spacer>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="pageAppearance">
+      <layout class="QVBoxLayout" name="verticalLayout_3">
+       <item>
+        <layout class="QHBoxLayout" name="layoutTheme" stretch="0,0">
+         <item>
+          <widget class="QLabel" name="themeLabel">
+           <property name="text">
+            <string>Theme:</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QValueComboBox" name="theme"/>
+         </item>
+        </layout>
        </item>
       </layout>
      </widget>
