@@ -89,6 +89,7 @@ OptionsDialog::OptionsDialog(QWidget *parent, bool enableWallet) :
     pageButtons.addButton(ui->btnWindow, pageButtons.buttons().size());
 #endif
     pageButtons.addButton(ui->btnDisplay, pageButtons.buttons().size());
+    pageButtons.addButton(ui->btnAppearance, pageButtons.buttons().size());
 
     connect(&pageButtons, SIGNAL(buttonClicked(int)), this, SLOT(showPage(int)));
 
@@ -102,12 +103,6 @@ OptionsDialog::OptionsDialog(QWidget *parent, bool enableWallet) :
         digits.setNum(index);
         ui->digits->addItem(digits, digits);
     }
-
-    /* Theme selector */
-    for (const QString& entry : GUIUtil::listThemes()) {
-        ui->theme->addItem(entry, QVariant(entry));
-    }
-    connect(ui->theme, SIGNAL(valueChanged()), this, SLOT(updateTheme()));
 
     /* Language selector */
     QDir translations(":translations");
@@ -134,6 +129,11 @@ OptionsDialog::OptionsDialog(QWidget *parent, bool enableWallet) :
         }
     }
     ui->thirdPartyTxUrls->setPlaceholderText("https://example.com/tx/%s");
+
+    /* Theme selector */
+    for (const QString& entry : GUIUtil::listThemes()) {
+        ui->theme->addItem(entry, QVariant(entry));
+    }
 
     ui->unit->setModel(new BitcoinUnits(this));
 
@@ -196,6 +196,8 @@ void OptionsDialog::setModel(OptionsModel *_model)
     connect(ui->digits, SIGNAL(valueChanged()), this, SLOT(showRestartWarning()));
     connect(ui->lang, SIGNAL(valueChanged()), this, SLOT(showRestartWarning()));
     connect(ui->thirdPartyTxUrls, SIGNAL(textChanged(const QString &)), this, SLOT(showRestartWarning()));
+    /* Appearance */
+    connect(ui->theme, SIGNAL(valueChanged()), this, SLOT(updateTheme()));
 }
 
 void OptionsDialog::setMapper()
@@ -237,11 +239,12 @@ void OptionsDialog::setMapper()
 
     /* Display */
     mapper->addMapping(ui->digits, OptionsModel::Digits);
-    mapper->addMapping(ui->theme, OptionsModel::Theme);
     mapper->addMapping(ui->lang, OptionsModel::Language);
     mapper->addMapping(ui->unit, OptionsModel::DisplayUnit);
     mapper->addMapping(ui->thirdPartyTxUrls, OptionsModel::ThirdPartyTxUrls);
 
+    /* Appearance */
+    mapper->addMapping(ui->theme, OptionsModel::Theme);
 }
 
 void OptionsDialog::showPage(int index)
