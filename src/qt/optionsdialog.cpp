@@ -198,6 +198,7 @@ void OptionsDialog::setModel(OptionsModel *_model)
     connect(ui->thirdPartyTxUrls, SIGNAL(textChanged(const QString &)), this, SLOT(showRestartWarning()));
     /* Appearance */
     connect(ui->theme, SIGNAL(valueChanged()), this, SLOT(updateTheme()));
+    connect(ui->fontScaleSlider, SIGNAL(valueChanged(int)), this, SLOT(updateFontScale(int)));
 }
 
 void OptionsDialog::setMapper()
@@ -245,6 +246,7 @@ void OptionsDialog::setMapper()
 
     /* Appearance */
     mapper->addMapping(ui->theme, OptionsModel::Theme);
+    mapper->addMapping(ui->fontScaleSlider, OptionsModel::FontScale);
 }
 
 void OptionsDialog::showPage(int index)
@@ -393,6 +395,12 @@ void OptionsDialog::updateTheme(const QString& theme)
         QSettings().sync();
         Q_EMIT themeChanged();
     }
+}
+
+void OptionsDialog::updateFontScale(int nScale)
+{
+    GUIUtil::setFontScale(nScale);
+    GUIUtil::updateFonts();
 }
 
 ProxyAddressValidator::ProxyAddressValidator(QObject *parent) :
