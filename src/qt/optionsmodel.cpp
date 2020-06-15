@@ -88,6 +88,11 @@ void OptionsModel::Init(bool resetSettings)
     if (!settings.contains("theme"))
         settings.setValue("theme", GUIUtil::getDefaultTheme());
 
+    if (!settings.contains("fontScale"))
+        settings.setValue("fontScale", GUIUtil::getFontScaleDefault());
+    if (!gArgs.SoftSetArg("-font-scale", settings.value("fontScale").toString().toStdString()))
+        addOverriddenOption("-font-scale");
+
 #ifdef ENABLE_WALLET
     if (!settings.contains("fCoinControlFeatures"))
         settings.setValue("fCoinControlFeatures", false);
@@ -338,6 +343,8 @@ QVariant OptionsModel::data(const QModelIndex & index, int role) const
 #endif // ENABLE_WALLET
         case Theme:
             return settings.value("theme");
+        case FontScale:
+            return settings.value("fontScale");
         case Language:
             return settings.value("language");
 #ifdef ENABLE_WALLET
@@ -513,6 +520,11 @@ bool OptionsModel::setData(const QModelIndex & index, const QVariant & value, in
         case Theme:
             // Set in OptionsDialog::updateTheme slot now
             // to allow instant theme changes.
+            break;
+        case FontScale:
+            if (settings.value("fontScale") != value) {
+                settings.setValue("fontScale", value);
+            }
             break;
         case Language:
             if (settings.value("language") != value) {
