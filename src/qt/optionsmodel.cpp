@@ -84,6 +84,7 @@ void OptionsModel::Init(bool resetSettings)
         settings.setValue("strThirdPartyTxUrls", "");
     strThirdPartyTxUrls = settings.value("strThirdPartyTxUrls", "").toString();
 
+    // Appearance
     if (!settings.contains("theme"))
         settings.setValue("theme", GUIUtil::getDefaultTheme());
 
