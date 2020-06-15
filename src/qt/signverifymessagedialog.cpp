@@ -65,9 +65,12 @@ SignVerifyMessageDialog::SignVerifyMessageDialog(const PlatformStyle *_platformS
     ui->signatureIn_VM->installEventFilter(this);
 
     GUIUtil::setFixedPitchFont({ui->signatureOut_SM, ui->signatureIn_VM});
-    
-    GUIUtil::setFont({ui->signatureOut_SM}, QFont::Light, true);
+
+    GUIUtil::setFont({ui->signatureOut_SM}, GUIUtil::getFontWeightNormal(), 11, true);
+    GUIUtil::setFont({ui->signatureLabel_SM}, GUIUtil::getFontWeightBold(), 16);
     GUIUtil::setFont({ui->statusLabel_SM, ui->statusLabel_VM}, GUIUtil::getFontWeightBold());
+
+    GUIUtil::updateFonts();
 
     GUIUtil::disableMacFocusRect(this);
 }
@@ -118,8 +121,8 @@ void SignVerifyMessageDialog::showPage(int index)
         }
     }
 
-    GUIUtil::setFont({btnActive}, GUIUtil::getFontWeightBold());
-    GUIUtil::setFont(vecNormal, GUIUtil::getFontWeightNormal());
+    GUIUtil::setFont({btnActive}, GUIUtil::getFontWeightBold(), 16);
+    GUIUtil::setFont(vecNormal, GUIUtil::getFontWeightNormal(), 16);
 
     ui->stackedWidgetSig->setCurrentIndex(index);
     btnActive->setChecked(true);

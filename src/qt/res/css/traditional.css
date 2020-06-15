@@ -63,7 +63,6 @@ QPushButton - Special case, tabbar replacement buttons
 #btnSignMessage,
 #btnVerifyMessage {
     background: none;
-    font-size: 15px;
 	border-radius: 0px;
     color: red;
     border-bottom: 3px solid red;

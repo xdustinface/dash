@@ -60,6 +60,8 @@ CoinControlDialog::CoinControlDialog(const PlatformStyle *_platformStyle, QWidge
                       ui->labelCoinControlChangeText
                      }, GUIUtil::getFontWeightBold());
 
+    GUIUtil::updateFonts();
+
     GUIUtil::disableMacFocusRect(this);
     
     // context menu actions

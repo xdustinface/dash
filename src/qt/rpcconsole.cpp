@@ -469,7 +469,7 @@ RPCConsole::RPCConsole(const PlatformStyle *_platformStyle, QWidget *parent) :
                       ui->peerHeading,
                       ui->label_repair_header,
                       ui->banHeading
-                     }, GUIUtil::getFontWeightBold());
+                     }, GUIUtil::getFontWeightBold(), 16);
 
     GUIUtil::disableMacFocusRect(this);
 
@@ -987,8 +987,8 @@ void RPCConsole::showPage(int index)
         }
     }
 
-    GUIUtil::setFont({btnActive}, GUIUtil::getFontWeightBold());
-    GUIUtil::setFont(vecNormal, GUIUtil::getFontWeightNormal());
+    GUIUtil::setFont({btnActive}, GUIUtil::getFontWeightBold(), 16);
+    GUIUtil::setFont(vecNormal, GUIUtil::getFontWeightNormal(), 16);
 
     ui->stackedWidgetRPC->setCurrentIndex(index);
     btnActive->setChecked(true);

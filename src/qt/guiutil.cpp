@@ -129,6 +129,8 @@ int fontScale = defaultFontScale;
 static std::map<QWidget*, std::pair<QFont::Weight, bool>> mapNormalFontUpdates;
 // Contains all widgets where a fixed pitch font has been set with GUIUtil::setFixedPitchFont
 static std::set<QWidget*> setFixedPitchFontUpdates;
+// Contains all widgets where a non-default fontsize has been seet with GUIUtil::setFont
+static std::map<QWidget*, int> mapFontSizeUpdates;
 #ifdef Q_OS_MAC
 // Contains all widgets where the macOS focus rect has been disabled.
 static std::set<QWidget*> setRectsDisabled;
@@ -1287,15 +1289,21 @@ void setApplicationFont()
                 " match: " << qApp->font().exactMatch();
 }
 
-void setFont(const std::vector<QWidget*> &vecWidgets, QFont::Weight weight, bool fItalic)
+void setFont(const std::vector<QWidget*> &vecWidgets, QFont::Weight weight, int nPointSize, bool fItalic)
 {
     // TODO: Evaluate maybe wrapping this later into some "theme handler" or so..
-    QFont font = getFont(weight, fItalic);
+    QFont font = getFont(weight, fItalic, nPointSize);
 
     for (auto it : vecWidgets) {
         auto fontAttributes = std::make_pair(weight, fItalic);
         auto itw = mapNormalFontUpdates.emplace(std::make_pair(it, fontAttributes));
         if (!itw.second) itw.first->second = fontAttributes;
+
+        if (nPointSize != -1) {
+            auto its = mapFontSizeUpdates.emplace(std::make_pair(it, nPointSize));
+            if (!its.second) its.first->second = nPointSize;
+        }
+
         it->setFont(font);
     }
 }
@@ -1314,6 +1322,13 @@ void updateFonts()
     // TODO: Evaluate maybe wrapping this later into some "theme handler" or so..
     setApplicationFont();
 
+    auto getKey = [](QWidget* w) -> QString
+    {
+        return w->parent() ? w->parent()->objectName() + w->objectName() :
+                             w->objectName();
+    };
+
+    static std::map<QString, int> mapDefaultFontSizes;
     std::map<QWidget*, QFont> mapWidgetFonts;
 
     for (QWidget* w : qApp->allWidgets()) {
@@ -1322,22 +1337,41 @@ void updateFonts()
         font.setWeight(qApp->font().weight());
         font.setStyleName(qApp->font().styleName());
         font.setStyle(qApp->font().style());
+        // Set the font size based on the widgets default font size + the font scale
+        QString key = getKey(w);
+        if (!mapDefaultFontSizes.count(key)) {
+            mapDefaultFontSizes.emplace(std::make_pair(key, font.pointSize() > 0 ? font.pointSize() : defaultFontSize));
+        }
+        font.setPointSizeF(getScaledFontSize(mapDefaultFontSizes[key]));
         mapWidgetFonts.emplace(w, font);
     }
 
     auto itn = mapNormalFontUpdates.begin();
     while (itn != mapNormalFontUpdates.end()) {
         if (mapWidgetFonts.count(itn->first)) {
-            mapWidgetFonts[itn->first] = getFont(itn->second.first, itn->second.second);
+            mapWidgetFonts[itn->first] = getFont(itn->second.first, itn->second.second, mapDefaultFontSizes[getKey(itn->first)]);
             ++itn;
         } else {
             itn = mapNormalFontUpdates.erase(itn);
         }
     }
+    auto its = mapFontSizeUpdates.begin();
+    while (its != mapFontSizeUpdates.end()) {
+        if (mapWidgetFonts.count(its->first)) {
+            QFont font = mapWidgetFonts[its->first];
+            font.setPointSizeF(getScaledFontSize(its->second));
+            mapWidgetFonts[its->first] = font;
+            ++its;
+        } else {
+            its = mapFontSizeUpdates.erase(its);
+        }
+    }
     auto itf = setFixedPitchFontUpdates.begin();
     while (itf != setFixedPitchFontUpdates.end()) {
         if (mapWidgetFonts.count(*itf)) {
-            mapWidgetFonts[*itf] = fixedPitchFont();
+            QFont font = fixedPitchFont();
+            font.setPointSizeF(getScaledFontSize(mapDefaultFontSizes[getKey(*itf)]));
+            mapWidgetFonts[*itf] = font;
             ++itf;
         } else {
             itf = setFixedPitchFontUpdates.erase(itf);
@@ -1346,10 +1380,13 @@ void updateFonts()
 
     for (auto it: mapWidgetFonts) {
         it.first->setFont(it.second);
+        if (gArgs.IsArgSet("-debug-ui")) {
+            qDebug() << __func__ << ": set font " << it.second << " for widget " << it.first->objectName();
+        }
     }
 }
 
-QFont getFont(QFont::Weight weight, bool fItalic)
+QFont getFont(QFont::Weight weight, bool fItalic, int nPointSize)
 {
     // TODO: Evaluate maybe wrapping this later into some "theme handler" or so..
     QFont font;
@@ -1398,6 +1435,11 @@ QFont getFont(QFont::Weight weight, bool fItalic)
         font.setWeight(weight > QFont::Normal ? QFont::Bold : QFont::Normal);
         font.setStyle(fItalic ? QFont::StyleItalic : QFont::StyleNormal);
     }
+
+    if (nPointSize != -1) {
+        font.setPointSizeF(getScaledFontSize(nPointSize));
+    }
+
     if (gArgs.IsArgSet("-debug-ui")) {
         qDebug() << __func__ << ": font size: " << font.pointSizeF() << " family: " << font.family() << ", style: " << font.styleName() << " match: " << font.exactMatch();
     }

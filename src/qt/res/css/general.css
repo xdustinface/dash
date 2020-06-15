@@ -68,7 +68,6 @@ QLabel,
 QListView,
 QRadioButton,
 QTreeWidget { /* Base Text Size & Color */
-    font-size: 12px;
 }
 
 /******************************************************
@@ -82,7 +81,6 @@ QLineEdit {
     border: 1px solid red;
     border-color: red;
     border-radius: 8px;
-    font-size: 13px;
     padding: 0px 8px 0px 8px;
 }
 
@@ -409,7 +407,6 @@ QGroupBox
 QGroupBox {
     background-color:red;
     color: red;
-    font-size: 16px;
     padding-top: 20px;
 }
 
@@ -430,7 +427,6 @@ QHeaderView { /* Table Header */
 QHeaderView::section { /* Table Header Sections */
     qproperty-alignment: center;
     min-height: 25px;
-    font-size: 12px;
     outline: 0;
     border: 0px solid;
     padding-left: 5px;
@@ -476,7 +472,6 @@ QMenu
 QMenu {
     border: 1px solid red;
     border-radius: 5px;
-    font-size: 12px;
 }
 
 QMenu::item {
@@ -496,7 +491,6 @@ QMenuBar
 ******************************************************/
 
 QMenuBar {
-    font-size: 12px;
 }
 
 QMenuBar::item {
@@ -539,7 +533,6 @@ QPushButton {
     border: 0;
     border-radius: 8px;
     color: red;
-    font-size: 12px;
     max-height: 26px;
     min-height: 26px;
     padding-left: 12px;
@@ -662,7 +655,6 @@ QPushButton - Special case, tabbar replacement buttons
 #btnSignMessage,
 #btnVerifyMessage {
     background: none;
-    font-size: 15px;
 	border-radius: 0px;
     color: red;
     border-bottom: 2px solid red;
@@ -866,11 +858,9 @@ QTableView
     border: 1px solid red;
     background-color: #00000000;
     qproperty-showGrid: false;
-    font-size: 12px;
 }
 
 QTableView::item { /* Table Item */
-    font-size: 12px;
     border-bottom: 1px solid;
 }
 
@@ -920,7 +910,6 @@ QToolBar > QToolButton {
     border: none;
     min-height: 50px;
     max-height: 50px;
-    font-size: 16px;
     color: #ddd;
     width: 100%;
     padding: 1px;
@@ -1059,7 +1048,6 @@ QWidget#AddressBookPage {
 }
 
 QWidget#AddressBookPage QTableView { /* Address Listing */
-    font-size: 12px;
 }
 
 QWidget#AddressBookPage QTableView::item {
@@ -1219,7 +1207,6 @@ MasternodeList
 MasternodeList QLabel#label_filter_2,
 MasternodeList QLabel#label_count_2,
 MasternodeList QLabel#countLabelDIP3 {
-    font-size: 15px;
 }
 
 /******************************************************
@@ -1319,7 +1306,6 @@ QWidget .QFrame#frame .QLabel#label_5 { /* Wallet Label */
     margin-top: 0;
     margin-right: 5px;
     padding-right: 5px;
-    font-size: 16px;
 }
 
 QWidget .QFrame#frame .QLabel#labelWalletStatus { /* Wallet Sync Status */
@@ -1330,13 +1316,11 @@ QWidget .QFrame#frame .QLabel#labelWalletStatus { /* Wallet Sync Status */
 
 QWidget .QFrame#frame .QLabel#labelSpendable { /* Spendable Header */
     qproperty-alignment: 'AlignVCenter | AlignLeft';
-    font-size: 12px;
     margin-left: 15px;
 }
 
 QWidget .QFrame#frame .QLabel#labelWatchonly { /* Watch-only Header */
     qproperty-alignment: 'AlignVCenter | AlignLeft';
-    font-size: 12px;
     margin-left: 16px;
 }
 
@@ -1345,19 +1329,16 @@ QWidget .QFrame#frame .QLabel#labelBalanceText { /* Available Balance Label */
     min-width: 100px;
     margin-right: 5px;
     padding-right: 5px;
-    font-size: 12px;
 }
 
 QWidget .QFrame#frame .QLabel#labelBalance { /* Available Balance */
     qproperty-alignment: 'AlignVCenter | AlignLeft';
-    font-size: 12px;
     margin-bottom: -1px;
     margin-left: 0px;
 }
 
 QWidget .QFrame#frame .QLabel#labelWatchAvailable { /* Watch-only Balance */
     qproperty-alignment: 'AlignVCenter | AlignLeft';
-    font-size: 12px;
     margin-bottom: -2px;
     margin-left: 16px;
 }
@@ -1365,21 +1346,18 @@ QWidget .QFrame#frame .QLabel#labelWatchAvailable { /* Watch-only Balance */
 QWidget .QFrame#frame .QLabel#labelPendingText { /* Pending Balance Label */
     qproperty-alignment: 'AlignVCenter | AlignRight';
     min-width: 100px;
-    font-size: 12px;
     margin-right: 5px;
     padding-right: 5px;
 }
 
 QWidget .QFrame#frame .QLabel#labelUnconfirmed { /* Pending Balance */
     qproperty-alignment: 'AlignVCenter | AlignLeft';
-    font-size: 12px;
     margin-bottom: -2px;
     margin-left: 0px;
 }
 
 QWidget .QFrame#frame .QLabel#labelWatchPending { /* Watch-only Pending Balance */
     qproperty-alignment: 'AlignVCenter | AlignLeft';
-    font-size: 12px;
     margin-bottom: -2px;
     margin-left: 16px;
 }
@@ -1387,21 +1365,18 @@ QWidget .QFrame#frame .QLabel#labelWatchPending { /* Watch-only Pending Balance 
 QWidget .QFrame#frame .QLabel#labelImmatureText { /* Immature Balance Label */
     qproperty-alignment: 'AlignVCenter | AlignRight';
     min-width: 100px;
-    font-size: 12px;
     margin-right: 5px;
     padding-right: 5px;
 }
 
 QWidget .QFrame#frame .QLabel#labelImmature { /* Immature Balance */
     qproperty-alignment: 'AlignVCenter | AlignLeft';
-    font-size: 12px;
     margin-bottom: -2px;
     margin-left: 0px;
 }
 
 QWidget .QFrame#frame .QLabel#labelWatchImmature { /* Watch-only Immature Balance */
     qproperty-alignment: 'AlignVCenter | AlignLeft';
-    font-size: 12px;
     margin-bottom: -2px;
     margin-left: 16px;
 }
@@ -1409,21 +1384,18 @@ QWidget .QFrame#frame .QLabel#labelWatchImmature { /* Watch-only Immature Balanc
 QWidget .QFrame#frame .QLabel#labelTotalText { /* Total Balance Label */
     qproperty-alignment: 'AlignVCenter | AlignRight';
     min-width: 100px;
-    font-size: 14px;
     margin-right: 5px;
     padding-right: 5px;
 }
 
 QWidget .QFrame#frame .QLabel#labelTotal { /* Total Balance */
     qproperty-alignment: 'AlignVCenter | AlignLeft';
-    font-size: 14px;
     margin-bottom: -2px;
     margin-left: 0px;
 }
 
 QWidget .QFrame#frame .QLabel#labelWatchTotal { /* Watch-only Total Balance */
     qproperty-alignment: 'AlignVCenter | AlignLeft';
-    font-size: 14px;
     margin-bottom: -2px;
     margin-left: 16px;
 }
@@ -1447,7 +1419,6 @@ QWidget .QFrame#framePrivateSend  > .QLabel {
 QWidget .QFrame#framePrivateSend .QLabel#labelPrivateSendHeader { /* PrivateSend Header */
     qproperty-alignment: 'AlignVCenter | AlignLeft';
     margin-right: 10px;
-    font-size: 16px;
 }
 
 QWidget .QFrame#framePrivateSend .QLabel#labelPrivateSendSyncStatus { /* PrivateSend Sync Status */
@@ -1523,7 +1494,6 @@ QWidget .QFrame#framePrivateSend .QLabel#labelPrivateSendLastMessage { /* Privat
     qproperty-alignment: 'AlignVCenter | AlignLeft';
     min-width: 288px;
     min-height: 50px;
-    font-size: 11px;
 }
 
 QWidget .QFrame#framePrivateSend .QPushButton#togglePrivateSend { /* Start PrivateSend Mixing */
@@ -1551,7 +1521,6 @@ QWidget .QFrame#frame_2 .QLabel#label_4 { /* Recent Transactions Label */
     margin-top: 0;
     margin-right: 5px;
     padding-right: 5px;
-    font-size: 16px;
     min-height: 30px;
 }
 
@@ -1566,7 +1535,6 @@ QWidget .QFrame#frame_2 .QLabel#labelTransactionsStatus { /* Recent Transactions
 }
 
 QWidget .QFrame#frame_2 QListView { /* Transaction List */
-    font-size: 12px;
     max-width: 369px;
     margin-top: 12px;
     margin-left: 0px; /* CSS Voodoo - set to -66px to hide default transaction icons */
@@ -1584,7 +1552,6 @@ QWidget#ReceiveCoinsDialog .QFrame#frame2 .QLabel#label_2,
 QWidget#ReceiveCoinsDialog .QFrame#frame2 .QLabel#label_3,
 QWidget#ReceiveCoinsDialog .QFrame#frame .QLabel#label_6 { /* Label Label */
     min-width: 0px;
-    font-size: 15px;
 }
 
 QWidget#ReceiveCoinsDialog .QFrame#frame QTableView#recentRequestsView::item { /* Recent Requests Table */
@@ -1613,7 +1580,6 @@ QWidget#RPCConsole QLabel#labelMempoolTitle,
 QWidget#RPCConsole QLabel#label_repair_header,
 QWidget#RPCConsole QLabel#peerHeading,
 QWidget#RPCConsole QLabel#banHeading {
-    font-size: 16px;
 }
 
 QWidget#RPCConsole QLabel#labelNetwork,
@@ -1695,7 +1661,6 @@ QDialog#SendCoinsDialog .QFrame#frameCoinControl .QPushButton#pushButtonCoinCont
 }
 
 QDialog#SendCoinsDialog .QFrame#frameCoinControl .QLabel#labelCoinControlFeatures { /* Coin Control Header */
-    font-size: 16px;
 }
 
 QDialog#SendCoinsDialog .QFrame#frameCoinControl .QWidget#widgetCoinControl { /* Coin Control Inputs */
@@ -1725,7 +1690,6 @@ QDialog#SendCoinsDialog QLabel#labelBalance {
     qproperty-alignment: 'AlignLeading | AlignLeft';
     min-height: 20px;
     max-height: 20px;
-    font-size: 15px;
 }
 
 QDialog#SendCoinsDialog QLabel#labelBalance {
@@ -1747,7 +1711,6 @@ SendCoinsEntry
 QStackedWidget#SendCoinsEntry .QFrame#SendCoins > .QLabel { /* Send Coin Entry Labels */
     background-color: #00000000;
     min-width: 50px;
-    font-size: 15px;
     min-height: 25px;
     margin-right: 5px;
     padding-right: 5px;
@@ -1807,7 +1770,6 @@ QDialog#SignVerifyMessageDialog QPlainTextEdit#messageIn_VM {
 }
 
 QDialog#SignVerifyMessageDialog QLabel#signatureLabel_SM {
-    font-size: 16px;
 }
 
 QDialog#SignVerifyMessageDialog QPushButton#pasteButton_SM { /* Paste Button */
@@ -1816,7 +1778,6 @@ QDialog#SignVerifyMessageDialog QPushButton#pasteButton_SM { /* Paste Button */
 
 QDialog#SignVerifyMessageDialog QLineEdit#signatureOut_SM,
 QDialog#SignVerifyMessageDialog QLineEdit#signatureIn_VM {
-    font-size: 10px;
 }
 
 QDialog#SignVerifyMessageDialog QPushButton#copySignatureButton_SM { /* Copy Button */
@@ -1888,7 +1849,6 @@ TransactionView QComboBox {
 #transactionSumLabel,
 #transactionSum {
     qproperty-alignment: 'AlignLeading | AlignLeft';
-    font-size: 15px;
     min-height: 30px;
     margin-top: 15px;
 }

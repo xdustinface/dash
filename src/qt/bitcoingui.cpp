@@ -396,6 +396,9 @@ void BitcoinGUI::createActions()
     connect(historyAction, SIGNAL(clicked()), this, SLOT(showNormalIfMinimized()));
     connect(historyAction, SIGNAL(clicked()), this, SLOT(gotoHistoryPage()));
 
+    for (auto button : tabGroup->buttons()) {
+        GUIUtil::setFont({button}, GUIUtil::getFontWeightNormal(), 16);
+    }
     // Give the selected tab button a bolder font.
     connect(tabGroup, SIGNAL(buttonToggled(QAbstractButton *, bool)), this, SLOT(highlightTabButton(QAbstractButton *, bool)));
 #endif // ENABLE_WALLET
@@ -924,7 +927,7 @@ void BitcoinGUI::openClicked()
 
 void BitcoinGUI::highlightTabButton(QAbstractButton *button, bool checked)
 {
-    GUIUtil::setFont({button}, checked ? GUIUtil::getFontWeightBold() : GUIUtil::getFontWeightNormal());
+    GUIUtil::setFont({button}, checked ? GUIUtil::getFontWeightBold() : GUIUtil::getFontWeightNormal(), 16);
 }
 
 void BitcoinGUI::gotoOverviewPage()

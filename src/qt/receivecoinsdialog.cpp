@@ -29,7 +29,10 @@ ReceiveCoinsDialog::ReceiveCoinsDialog(const PlatformStyle *_platformStyle, QWid
 {
     ui->setupUi(this);
     
-    GUIUtil::setFont({ui->label_6}, GUIUtil::getFontWeightBold());
+    GUIUtil::setFont({ui->label_6}, GUIUtil::getFontWeightBold(), 16);
+    GUIUtil::setFont({ui->label,
+                      ui->label_2,
+                      ui->label_3}, GUIUtil::getFontWeightNormal(), 15);
 
     if (!_platformStyle->getImagesOnButtons()) {
         ui->clearButton->setIcon(QIcon());
