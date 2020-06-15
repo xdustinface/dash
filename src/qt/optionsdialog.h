@@ -61,6 +61,7 @@ private Q_SLOTS:
     /* query the networks, for which the default proxy is used */
     void updateDefaultProxyNets();
     void updateTheme(const QString& toTheme = QString());
+    void updateFontScale(int nScale);
 
 Q_SIGNALS:
     void proxyIpChecks(QValidatedLineEdit *pUiProxyIp, int nProxyPort);

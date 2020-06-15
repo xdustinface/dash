@@ -1284,6 +1284,12 @@ QDialog#OptionsDialog QLabel#label_3 { /* Translations Missing? Label */
     color: #c79304;
 }
 
+QDialog#OptionsDialog #lblSmaller,
+QDialog#OptionsDialog #lblBigger {
+    font-size: 12px;
+    min-width: 60px;
+}
+
 QDialog#OptionsDialog #line,
 QDialog#OptionsDialog #frame {
     border-top: 1px solid red;
