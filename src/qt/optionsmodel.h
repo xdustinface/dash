@@ -45,6 +45,7 @@ public:
         ThirdPartyTxUrls,       // QString
         Digits,                 // QString
         Theme,                  // QString
+        FontFamily,             // int
         FontScale,              // int
         FontWeightNormal,       // int
         FontWeightBold,         // int
