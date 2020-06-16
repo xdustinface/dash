@@ -61,6 +61,7 @@ private Q_SLOTS:
     /* query the networks, for which the default proxy is used */
     void updateDefaultProxyNets();
     void updateTheme(const QString& toTheme = QString());
+    void updateFontFamily(const QString& family);
     void updateFontScale(int nScale);
     void updateFontWeightNormal(int nValue);
     void updateFontWeightBold(int nValue);
