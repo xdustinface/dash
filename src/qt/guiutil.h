@@ -264,6 +264,23 @@ namespace GUIUtil
         Bold,   // Font weight for bold text
     };
 
+    /** Convert weight value from args (0-8) to QFont::Weight */
+    bool weightFromArg(int nArg, QFont::Weight& weight);
+    /** Convert QFont::Weight to an arg value (0-8) */
+    int weightToArg(const QFont::Weight weight);
+    /** Convert GUIUtil::Weight to QFont::Weight */
+    QFont::Weight toQFontWeight(GUIUtil::Weight weight);
+
+    enum class FontFamily {
+        SystemDefault,
+        Montserrat,
+    };
+
+    GUIUtil::FontFamily fromString(QString strFamily);
+    QString toString(GUIUtil::FontFamily family);
+
+    /** Application font family */
+    extern GUIUtil::FontFamily fontFamily;
     /** Application font weight for normal text. May be overwritten by -font-weight-normal. */
     extern QFont::Weight fontWeightNormal;
     /** Application font weight for bold text. May be overwritten by -font-weight-bold. */
@@ -271,12 +288,11 @@ namespace GUIUtil
     /** Application font scale value. May be overwritten by -font-scale. */
     extern int fontScale;
 
-    /** Convert weight value from args (0-8) to QFont::Weight */
-    bool weightFromArg(int nArg, QFont::Weight& weight);
-    /** Convert QFont::Weight to an arg value (0-8) */
-    int weightToArg(const QFont::Weight weight);
-    /** Convert GUIUtil::Weight to QFont::Weight */
-    QFont::Weight toQFontWeight(GUIUtil::Weight weight);
+    /** set/get font family: GUIUtil::fontFamily */
+    GUIUtil::FontFamily getFontFamilyDefault();
+    QString getFontFamilyDefaultString();
+    GUIUtil::FontFamily getFontFamily();
+    void setFontFamily(GUIUtil::FontFamily family);
 
     /** set/get normal font weight: GUIUtil::fontWeightNormal */
     QFont::Weight getFontWeightNormalDefault();

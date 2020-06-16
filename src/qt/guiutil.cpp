@@ -102,7 +102,7 @@ static const std::map<QString, QString> mapStyleToTheme {{"general.css", ""},
 /** Font related default values.
 *   TODO: Evaluate maybe wrapping this later into some "theme handler" or so..
 */
-static const QString defaultFontFamily = "Montserrat";
+static const GUIUtil::FontFamily defaultFontFamily = GUIUtil::FontFamily::Montserrat;
 static const int defaultFontSize = 12;
 static const double fontScaleSteps = 0.01;
 #ifdef Q_OS_MAC
@@ -118,6 +118,7 @@ static const int defaultFontScale = 0;
 /** Font related variables.
 *   TODO: Evaluate maybe wrapping this later into some "theme handler" or so..
 */
+GUIUtil::FontFamily fontFamily = defaultFontFamily;
 // Weight for normal text
 QFont::Weight fontWeightNormal = defaultFontWeightNormal;
 // Weight for bold text
@@ -1107,6 +1108,49 @@ void loadStyleSheet(QWidget* widget, bool fForceUpdate)
     }
 }
 
+FontFamily fromString(QString strFamily)
+{
+    if (strFamily == "SystemDefault") {
+       return FontFamily::SystemDefault;
+    }
+    if (strFamily == "Montserrat") {
+        return FontFamily::Montserrat;
+    }
+    assert(false);
+}
+
+QString toString(FontFamily family)
+{
+    switch(family) {
+    case FontFamily::SystemDefault:
+        return "SystemDefault";
+    case FontFamily::Montserrat:
+        return "Montserrat";
+    default:
+        assert(false);
+    }
+}
+
+void setFontFamily(GUIUtil::FontFamily family)
+{
+    fontFamily = family;
+}
+
+GUIUtil::FontFamily getFontFamilyDefault()
+{
+    return defaultFontFamily;
+}
+
+QString getFontFamilyDefaultString()
+{
+    return GUIUtil::toString(getFontFamilyDefault());
+}
+
+GUIUtil::FontFamily getFontFamily()
+{
+    return fontFamily;
+}
+
 bool weightFromArg(int nArg, QFont::Weight& weight)
 {
     const std::map<int, QFont::Weight> mapWeight {
@@ -1203,7 +1247,7 @@ double getScaledFontSize(int nSize)
 bool loadFonts()
 {
     // TODO: Evaluate maybe wrapping this later into some "theme handler" or so..
-    QString family = defaultFontFamily;
+    QString family = GUIUtil::getFontFamilyDefaultString();
     QString italic = "Italic";
 
     std::map<QString, bool> mapStyles {
@@ -1269,24 +1313,27 @@ void setApplicationFont()
     // TODO: Evaluate maybe wrapping this later into some "theme handler" or so..
     static QFont osDefaultFont = QApplication::font();
 
-    if (dashThemeActive()) {
-        QString family = defaultFontFamily;
-        QFont appFont = QFont(family);
+    std::unique_ptr<QFont> font;
+
+    if (getFontFamily() == FontFamily::Montserrat) {
+        QString family = GUIUtil::getFontFamilyDefaultString();
 #ifdef Q_OS_MAC
-        if (getFontWeightNormal() != defaultFontWeightNormal) {
-            appFont = getFontNormal();
+        if (getFontWeightNormal() != getFontWeightNormalDefault()) {
+            font = std::make_unique<QFont>(getFontNormal());
         } else {
-            appFont.setWeight(defaultFontWeightNormal);
+            font = std::make_unique<QFont>(family);
+            font->setWeight(getFontWeightNormalDefault());
         }
-        appFont.setPointSizeF(getScaledFontSize(defaultFontSize));
 #else
-        appFont.setWeight(getFontWeightNormal());
-        appFont.setPointSizeF(getScaledFontSize(defaultFontSize));
+        font = std::make_unique<QFont>(family);
+        font->setWeight(getFontWeightNormal());
 #endif
-        qApp->setFont(appFont);
     } else {
-        qApp->setFont(osDefaultFont);
+        font = std::make_unique<QFont>(osDefaultFont);
     }
+
+    font->setPointSizeF(defaultFontSize);
+    qApp->setFont(*font);
 
     qDebug() << __func__ << ": " << qApp->font().toString() <<
                 " family: " << qApp->font().family() <<
@@ -1397,7 +1444,7 @@ QFont getFont(GUIUtil::Weight weight, bool fItalic, int nPointSize)
     QFont font;
     QFont::Weight qWeight = GUIUtil::toQFontWeight(weight);
 
-    if (dashThemeActive()) {
+    if (getFontFamily() == FontFamily::Montserrat) {
 
         static std::map<QFont::Weight, QString> mapMontserratMapping {
             {QFont::Thin, "Thin"},
@@ -1430,10 +1477,10 @@ QFont getFont(GUIUtil::Weight weight, bool fItalic, int nPointSize)
             }
         }
 
-        font.setFamily(defaultFontFamily);
+        font.setFamily(GUIUtil::getFontFamilyDefaultString());
         font.setStyleName(styleName);
 #else
-        font.setFamily(defaultFontFamily + " " + mapMontserratMapping[qWeight]);
+        font.setFamily(GUIUtil::getFontFamilyDefaultString() + " " + mapMontserratMapping[qWeight]);
         font.setWeight(qWeight);
         font.setStyle(fItalic ? QFont::StyleItalic : QFont::StyleNormal);
 #endif
