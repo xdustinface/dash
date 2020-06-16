@@ -93,6 +93,16 @@ void OptionsModel::Init(bool resetSettings)
     if (!gArgs.SoftSetArg("-font-scale", settings.value("fontScale").toString().toStdString()))
         addOverriddenOption("-font-scale");
 
+    if (!settings.contains("fontWeightNormal"))
+        settings.setValue("fontWeightNormal", GUIUtil::weightToArg(GUIUtil::getFontWeightNormalDefault()));
+    if (!gArgs.SoftSetArg("-font-weight-normal", settings.value("fontWeightNormal").toString().toStdString()))
+        addOverriddenOption("-font-weight-normal");
+
+    if (!settings.contains("fontWeightBold"))
+        settings.setValue("fontWeightBold", GUIUtil::weightToArg(GUIUtil::getFontWeightBoldDefault()));
+    if (!gArgs.SoftSetArg("-font-weight-bold", settings.value("fontWeightBold").toString().toStdString()))
+        addOverriddenOption("-font-weight-bold");
+
 #ifdef ENABLE_WALLET
     if (!settings.contains("fCoinControlFeatures"))
         settings.setValue("fCoinControlFeatures", false);
@@ -345,6 +355,10 @@ QVariant OptionsModel::data(const QModelIndex & index, int role) const
             return settings.value("theme");
         case FontScale:
             return settings.value("fontScale");
+        case FontWeightNormal:
+            return settings.value("fontWeightNormal");
+        case FontWeightBold:
+            return settings.value("fontWeightBold");
         case Language:
             return settings.value("language");
 #ifdef ENABLE_WALLET
@@ -524,6 +538,16 @@ bool OptionsModel::setData(const QModelIndex & index, const QVariant & value, in
         case FontScale:
             if (settings.value("fontScale") != value) {
                 settings.setValue("fontScale", value);
+            }
+            break;
+        case FontWeightNormal:
+            if (settings.value("fontWeightNormal") != value) {
+                settings.setValue("fontWeightNormal", value);
+            }
+            break;
+        case FontWeightBold:
+            if (settings.value("fontWeightBold") != value) {
+                settings.setValue("fontWeightBold", value);
             }
             break;
         case Language:
