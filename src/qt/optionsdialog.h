@@ -62,6 +62,8 @@ private Q_SLOTS:
     void updateDefaultProxyNets();
     void updateTheme(const QString& toTheme = QString());
     void updateFontScale(int nScale);
+    void updateFontWeightNormal(int nValue);
+    void updateFontWeightBold(int nValue);
 
 Q_SIGNALS:
     void proxyIpChecks(QValidatedLineEdit *pUiProxyIp, int nProxyPort);

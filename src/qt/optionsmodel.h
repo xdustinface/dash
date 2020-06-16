@@ -46,6 +46,8 @@ public:
         Digits,                 // QString
         Theme,                  // QString
         FontScale,              // int
+        FontWeightNormal,       // int
+        FontWeightBold,         // int
         Language,               // QString
         CoinControlFeatures,    // bool
         ThreadsScriptVerif,     // int
