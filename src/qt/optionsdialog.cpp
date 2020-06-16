@@ -135,6 +135,11 @@ OptionsDialog::OptionsDialog(QWidget *parent, bool enableWallet) :
         ui->theme->addItem(entry, QVariant(entry));
     }
 
+    QString strMontserrat = GUIUtil::toString(GUIUtil::FontFamily::Montserrat);
+    QString strSystem = GUIUtil::toString(GUIUtil::FontFamily::SystemDefault);
+    ui->fontFamily->addItem(strMontserrat, QVariant(strMontserrat));
+    ui->fontFamily->addItem(strSystem, QVariant(strSystem));
+
     ui->unit->setModel(new BitcoinUnits(this));
 
     /* Widget-to-option mapper */
@@ -198,6 +203,7 @@ void OptionsDialog::setModel(OptionsModel *_model)
     connect(ui->thirdPartyTxUrls, SIGNAL(textChanged(const QString &)), this, SLOT(showRestartWarning()));
     /* Appearance */
     connect(ui->theme, SIGNAL(valueChanged()), this, SLOT(updateTheme()));
+    connect(ui->fontFamily, SIGNAL(currentTextChanged(const QString&)), this, SLOT(updateFontFamily(const QString&)));
     connect(ui->fontScaleSlider, SIGNAL(valueChanged(int)), this, SLOT(updateFontScale(int)));
     connect(ui->fontWeightNormalSlider, SIGNAL(valueChanged(int)), this, SLOT(updateFontWeightNormal(int)));
     connect(ui->fontWeightBoldSlider, SIGNAL(valueChanged(int)), this, SLOT(updateFontWeightBold(int)));
@@ -248,6 +254,7 @@ void OptionsDialog::setMapper()
 
     /* Appearance */
     mapper->addMapping(ui->theme, OptionsModel::Theme);
+    mapper->addMapping(ui->fontFamily, OptionsModel::FontFamily);
     mapper->addMapping(ui->fontScaleSlider, OptionsModel::FontScale);
     mapper->addMapping(ui->fontWeightNormalSlider, OptionsModel::FontWeightNormal);
     mapper->addMapping(ui->fontWeightBoldSlider, OptionsModel::FontWeightBold);
@@ -398,6 +405,12 @@ void OptionsDialog::updateTheme(const QString& theme)
         QSettings().sync();
         Q_EMIT themeChanged();
     }
+}
+
+void OptionsDialog::updateFontFamily(const QString& family)
+{
+    GUIUtil::setFontFamily(GUIUtil::fromString(family));
+    GUIUtil::updateFonts();
 }
 
 void OptionsDialog::updateFontScale(int nScale)

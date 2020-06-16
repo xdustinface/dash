@@ -88,6 +88,9 @@ void OptionsModel::Init(bool resetSettings)
     if (!settings.contains("theme"))
         settings.setValue("theme", GUIUtil::getDefaultTheme());
 
+    if (!settings.contains("fontFamily"))
+        settings.setValue("fontFamily", GUIUtil::getFontFamilyDefaultString());
+
     if (!settings.contains("fontScale"))
         settings.setValue("fontScale", GUIUtil::getFontScaleDefault());
     if (!gArgs.SoftSetArg("-font-scale", settings.value("fontScale").toString().toStdString()))
@@ -353,6 +356,8 @@ QVariant OptionsModel::data(const QModelIndex & index, int role) const
 #endif // ENABLE_WALLET
         case Theme:
             return settings.value("theme");
+        case FontFamily:
+            return settings.value("fontFamily");
         case FontScale:
             return settings.value("fontScale");
         case FontWeightNormal:
@@ -534,6 +539,11 @@ bool OptionsModel::setData(const QModelIndex & index, const QVariant & value, in
         case Theme:
             // Set in OptionsDialog::updateTheme slot now
             // to allow instant theme changes.
+            break;
+        case FontFamily:
+            if (settings.value("fontFamily") != value) {
+                settings.setValue("fontFamily", value);
+            }
             break;
         case FontScale:
             if (settings.value("fontScale") != value) {
