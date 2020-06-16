@@ -197,6 +197,8 @@ void OptionsDialog::setModel(OptionsModel *_model)
     /* Appearance */
     connect(ui->theme, SIGNAL(valueChanged()), this, SLOT(updateTheme()));
     connect(ui->fontScaleSlider, SIGNAL(valueChanged(int)), this, SLOT(updateFontScale(int)));
+    connect(ui->fontWeightNormalSlider, SIGNAL(valueChanged(int)), this, SLOT(updateFontWeightNormal(int)));
+    connect(ui->fontWeightBoldSlider, SIGNAL(valueChanged(int)), this, SLOT(updateFontWeightBold(int)));
 }
 
 void OptionsDialog::setMapper()
@@ -245,6 +247,8 @@ void OptionsDialog::setMapper()
     /* Appearance */
     mapper->addMapping(ui->theme, OptionsModel::Theme);
     mapper->addMapping(ui->fontScaleSlider, OptionsModel::FontScale);
+    mapper->addMapping(ui->fontWeightNormalSlider, OptionsModel::FontWeightNormal);
+    mapper->addMapping(ui->fontWeightBoldSlider, OptionsModel::FontWeightBold);
 }
 
 void OptionsDialog::showPage(int index)
@@ -397,6 +401,22 @@ void OptionsDialog::updateTheme(const QString& theme)
 void OptionsDialog::updateFontScale(int nScale)
 {
     GUIUtil::setFontScale(nScale);
+    GUIUtil::updateFonts();
+}
+
+void OptionsDialog::updateFontWeightNormal(int nValue)
+{
+    QFont::Weight weight;
+    assert(GUIUtil::weightFromArg(nValue, weight));
+    GUIUtil::setFontWeightNormal(weight);
+    GUIUtil::updateFonts();
+}
+
+void OptionsDialog::updateFontWeightBold(int nValue)
+{
+    QFont::Weight weight;
+    assert(GUIUtil::weightFromArg(nValue, weight));
+    GUIUtil::setFontWeightBold(weight);
     GUIUtil::updateFonts();
 }
 

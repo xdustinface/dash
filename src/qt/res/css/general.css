@@ -1277,7 +1277,11 @@ QDialog#OptionsDialog QLabel#label_3 { /* Translations Missing? Label */
 }
 
 QDialog#OptionsDialog #lblSmaller,
-QDialog#OptionsDialog #lblBigger {
+QDialog#OptionsDialog #lblBigger,
+QDialog#OptionsDialog #lblBolderNormal,
+QDialog#OptionsDialog #lblBolderBold,
+QDialog#OptionsDialog #lblLighterNormal,
+QDialog#OptionsDialog #lblLighterBold {
     min-width: 60px;
 }
 
