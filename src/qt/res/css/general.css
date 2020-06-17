@@ -1079,11 +1079,6 @@ BitcoinAmountField
 ******************************************************/
 
 BitcoinAmountField{
-    /* This is a hacky way to make sure BitcoinAmountField's
-    * shows completely.
-    * TODO: Fix the issue properly.
-    */
-    margin-bottom: 5px;
 }
 
 /******************************************************
