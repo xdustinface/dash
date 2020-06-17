@@ -749,28 +749,20 @@ QRadioButton::indicator {
     margin-right: 5px;
 }
 QRadioButton::indicator:unchecked {
-    border-image: url(':/images/radio_normal');
 }
 QRadioButton::indicator:hover:unchecked {
-    border-image: url(':/images/radio_normal_hover');
 }
 QRadioButton::indicator:unchecked:pressed {
-    border-image: url(':/images/radio_normal_pressed');
 }
 QRadioButton::indicator:checked {
-    border-image: url(':/images/radio_checked');
 }
 QRadioButton::indicator:checked:hover {
-    border-image: url(':/images/radio_checked_hover');
 }
 QRadioButton::indicator:checked:pressed {
-    border-image: url(':/images/radio_checked_pressed');
 }
 QRadioButton::indicator:checked:disabled {
-    border-image: url(':/images/radio_checked_disabled');
 }
 QRadioButton::indicator:unchecked:disabled {
-    border-image: url(':/images/radio_normal_disabled');
 }
 
 /******************************************************
