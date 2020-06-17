@@ -491,7 +491,27 @@ QPushButton - Special case, tabbar replacement buttons
 QRadioButton
 ******************************************************/
 
-/***** No light.css specific coloring here yet *****/
+QRadioButton::indicator:unchecked,
+QRadioButton::indicator:unchecked:pressed {
+    border-image: url(':/images/radio_normal_light');
+}
+QRadioButton::indicator:checked,
+QRadioButton::indicator:checked:pressed {
+    border-image: url(':/images/radio_checked_light');
+}
+QRadioButton::indicator:hover:unchecked:!pressed {
+    border-image: url(':/images/radio_normal_hover_light');
+}
+QRadioButton::indicator:checked:hover:!pressed {
+    border-image: url(':/images/radio_checked_hover_light');
+}
+QRadioButton::indicator:checked:disabled {
+    border-image: url(':/images/radio_checked_disabled_light');
+}
+QRadioButton::indicator:unchecked:disabled {
+    border-image: url(':/images/radio_normal_disabled_light');
+}
+
 
 /******************************************************
 QScrollArea
