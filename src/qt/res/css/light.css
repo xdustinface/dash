@@ -167,6 +167,41 @@ QCalendarWidget QAbstractItemView:disabled {
 }
 
 /******************************************************
+QCheckBox
+******************************************************/
+
+QCheckBox::indicator:unchecked,
+QCheckBox::indicator:unchecked:pressed {
+    border-image: url(':/images/checkbox_normal_light');
+}
+QCheckBox::indicator:checked,
+QCheckBox::indicator:checked:pressed {
+    border-image: url(':/images/checkbox_checked_light');
+}
+QCheckBox::indicator:indeterminate,
+QCheckBox::indicator:indeterminate:pressed {
+    border-image: url(':/images/checkbox_partly_checked_light');
+}
+QCheckBox::indicator:hover:!pressed:unchecked {
+    border-image: url(':/images/checkbox_normal_hover_light');
+}
+QCheckBox::indicator:unchecked:disabled {
+    border-image: url(':/images/checkbox_normal_disabled_light');
+}
+QCheckBox::indicator:checked:!pressed:hover {
+    border-image: url(':/images/checkbox_checked_hover_light');
+}
+QCheckBox::indicator:checked:disabled {
+    border-image: url(':/images/checkbox_checked_disabled_light');
+}
+QCheckBox::indicator:indeterminate:hover {
+    border-image: url(':/images/checkbox_partly_checked_hover_light');
+}
+QCheckBox::indicator:indeterminate:disabled {
+    border-image: url(':/images/checkbox_partly_checked_disabled_light');
+}
+
+/******************************************************
 QComboBox
 ******************************************************/
 
@@ -587,6 +622,36 @@ QTreeWidget {
     alternate-background-color: #eaeaec;
     background-color: #eaeaec;
     border-color: #dcdcdc;
+}
+QTreeWidget::indicator:unchecked,
+QTreeWidget::indicator:unchecked:pressed {
+    border-image: url(':/images/checkbox_normal_light');
+}
+QTreeWidget::indicator:checked,
+QTreeWidget::indicator:checked:pressed {
+    border-image: url(':/images/checkbox_checked_light');
+}
+QTreeWidget::indicator:indeterminate,
+QTreeWidget::indicator:indeterminate:pressed {
+    border-image: url(':/images/checkbox_partly_checked_light');
+}
+QTreeWidget::indicator:hover:unchecked {
+    border-image: url(':/images/checkbox_normal_hover_light');
+}
+QTreeWidget::indicator:unchecked:disabled {
+    border-image: url(':/images/checkbox_normal_disabled_light');
+}
+QTreeWidget::indicator:checked:hover {
+    border-image: url(':/images/checkbox_checked_hover_light');
+}
+QTreeWidget::indicator:checked:disabled {
+    border-image: url(':/images/checkbox_checked_disabled_light');
+}
+QTreeWidget::indicator:indeterminate:!pressed:hover {
+    border-image: url(':/images/checkbox_partly_checked_hover_light');
+}
+QTreeWidget::indicator:indeterminate:disabled {
+    border-image: url(':/images/checkbox_partly_checked_disabled_light');
 }
 
 /******************************************************

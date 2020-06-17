@@ -285,42 +285,29 @@ QCheckBox::indicator {
     height: 15px;
     margin-right: 5px;
 }
-
 QCheckBox::indicator:unchecked {
-    border-image: url(':/images/checkbox_normal');
 }
 QCheckBox::indicator:hover:unchecked {
-    border-image: url(':/images/checkbox_normal_hover');
 }
 QCheckBox::indicator:unchecked:pressed {
-    border-image: url(':/images/checkbox_normal_pressed');
 }
 QCheckBox::indicator:unchecked:disabled {
-    border-image: url(':/images/checkbox_normal_disabled');
 }
 QCheckBox::indicator:checked {
-    border-image: url(':/images/checkbox_checked');
 }
 QCheckBox::indicator:checked:hover {
-    border-image: url(':/images/checkbox_checked_hover');
 }
 QCheckBox::indicator:checked:pressed {
-    border-image: url(':/images/checkbox_checked_pressed');
 }
 QCheckBox::indicator:checked:disabled {
-    border-image: url(':/images/checkbox_checked_disabled');
 }
 QCheckBox::indicator:indeterminate {
-    border-image: url(':/images/checkbox_partly_checked');
 }
 QCheckBox::indicator:indeterminate:hover {
-    border-image: url(':/images/checkbox_partly_checked_hover');
 }
 QCheckBox::indicator:indeterminate:pressed {
-    border-image: url(':/images/checkbox_partly_checked_pressed');
 }
 QCheckBox::indicator:indeterminate:disabled {
-    border-image: url(':/images/checkbox_partly_checked_disabled');
 }
 
 /******************************************************
@@ -975,40 +962,28 @@ QTreeWidget::indicator {
     margin-right: 5px;
 }
 QTreeWidget::indicator:unchecked {
-    border-image: url(':/images/checkbox_normal');
 }
 QTreeWidget::indicator:hover:unchecked {
-    border-image: url(':/images/checkbox_normal_hover');
 }
 QTreeWidget::indicator:unchecked:pressed {
-    border-image: url(':/images/checkbox_normal_pressed');
 }
 QTreeWidget::indicator:unchecked:disabled {
-    border-image: url(':/images/checkbox_normal_disabled');
 }
 QTreeWidget::indicator:checked {
-    border-image: url(':/images/checkbox_checked');
 }
 QTreeWidget::indicator:checked:hover {
-    border-image: url(':/images/checkbox_checked_hover');
 }
 QTreeWidget::indicator:checked:pressed {
-    border-image: url(':/images/checkbox_checked_pressed');
 }
 QTreeWidget::indicator:checked:disabled {
-    border-image: url(':/images/checkbox_checked_disabled');
 }
 QTreeWidget::indicator:indeterminate {
-    border-image: url(':/images/checkbox_partly_checked');
 }
 QTreeWidget::indicator:indeterminate:hover {
-    border-image: url(':/images/checkbox_partly_checked_hover');
 }
 QTreeWidget::indicator:indeterminate:pressed {
-    border-image: url(':/images/checkbox_partly_checked_pressed');
 }
 QTreeWidget::indicator:indeterminate:disabled {
-    border-image: url(':/images/checkbox_partly_checked_disabled');
 }
 
 /******************************************************
