@@ -102,8 +102,7 @@ static const std::map<QString, QString> mapStyleToTheme{
     {"general.css", ""},
     {"dark.css", "Dark"},
     {"light.css", "Light"},
-    {"traditional.css", "Traditional"},
-    {"scrollbars.css", ""}
+    {"traditional.css", "Traditional"}
 };
 
 /** Font related default values. */
