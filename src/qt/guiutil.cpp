@@ -1122,9 +1122,6 @@ void loadStyleSheet(QWidget* widget, bool fForceUpdate)
         std::vector<QString> vecFiles;
         // If light/dark theme is used load general styles first
         if (dashThemeActive()) {
-#ifndef Q_OS_MAC
-            vecFiles.push_back(pathToFile("scrollbars"));
-#endif
             vecFiles.push_back(pathToFile("general"));
         }
         vecFiles.push_back(pathToFile(getActiveTheme()));
