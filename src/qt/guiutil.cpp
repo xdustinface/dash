@@ -6,6 +6,7 @@
 #include <qt/guiutil.h>
 
 #include <qt/bitcoinaddressvalidator.h>
+#include <qt/bitcoingui.h>
 #include <qt/bitcoinunits.h>
 #include <qt/qvalidatedlineedit.h>
 #include <qt/walletmodel.h>
@@ -1057,7 +1058,39 @@ void loadStyleSheet(QWidget* widget, bool fForceUpdate)
         {
             QFile qFile(QString(stylesheetDirectory + "/" + "%1%2").arg(name).arg(isStyleSheetDirectoryCustom() ? ".css" : ""));
             if (qFile.open(QFile::ReadOnly)) {
-                stylesheet->append(QLatin1String(qFile.readAll()));
+                QString strStyle = QLatin1String(qFile.readAll());
+
+                // RegEx to match all <os=...></os> groups in the stylesheet
+                QRegularExpressionMatch osStyleMatch;
+                QRegularExpression osStyleExp("^(<os=(?:'|\").+(?:'|\")>)((?:.|\n)+?)(</os>?)$");
+                osStyleExp.setPatternOptions(QRegularExpression::MultilineOption);
+                QRegularExpressionMatchIterator it = osStyleExp.globalMatch(strStyle);
+
+                // For all <os=...></os> sections
+                while (it.hasNext() && (osStyleMatch = it.next()).isValid()) {
+
+                    QStringList listMatches = osStyleMatch.capturedTexts();
+
+                    // Full match + 3 group matches
+                    if (listMatches.size() % 4) {
+                        qDebug() << "Invalid OS specific stylesheet section.";
+                        return;
+                    }
+
+                    for (int i = 0; i < listMatches.size(); i+=4) {
+                        if (!listMatches[i+1].contains(QString::fromStdString(BitcoinGUI::DEFAULT_UIPLATFORM))) {
+                            // If os is not supported for this styles
+                            // just remove the full match
+                            strStyle.replace(listMatches[i], "");
+                        } else {
+                            // If its supported remove the <os=...></os> tags
+                            strStyle.replace(listMatches[i+1], "");
+                            strStyle.replace(listMatches[i+3], "");
+                        }
+                    }
+                }
+
+                stylesheet->append(strStyle);
             }
         };
 
