@@ -35,19 +35,12 @@ SignVerifyMessageDialog::SignVerifyMessageDialog(const PlatformStyle *_platformS
 
     ui->signatureOut_SM->setPlaceholderText(tr("Click \"Sign Message\" to generate signature"));
 
-#ifdef Q_OS_MAC // Icons on push buttons are very uncommon on Mac
-    ui->signMessageButton_SM->setIcon(QIcon());
-    ui->clearButton_SM->setIcon(QIcon());
-    ui->verifyMessageButton_VM->setIcon(QIcon());
-    ui->clearButton_VM->setIcon(QIcon());
-#else
-    ui->signMessageButton_SM->setIcon(QIcon(":/icons/edit"));
-    ui->clearButton_SM->setIcon(QIcon(":/icons/remove"));
-    ui->verifyMessageButton_VM->setIcon(QIcon(":/icons/transaction_0"));
-    ui->clearButton_VM->setIcon(QIcon(":/icons/remove"));
-#endif
+    ui->signMessageButton_SM->setIcon(platformStyle->Icon(":/icons/edit"));
+    ui->clearButton_SM->setIcon(platformStyle->Icon(":/icons/remove"));
+    ui->verifyMessageButton_VM->setIcon(platformStyle->Icon(":/icons/transaction_0"));
+    ui->clearButton_VM->setIcon(platformStyle->Icon(":/icons/remove"));
 
-    // These icons are needed on Mac also
+    // These icons are needed no matter what platformStyle thinks
     ui->addressBookButton_SM->setIcon(QIcon(":/icons/address-book"));
     ui->pasteButton_SM->setIcon(QIcon(":/icons/editpaste"));
     ui->copySignatureButton_SM->setIcon(QIcon(":/icons/editcopy"));

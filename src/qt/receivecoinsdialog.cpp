@@ -34,17 +34,10 @@ ReceiveCoinsDialog::ReceiveCoinsDialog(const PlatformStyle *_platformStyle, QWid
                       ui->label_2,
                       ui->label_3}, GUIUtil::FontWeight::Normal, 15);
 
-    if (!_platformStyle->getImagesOnButtons()) {
-        ui->clearButton->setIcon(QIcon());
-        ui->receiveButton->setIcon(QIcon());
-        ui->showRequestButton->setIcon(QIcon());
-        ui->removeRequestButton->setIcon(QIcon());
-    } else {
-        ui->clearButton->setIcon(QIcon(":/icons/remove"));
-        ui->receiveButton->setIcon(QIcon(":/icons/receiving_addresses"));
-        ui->showRequestButton->setIcon(QIcon(":/icons/edit"));
-        ui->removeRequestButton->setIcon(QIcon(":/icons/remove"));
-    }
+    ui->clearButton->setIcon(platformStyle->Icon(":/icons/remove"));
+    ui->receiveButton->setIcon(platformStyle->Icon(":/icons/receiving_addresses"));
+    ui->showRequestButton->setIcon(platformStyle->Icon(":/icons/edit"));
+    ui->removeRequestButton->setIcon(platformStyle->Icon(":/icons/remove"));
 
     // context menu actions
     QAction *copyURIAction = new QAction(tr("Copy URI"), this);

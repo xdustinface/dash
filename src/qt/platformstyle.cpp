@@ -95,6 +95,15 @@ PlatformStyle::PlatformStyle(const QString &_name, bool _imagesOnButtons, bool _
     textColor = QColor(QApplication::palette().color(QPalette::WindowText));
 }
 
+QIcon PlatformStyle::Icon(const QIcon& icon) const
+{
+    return imagesOnButtons ? icon : QIcon();
+}
+QIcon PlatformStyle::Icon(const QString& filename) const
+{
+    return Icon(QIcon(filename));
+}
+
 QImage PlatformStyle::SingleColorImage(const QString& filename) const
 {
     if (!colorizeIcons)
