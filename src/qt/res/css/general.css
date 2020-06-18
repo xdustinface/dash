@@ -11,8 +11,7 @@ loaded and combined in `GUIUtil::loadStyleSheet()` in guitil.cpp.
 Hierarchy:
 
 *   general.css - base layout: Loaded first if selected theme is not "Traditional" (traditional.css)
-*   scrollbars.css - custom scrollbars: Loaded second only for windows/linux if general.css is loaded
-*   <theme.css> - theme css file:  Always loaded and loaded last.
+*   <theme.css> - theme css file: Always loaded last.
 
 To replace <theme.css> there are currently the following themes available:
 
