@@ -24,6 +24,12 @@ public:
     QColor TextColor() const { return textColor; }
     QColor SingleColor() const { return singleColor; }
 
+    /** Return the icon at (given filename) if imagesOnButtons is enabled */
+    QIcon Icon(const QString& filename) const;
+
+    /** Return the provided icon or an empty one depending on imagesOnButtons is enabled or not */
+    QIcon Icon(const QIcon& icon) const;
+
     /** Colorize an image (given filename) with the icon color */
     QImage SingleColorImage(const QString& filename) const;
 
