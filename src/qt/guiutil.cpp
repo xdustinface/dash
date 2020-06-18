@@ -1097,9 +1097,6 @@ void loadStyleSheet(QWidget* widget, bool fForceUpdate)
         // If light/dark theme is used load general styles first
         if (dashThemeActive()) {
             loadFile("general");
-#ifndef Q_OS_MAC
-            loadFile("scrollbars");
-#endif
         }
 
         loadFile(GUIUtil::getActiveTheme());
