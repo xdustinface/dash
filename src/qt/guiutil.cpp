@@ -1043,7 +1043,6 @@ void loadStyleSheet(QWidget* widget, bool fForceUpdate)
     LOCK(cs_css);
 
     static std::unique_ptr<QString> stylesheet;
-    static uint256 hashStyle;
     static std::set<QWidget*> setWidgets;
 
     bool fDebugUI = gArgs.GetBoolArg("-debug-ui", false) && GUIUtil::isStyleSheetDirectoryCustom();
@@ -1051,15 +1050,41 @@ void loadStyleSheet(QWidget* widget, bool fForceUpdate)
 
     if (stylesheet == nullptr || fForceUpdate || fDebugUI) {
 
-        stylesheet = std::make_unique<QString>();
-
-        auto loadFile = [](const QString& name)
+        auto hasModified = [](const std::vector<QString>& vecFiles) -> bool
         {
-            QFile qFile(QString(stylesheetDirectory + "/" + "%1%2").arg(name).arg(isStyleSheetDirectoryCustom() ? ".css" : ""));
-            if (qFile.open(QFile::ReadOnly)) {
+            static std::map<const QString, QDateTime> mapLastModified;
+
+            bool fModified = false;
+            for (auto file : vecFiles) {
+                QFileInfo info(file);
+                QDateTime lastModified = info.lastModified(), prevLastModified;
+                auto it = mapLastModified.emplace(std::make_pair(file, lastModified));
+                prevLastModified = it.second ? QDateTime() : it.first->second;
+                it.first->second = lastModified;
+                fModified = prevLastModified != lastModified;
+                if (fModified) {
+                    return true;
+                }
+            }
+            return fModified;
+        };
+
+        auto loadFiles = [fForceUpdate, fDebugUI, hasModified](const std::vector<QString>& vecFiles) -> bool
+        {
+            if (!fForceUpdate && fDebugUI && !hasModified(vecFiles)) {
+                return false;
+            }
+
+            stylesheet = std::make_unique<QString>();
+
+            for (auto file : vecFiles) {
+                QFile qFile(file);
+                if (!qFile.open(QFile::ReadOnly)) {
+                    throw std::runtime_error(strprintf("%s: Failed to open file: %s", __func__, file.toStdString()));
+                }
                 QString strStyle = QLatin1String(qFile.readAll());
 
-                // RegEx to match all <os=...></os> groups in the stylesheet
+                // Process all <os=...></os> groups in the stylesheet first
                 QRegularExpressionMatch osStyleMatch;
                 QRegularExpression osStyleExp("^(<os=(?:'|\").+(?:'|\")>)((?:.|\n)+?)(</os>?)$");
                 osStyleExp.setPatternOptions(QRegularExpression::MultilineOption);
@@ -1072,8 +1097,7 @@ void loadStyleSheet(QWidget* widget, bool fForceUpdate)
 
                     // Full match + 3 group matches
                     if (listMatches.size() % 4) {
-                        qDebug() << "Invalid OS specific stylesheet section.";
-                        return;
+                        throw std::runtime_error(strprintf("%s: Invalid <os=...></os> section in file %s", __func__, file.toStdString()));
                     }
 
                     for (int i = 0; i < listMatches.size(); i+=4) {
@@ -1088,36 +1112,32 @@ void loadStyleSheet(QWidget* widget, bool fForceUpdate)
                         }
                     }
                 }
-
                 stylesheet->append(strStyle);
             }
+            return true;
         };
 
+        auto pathToFile = [](const QString& file) -> QString
+        {
+            return QString(stylesheetDirectory + "/" + "%1%2").arg(file).arg(isStyleSheetDirectoryCustom() ? ".css" : "");
+        };
+
+        std::vector<QString> vecFiles;
         // If light/dark theme is used load general styles first
         if (dashThemeActive()) {
-            loadFile("general");
+            vecFiles.push_back(pathToFile("general"));
         }
+        vecFiles.push_back(pathToFile(GUIUtil::getActiveTheme()));
 
-        loadFile(GUIUtil::getActiveTheme());
-
-        if (hashStyle.IsNull()) {
-            hashStyle = Hash(stylesheet->begin(), stylesheet->end());
-        } else {
-            uint256 hashStyleTmp = Hash(stylesheet->begin(), stylesheet->end());
-            if (hashStyle != hashStyleTmp) {
-                hashStyle = hashStyleTmp;
-                fStyleSheetChanged = true;
-            }
-        }
+        fStyleSheetChanged = loadFiles(vecFiles);
     }
 
+    bool fUpdateStyleSheet = fForceUpdate || (fDebugUI && fStyleSheetChanged);
+
     if (widget) {
-        widget->setStyleSheet(*stylesheet);
         setWidgets.insert(widget);
         widget->setStyleSheet(*stylesheet);
     }
-
-    bool fUpdateStyleSheet = (fForceUpdate || fDebugUI) && fStyleSheetChanged;
 
     QWidgetList allWidgets = QApplication::allWidgets();
     auto it = setWidgets.begin();
