@@ -118,7 +118,30 @@ QLineEdit:disabled {
 QAbstractSpinBox
 ******************************************************/
 
-/***** No dark.css specific coloring here yet *****/
+QAbstractSpinBox::up-arrow {
+    border-image: url(':/images/arrow_up_dark');
+}
+QAbstractSpinBox::up-arrow:hover {
+    border-image: url(':/images/arrow_up_light');
+}
+QAbstractSpinBox::up-arrow:pressed {
+    border-image: url(':/images/arrow_up_dark');
+}
+QAbstractSpinBox::up-arrow:disabled {
+    border-image: url(':/images/arrow_light_up_hover');
+}
+QAbstractSpinBox::down-arrow {
+    border-image: url(':/images/arrow_down_dark');
+}
+QAbstractSpinBox::down-arrow:hover {
+    border-image: url(':/images/arrow_down_light');
+}
+QAbstractSpinBox::down-arrow:pressed {
+    border-image: url(':/images/arrow_down_dark');
+}
+QAbstractSpinBox::down-arrow:disabled {
+    border-image: url(':/images/arrow_light_down_hover');
+}
 
 /******************************************************
 QCalendarWidget
@@ -148,6 +171,13 @@ QCalendarWidget,
 #qt_calendar_monthbutton:hover,
 #qt_calendar_yearbutton:hover {
     background-color: #39393b;
+}
+
+#qt_calendar_prevmonth {
+    qproperty-icon: url(':/images/arrow_left_dark');
+}
+#qt_calendar_nextmonth {
+    qproperty-icon: url(':/images/arrow_right_dark');
 }
 
 QCalendarWidget QToolButton {
@@ -222,6 +252,19 @@ QComboBox::item:alternate {
 QComboBox::item:selected {
     background-color: #585858;
     color: #c7c7c7;
+}
+
+QComboBox::down-arrow {
+    border-image: url(':/images/arrow_down_dark') 0 0 0 0 stretch stretch;
+}
+QComboBox::down-arrow:hover {
+    border-image: url(':/images/arrow_down_light') 0 0 0 0 stretch stretch;
+}
+QComboBox::down-arrow:pressed {
+    border-image: url(':/images/arrow_down_dark') 0 0 0 0 stretch stretch;
+}
+QComboBox::down-arrow:disabled {
+    border-image: url(':/images/arrow_light_down_hover') 0 0 0 0 stretch stretch;
 }
 
 /******************************************************
@@ -658,6 +701,18 @@ QTreeWidget {
     background-color: #2d2d2e;
     border-color: #4a4a4b;
 }
+QTreeWidget::branch::closed:has-children {
+    border-image: url(':/images/arrow_right_dark');
+}
+QTreeWidget::branch::closed:has-children:hover {
+    border-image: url(':/images/arrow_right_light');
+}
+QTreeWidget::branch::open {
+    border-image: url(':/images/arrow_down_dark');
+}
+QTreeWidget::branch::open:hover {
+    border-image: url(':/images/arrow_down_light');
+}
 QTreeWidget::indicator:unchecked,
 QTreeWidget::indicator:unchecked:pressed {
     border-image: url(':/images/checkbox_normal_dark');
@@ -953,6 +1008,58 @@ QScrollBar::sub-line:vertical:pressed,
 QScrollBar::add-line:horizontal:pressed,
 QScrollBar::sub-line:horizontal:pressed {
     background-color: #39393b;
+}
+
+QScrollBar:up-arrow {
+    border-image: url(':/images/arrow_up_dark');
+}
+QScrollBar:up-arrow:hover {
+    border-image: url(':/images/arrow_up_light');
+}
+QScrollBar:up-arrow:pressed {
+    border-image: url(':/images/arrow_up_dark');
+}
+QScrollBar:up-arrow:disabled {
+    border-image: url(':/images/arrow_light_up_hover');
+}
+
+QScrollBar:down-arrow {
+    border-image: url(':/images/arrow_down_dark');
+}
+QScrollBar:down-arrow:hover {
+    border-image: url(':/images/arrow_down_light');
+}
+QScrollBar:down-arrow:pressed {
+    border-image: url(':/images/arrow_down_dark');
+}
+QScrollBar:down-arrow:disabled {
+    border-image: url(':/images/arrow_light_down_hover');
+}
+
+QScrollBar:left-arrow {
+    border-image: url(':/images/arrow_left_dark');
+}
+QScrollBar:left-arrow:hover {
+    border-image: url(':/images/arrow_left_light');
+}
+QScrollBar:left-arrow:pressed {
+    border-image: url(':/images/arrow_left_dark');
+}
+QScrollBar:left-arrow:disabled {
+    border-image: url(':/images/arrow_light_left_hover');
+}
+
+QScrollBar:right-arrow {
+    border-image: url(':/images/arrow_right_dark');
+}
+QScrollBar:right-arrow:hover {
+    border-image: url(':/images/arrow_right_light');
+}
+QScrollBar:right-arrow:pressed {
+    border-image: url(':/images/arrow_right_dark');
+}
+QScrollBar:right-arrow:disabled {
+    border-image: url(':/images/arrow_light_right_hover');
 }
 
 </os>
