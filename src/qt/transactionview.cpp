@@ -19,6 +19,7 @@
 
 #include <ui_interface.h>
 
+#include <QCalendarWidget>
 #include <QComboBox>
 #include <QDateTimeEdit>
 #include <QDesktopServices>
@@ -33,6 +34,7 @@
 #include <QSettings>
 #include <QSignalMapper>
 #include <QTableView>
+#include <QTextCharFormat>
 #include <QTimer>
 #include <QUrl>
 #include <QVBoxLayout>
@@ -646,7 +648,23 @@ QWidget *TransactionView::createDateRangeWidget()
     connect(dateFrom, SIGNAL(dateChanged(QDate)), this, SLOT(dateRangeChanged()));
     connect(dateTo, SIGNAL(dateChanged(QDate)), this, SLOT(dateRangeChanged()));
 
+    updateCalendarWidgets();
+
     return dateRangeWidget;
+}
+
+void TransactionView::updateCalendarWidgets()
+{
+    auto adjustWeekEndColors = [](QCalendarWidget* w){
+        QTextCharFormat format = w->weekdayTextFormat(Qt::Saturday);
+        format.setForeground(QBrush(GUIUtil::getThemedQColor(GUIUtil::ThemedColor::DEFAULT), Qt::SolidPattern));
+
+        w->setWeekdayTextFormat(Qt::Saturday, format);
+        w->setWeekdayTextFormat(Qt::Sunday, format);
+    };
+
+    adjustWeekEndColors(dateFrom->calendarWidget());
+    adjustWeekEndColors(dateTo->calendarWidget());
 }
 
 void TransactionView::dateRangeChanged()
@@ -708,6 +726,13 @@ void TransactionView::resizeEvent(QResizeEvent* event)
 {
     QWidget::resizeEvent(event);
     columnResizingFixer->stretchColumnWidth(TransactionTableModel::ToAddress);
+}
+
+void TransactionView::changeEvent(QEvent *e)
+{
+    if (e->type() == QEvent::StyleChange) {
+        updateCalendarWidgets();
+    }
 }
 
 // Need to override default Ctrl+C action for amount as default behaviour is just to copy DisplayRole text
