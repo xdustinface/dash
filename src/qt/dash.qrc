@@ -81,18 +81,14 @@
         <file alias="Montserrat-ThinItalic">res/fonts/Montserrat/Montserrat-ThinItalic.otf</file>
     </qresource>
     <qresource prefix="/images">
-        <file alias="arrow_down_normal">res/images/arrow_down_normal.png</file>
-        <file alias="arrow_down_hover">res/images/arrow_down_hover.png</file>
-        <file alias="arrow_down_pressed">res/images/arrow_down_pressed.png</file>
-        <file alias="arrow_left_normal">res/images/arrow_left_normal.png</file>
-        <file alias="arrow_left_hover">res/images/arrow_left_hover.png</file>
-        <file alias="arrow_left_pressed">res/images/arrow_left_pressed.png</file>
-        <file alias="arrow_right_normal">res/images/arrow_right_normal.png</file>
-        <file alias="arrow_right_hover">res/images/arrow_right_hover.png</file>
-        <file alias="arrow_right_pressed">res/images/arrow_right_pressed.png</file>
-        <file alias="arrow_up_normal">res/images/arrow_up_normal.png</file>
-        <file alias="arrow_up_hover">res/images/arrow_up_hover.png</file>
-        <file alias="arrow_up_pressed">res/images/arrow_up_pressed.png</file>
+        <file alias="arrow_down_dark">res/images/arrow_down_dark.png</file>
+        <file alias="arrow_down_light">res/images/arrow_down_light.png</file>
+        <file alias="arrow_left_dark">res/images/arrow_left_dark.png</file>
+        <file alias="arrow_left_light">res/images/arrow_left_light.png</file>
+        <file alias="arrow_right_dark">res/images/arrow_right_dark.png</file>
+        <file alias="arrow_right_light">res/images/arrow_right_light.png</file>
+        <file alias="arrow_up_dark">res/images/arrow_up_dark.png</file>
+        <file alias="arrow_up_light">res/images/arrow_up_light.png</file>
         <file alias="arrow_light_down_normal">res/images/arrow_light_down_normal.png</file>
         <file alias="arrow_light_down_hover">res/images/arrow_light_down_hover.png</file>
         <file alias="arrow_light_left_normal">res/images/arrow_light_left_normal.png</file>

@@ -116,7 +116,30 @@ QLineEdit:disabled {
 QAbstractSpinBox
 ******************************************************/
 
-/***** No light.css specific coloring here yet *****/
+QAbstractSpinBox::up-arrow {
+    border-image: url(':/images/arrow_up_light');
+}
+QAbstractSpinBox::up-arrow:hover {
+    border-image: url(':/images/arrow_down_dark');
+}
+QAbstractSpinBox::up-arrow:pressed {
+    border-image: url(':/images/arrow_up_light');
+}
+QAbstractSpinBox::up-arrow:disabled {
+    border-image: url(':/images/arrow_light_up_normal');
+}
+QAbstractSpinBox::down-arrow {
+    border-image: url(':/images/arrow_up_light');
+}
+QAbstractSpinBox::down-arrow:hover {
+    border-image: url(':/images/arrow_down_dark');
+}
+QAbstractSpinBox::down-arrow:pressed {
+    border-image: url(':/images/arrow_up_light');
+}
+QAbstractSpinBox::down-arrow:disabled {
+    border-image: url(':/images/arrow_light_down_normal');
+}
 
 /******************************************************
 QCalendarWidget
@@ -146,6 +169,13 @@ QCalendarWidget,
 #qt_calendar_monthbutton:hover,
 #qt_calendar_yearbutton:hover {
     background-color: #d2d2d2;
+}
+
+#qt_calendar_prevmonth {
+    qproperty-icon: url(':/images/arrow_left_light');
+}
+#qt_calendar_nextmonth {
+    qproperty-icon: url(':/images/arrow_right_light');
 }
 
 QCalendarWidget QToolButton {
@@ -220,6 +250,19 @@ QComboBox::item:alternate {
 
 QComboBox::item:selected {
     background-color: #d2d2d2;
+}
+
+QComboBox::down-arrow {
+    border-image: url(':/images/arrow_down_light') 0 0 0 0 stretch stretch;
+}
+QComboBox::down-arrow:hover {
+    border-image: url(':/images/arrow_down_dark') 0 0 0 0 stretch stretch;
+}
+QComboBox::down-arrow:pressed {
+    border-image: url(':/images/arrow_down_light') 0 0 0 0 stretch stretch;
+}
+QComboBox::down-arrow:disabled {
+    border-image: url(':/images/arrow_light_down_normal') 0 0 0 0 stretch stretch;
 }
 
 /******************************************************
@@ -643,6 +686,18 @@ QTreeWidget {
     background-color: #eaeaec;
     border-color: #dcdcdc;
 }
+QTreeWidget::branch::closed:has-children {
+    border-image: url(':/images/arrow_right_light');
+}
+QTreeWidget::branch::closed:has-children:hover {
+    border-image: url(':/images/arrow_right_dark');
+}
+QTreeWidget::branch::open {
+    border-image: url(':/images/arrow_down_light');
+}
+QTreeWidget::branch::open:hover {
+    border-image: url(':/images/arrow_down_dark');
+}
 QTreeWidget::indicator:unchecked,
 QTreeWidget::indicator:unchecked:pressed {
     border-image: url(':/images/checkbox_normal_light');
@@ -939,5 +994,56 @@ QScrollBar::sub-line:horizontal:pressed {
     background-color: #e0e0e0;
 }
 
-</os>
+QScrollBar:up-arrow {
+    border-image: url(':/images/arrow_up_light');
+}
+QScrollBar:up-arrow:hover {
+    border-image: url(':/images/arrow_up_dark');
+}
+QScrollBar:up-arrow:pressed {
+    border-image: url(':/images/arrow_up_light');
+}
+QScrollBar:up-arrow:disabled {
+    border-image: url(':/images/arrow_light_up_normal');
+}
 
+QScrollBar:down-arrow {
+    border-image: url(':/images/arrow_down_light');
+}
+QScrollBar:down-arrow:hover {
+    border-image: url(':/images/arrow_down_dark');
+}
+QScrollBar:down-arrow:pressed {
+    border-image: url(':/images/arrow_down_light');
+}
+QScrollBar:down-arrow:disabled {
+    border-image: url(':/images/arrow_light_down_normal');
+}
+
+QScrollBar:left-arrow {
+    border-image: url(':/images/arrow_left_light');
+}
+QScrollBar:left-arrow:hover {
+    border-image: url(':/images/arrow_left_dark');
+}
+QScrollBar:left-arrow:pressed {
+    border-image: url(':/images/arrow_left_light');
+}
+QScrollBar:left-arrow:disabled {
+    border-image: url(':/images/arrow_light_left_normal');
+}
+
+QScrollBar:right-arrow {
+    border-image: url(':/images/arrow_right_light');
+}
+QScrollBar:right-arrow:hover {
+    border-image: url(':/images/arrow_right_dark');
+}
+QScrollBar:right-arrow:pressed {
+    border-image: url(':/images/arrow_right_light');
+}
+QScrollBar:right-arrow:disabled {
+    border-image: url(':/images/arrow_light_right_normal');
+}
+
+</os>
