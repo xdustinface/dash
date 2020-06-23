@@ -80,6 +80,54 @@ QAbstractSpinBox::down-button {
 }
 
 /******************************************************
+QCalendarWidget
+******************************************************/
+
+QCalendarWidget,
+#qt_calendar_calendarview,
+#qt_calendar_navigationbar,
+#qt_calendar_prevmonth,
+#qt_calendar_nextmonth,
+#qt_calendar_monthbutton,
+#qt_calendar_yearbutton {
+    background-color: #2d2d2e;
+}
+
+#qt_calendar_calendarview,
+#qt_calendar_navigationbar,
+#qt_calendar_prevmonth,
+#qt_calendar_nextmonth,
+#qt_calendar_monthbutton,
+#qt_calendar_yearbutton {
+    border-color: #4a4a4b;
+}
+
+#qt_calendar_prevmonth:hover,
+#qt_calendar_nextmonth:hover,
+#qt_calendar_monthbutton:hover,
+#qt_calendar_yearbutton:hover {
+    background-color: #39393b;
+}
+
+QCalendarWidget QToolButton {
+    color: #c7c7c7;
+}
+
+QCalendarWidget QWidget {
+    alternate-background-color: #585858;
+}
+
+QCalendarWidget QAbstractItemView:enabled {
+    color: #c7c7c7;
+    selection-background-color: #4a4a4b;
+    selection-color: #c7c7c7;
+}
+
+QCalendarWidget QAbstractItemView:disabled {
+    color: #818181;
+}
+
+/******************************************************
 QComboBox
 ******************************************************/
 

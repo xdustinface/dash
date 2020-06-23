@@ -163,6 +163,94 @@ QAbstractSpinBox::down-arrow:disabled {
 }
 
 /******************************************************
+QCalendarWidget
+******************************************************/
+
+QCalendarWidget  {
+    background-color: red;
+    min-height: 250px;
+}
+
+#qt_calendar_calendarview {
+    border-top: 0px solid red;
+    border-right: 1px solid red;
+    border-bottom: 1px solid red;
+    border-left: 1px solid red;
+    background-color: red;
+}
+
+#qt_calendar_navigationbar {
+    background-color: red;
+}
+
+#qt_calendar_navigationbar,
+#qt_calendar_prevmonth {
+    border-left: 1px solid red;
+}
+
+#qt_calendar_navigationbar,
+#qt_calendar_nextmonth {
+    border-right: 1px solid red;
+}
+
+#qt_calendar_navigationbar,
+#qt_calendar_prevmonth,
+#qt_calendar_nextmonth,
+#qt_calendar_monthbutton,
+#qt_calendar_yearbutton {
+    border-top: 1px solid red;
+}
+
+#qt_calendar_prevmonth {
+    width: 80px;
+    height: 30px;
+    qproperty-icon: url(':/images/arrow_left_normal');
+    qproperty-iconSize: 23px 23px;
+}
+#qt_calendar_nextmonth {
+    width: 80px;
+    height: 30px;
+    qproperty-icon: url(':/images/arrow_right_normal');
+    qproperty-iconSize: 23px 23px;
+}
+#qt_calendar_prevmonth:hover,
+#qt_calendar_nextmonth:hover,
+#qt_calendar_monthbutton:hover,
+#qt_calendar_yearbutton:hover {
+    background-color: red;
+}
+
+QCalendarWidget QToolButton {
+    width: 80px;
+    color: red;
+    background-color: red;
+}
+
+QCalendarWidget QToolButton::menu-indicator {
+    image: none;
+}
+
+QCalendarWidget QWidget {
+    alternate-background-color: red;
+}
+
+QCalendarWidget QAbstractItemView {
+    selection-color: red;
+}
+
+QCalendarWidget QAbstractItemView:enabled
+{
+    color: red;
+    background-color: red;
+    selection-background-color: red;
+    selection-color: red;
+}
+
+QCalendarWidget QAbstractItemView:disabled {
+    color: red;
+}
+
+/******************************************************
 QCheckBox
 ******************************************************/
 
