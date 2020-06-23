@@ -909,6 +909,18 @@ QDialog#HelpMessageDialog QTextEdit {
 }
 
 /******************************************************
+Intro
+******************************************************/
+
+Intro QRadioButton#dataDirCustom {
+    margin-top: 10px;
+}
+
+Intro QPushButton#ellipsisButton {
+    margin-left: 10px;
+}
+
+/******************************************************
 MasternodeList
 ******************************************************/
 
