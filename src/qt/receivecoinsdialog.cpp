@@ -32,6 +32,9 @@ ReceiveCoinsDialog::ReceiveCoinsDialog(QWidget* parent) :
                       ui->label_2,
                       ui->label_3}, GUIUtil::FontWeight::Normal, 15);
 
+    ui->reqLabel->setPlaceholderText(tr("Enter a label for this request to add its address to your address book"));
+    ui->reqMessage->setPlaceholderText(tr("Enter a message which gets added to this request."));
+
     // context menu actions
     QAction *copyURIAction = new QAction(tr("Copy URI"), this);
     QAction *copyLabelAction = new QAction(tr("Copy label"), this);
