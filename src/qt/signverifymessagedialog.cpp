@@ -33,7 +33,11 @@ SignVerifyMessageDialog::SignVerifyMessageDialog(const PlatformStyle *_platformS
     pageButtons.addButton(ui->btnVerifyMessage, pageButtons.buttons().size());
     connect(&pageButtons, SIGNAL(buttonClicked(int)), this, SLOT(showPage(int)));
 
+    ui->messageIn_SM->setPlaceholderText(tr("Enter a message to be signed"));
     ui->signatureOut_SM->setPlaceholderText(tr("Click \"Sign Message\" to generate signature"));
+
+    ui->messageIn_VM->setPlaceholderText(tr("Enter a message to be verified"));
+    ui->signatureIn_VM->setPlaceholderText(tr("Enter a signature to be verified"));
 
     ui->signMessageButton_SM->setIcon(platformStyle->Icon(":/icons/edit"));
     ui->clearButton_SM->setIcon(platformStyle->Icon(":/icons/remove"));
