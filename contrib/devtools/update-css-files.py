@@ -7,7 +7,6 @@
 # Distributed under the MIT/X11 software license, see the accompanying
 # file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-import os
 from pathlib import Path
 import re
 import subprocess
