@@ -37,8 +37,6 @@ OptionsDialog::OptionsDialog(QWidget *parent, bool enableWallet) :
 {
     ui->setupUi(this);
 
-    previousTheme = GUIUtil::getActiveTheme();
-
     GUIUtil::setFont({ui->statusLabel}, GUIUtil::FontWeight::Bold, 16);
 
     GUIUtil::updateFonts();
@@ -130,16 +128,6 @@ OptionsDialog::OptionsDialog(QWidget *parent, bool enableWallet) :
     }
     ui->thirdPartyTxUrls->setPlaceholderText("https://example.com/tx/%s");
 
-    /* Theme selector */
-    for (const QString& entry : GUIUtil::listThemes()) {
-        ui->theme->addItem(entry, QVariant(entry));
-    }
-
-    QString strMontserrat = GUIUtil::toString(GUIUtil::FontFamily::Montserrat);
-    QString strSystem = GUIUtil::toString(GUIUtil::FontFamily::SystemDefault);
-    ui->fontFamily->addItem(strMontserrat, QVariant(strMontserrat));
-    ui->fontFamily->addItem(strSystem, QVariant(strSystem));
-
     ui->unit->setModel(new BitcoinUnits(this));
 
     /* Widget-to-option mapper */
@@ -182,6 +170,8 @@ void OptionsDialog::setModel(OptionsModel *_model)
         setMapper();
         mapper->toFirst();
 
+        ui->appearance->setModel(_model);
+
         updateDefaultProxyNets();
     }
 
@@ -201,12 +191,6 @@ void OptionsDialog::setModel(OptionsModel *_model)
     connect(ui->digits, SIGNAL(valueChanged()), this, SLOT(showRestartWarning()));
     connect(ui->lang, SIGNAL(valueChanged()), this, SLOT(showRestartWarning()));
     connect(ui->thirdPartyTxUrls, SIGNAL(textChanged(const QString &)), this, SLOT(showRestartWarning()));
-    /* Appearance */
-    connect(ui->theme, SIGNAL(valueChanged()), this, SLOT(updateTheme()));
-    connect(ui->fontFamily, SIGNAL(currentTextChanged(const QString&)), this, SLOT(updateFontFamily(const QString&)));
-    connect(ui->fontScaleSlider, SIGNAL(valueChanged(int)), this, SLOT(updateFontScale(int)));
-    connect(ui->fontWeightNormalSlider, SIGNAL(valueChanged(int)), this, SLOT(updateFontWeightNormal(int)));
-    connect(ui->fontWeightBoldSlider, SIGNAL(valueChanged(int)), this, SLOT(updateFontWeightBold(int)));
 }
 
 void OptionsDialog::setMapper()
@@ -252,12 +236,9 @@ void OptionsDialog::setMapper()
     mapper->addMapping(ui->unit, OptionsModel::DisplayUnit);
     mapper->addMapping(ui->thirdPartyTxUrls, OptionsModel::ThirdPartyTxUrls);
 
-    /* Appearance */
-    mapper->addMapping(ui->theme, OptionsModel::Theme);
-    mapper->addMapping(ui->fontFamily, OptionsModel::FontFamily);
-    mapper->addMapping(ui->fontScaleSlider, OptionsModel::FontScale);
-    mapper->addMapping(ui->fontWeightNormalSlider, OptionsModel::FontWeightNormal);
-    mapper->addMapping(ui->fontWeightBoldSlider, OptionsModel::FontWeightBold);
+    /* Appearance
+       See AppearanceWidget::setModel
+    */
 }
 
 void OptionsDialog::showPage(int index)
@@ -303,6 +284,7 @@ void OptionsDialog::on_resetButton_clicked()
 void OptionsDialog::on_okButton_clicked()
 {
     mapper->submit();
+    ui->appearance->accept();
 #ifdef ENABLE_WALLET
     privateSendClient.nCachedNumBlocks = std::numeric_limits<int>::max();
     if(HasWallets())
@@ -314,9 +296,6 @@ void OptionsDialog::on_okButton_clicked()
 
 void OptionsDialog::on_cancelButton_clicked()
 {
-    if (previousTheme != GUIUtil::getActiveTheme()) {
-        updateTheme(previousTheme);
-    }
     reject();
 }
 
@@ -395,44 +374,6 @@ void OptionsDialog::updateDefaultProxyNets()
     strProxy = proxy.proxy.ToStringIP() + ":" + proxy.proxy.ToStringPort();
     strDefaultProxyGUI = ui->proxyIp->text() + ":" + ui->proxyPort->text();
     (strProxy == strDefaultProxyGUI.toStdString()) ? ui->proxyReachTor->setChecked(true) : ui->proxyReachTor->setChecked(false);
-}
-
-void OptionsDialog::updateTheme(const QString& theme)
-{
-    QString newValue = theme.isEmpty() ? ui->theme->value().toString() : theme;
-    if (GUIUtil::getActiveTheme() != newValue) {
-        QSettings().setValue("theme", newValue);
-        QSettings().sync();
-        Q_EMIT themeChanged();
-    }
-}
-
-void OptionsDialog::updateFontFamily(const QString& family)
-{
-    GUIUtil::setFontFamily(GUIUtil::fromString(family));
-    GUIUtil::updateFonts();
-}
-
-void OptionsDialog::updateFontScale(int nScale)
-{
-    GUIUtil::setFontScale(nScale);
-    GUIUtil::updateFonts();
-}
-
-void OptionsDialog::updateFontWeightNormal(int nValue)
-{
-    QFont::Weight weight;
-    assert(GUIUtil::weightFromArg(nValue, weight));
-    GUIUtil::setFontWeightNormal(weight);
-    GUIUtil::updateFonts();
-}
-
-void OptionsDialog::updateFontWeightBold(int nValue)
-{
-    QFont::Weight weight;
-    assert(GUIUtil::weightFromArg(nValue, weight));
-    GUIUtil::setFontWeightBold(weight);
-    GUIUtil::updateFonts();
 }
 
 ProxyAddressValidator::ProxyAddressValidator(QObject *parent) :

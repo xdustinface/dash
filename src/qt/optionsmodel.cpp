@@ -537,7 +537,7 @@ bool OptionsModel::setData(const QModelIndex & index, const QVariant & value, in
             break;
 #endif // ENABLE_WALLET
         case Theme:
-            // Set in OptionsDialog::updateTheme slot now
+            // Set in AppearanceWidget::updateTheme slot now
             // to allow instant theme changes.
             break;
         case FontFamily:
