@@ -9,6 +9,7 @@
 #include <QDialog>
 #include <QValidator>
 
+class AppearanceWidget;
 class OptionsModel;
 class QValidatedLineEdit;
 
@@ -60,15 +61,9 @@ private Q_SLOTS:
     void updateProxyValidationState();
     /* query the networks, for which the default proxy is used */
     void updateDefaultProxyNets();
-    void updateTheme(const QString& toTheme = QString());
-    void updateFontFamily(const QString& family);
-    void updateFontScale(int nScale);
-    void updateFontWeightNormal(int nValue);
-    void updateFontWeightBold(int nValue);
 
 Q_SIGNALS:
     void proxyIpChecks(QValidatedLineEdit *pUiProxyIp, int nProxyPort);
-    void themeChanged();
 
 private:
     Ui::OptionsDialog *ui;
@@ -76,6 +71,7 @@ private:
     QDataWidgetMapper *mapper;
     QButtonGroup pageButtons;
     QString previousTheme;
+    AppearanceWidget* appearance;
 };
 
 #endif // BITCOIN_QT_OPTIONSDIALOG_H

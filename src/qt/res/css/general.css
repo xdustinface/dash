@@ -1060,6 +1060,44 @@ QWidget#AddressBookPage QHeaderView::section { /* Min width for Windows fix */
 }
 
 /******************************************************
+AppearanceWidget
+******************************************************/
+
+AppearanceWidget #lblSmaller,
+AppearanceWidget #lblBigger,
+AppearanceWidget #lblBolderNormal,
+AppearanceWidget #lblBolderBold,
+AppearanceWidget #lblLighterNormal,
+AppearanceWidget #lblLighterBold {
+    /* Exceptional use of font-size here to
+    avoid changes of the slider postions */
+    font-size: 13px;
+}
+
+AppearanceWidget #lblTheme,
+AppearanceWidget #lblFontFamily,
+AppearanceWidget #lblFontScale,
+AppearanceWidget #lblFontWeightNormal,
+AppearanceWidget #lblFontWeightBold,
+AppearanceWidget #lblSmaller,
+AppearanceWidget #lblBigger,
+AppearanceWidget #lblBolderNormal,
+AppearanceWidget #lblBolderBold,
+AppearanceWidget #lblLighterNormal,
+AppearanceWidget #lblLighterBold {
+    min-height: 40px;
+}
+
+AppearanceWidget #lblTheme,
+AppearanceWidget #lblFontFamily,
+AppearanceWidget #lblFontScale,
+AppearanceWidget #lblFontWeightNormal,
+AppearanceWidget #lblFontWeightBold {
+    min-width: 170px;
+    max-width: 170px;
+}
+
+/******************************************************
 AskPassphraseDialog
 ******************************************************/
 
@@ -1274,15 +1312,6 @@ QDialog#OptionsDialog QLabel#label_3 { /* Translations Missing? Label */
     padding-left: 8px;
     min-height: 60px;
     color: #c79304;
-}
-
-QDialog#OptionsDialog #lblSmaller,
-QDialog#OptionsDialog #lblBigger,
-QDialog#OptionsDialog #lblBolderNormal,
-QDialog#OptionsDialog #lblBolderBold,
-QDialog#OptionsDialog #lblLighterNormal,
-QDialog#OptionsDialog #lblLighterBold {
-    min-width: 60px;
 }
 
 QDialog#OptionsDialog #line,
