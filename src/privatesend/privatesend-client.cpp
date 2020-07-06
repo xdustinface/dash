@@ -1581,23 +1581,18 @@ bool CPrivateSendClientSession::CreateDenominated(CAmount nBalanceToDenominate, 
             if (nValueLeft == 0 || nBalanceToDenominate <= 0) break;
         }
 
-        bool finished = true;
-        for (const auto it : mapDenomCount) {
-            // Check if this specific denom could use another loop, check that there aren't nPrivateSendDenomsGoal of this
-            // denom and that our nValueLeft/nBalanceToDenominate is enough to create one of these denoms, if so, loop again.
-            if (it.second < privateSendClient.nPrivateSendDenomsGoal && nValueLeft >= it.first && nBalanceToDenominate > 0) {
-                finished = false;
-                LogPrint(BCLog::PRIVATESEND,
-                        "CPrivateSendClientSession::CreateDenominated -- 1 - NOT finished - nDenomValue: %f, count: %d, nValueLeft: %f, nBalanceToDenominate: %f\n",
-                        (float) it.first / COIN, it.second, (float) nValueLeft / COIN, (float) nBalanceToDenominate / COIN);
-                break;
-            }
+        // Check if this specific denom could use another loop, check that there aren't nPrivateSendDenomsGoal of this
+        // denom and that our nValueLeft/nBalanceToDenominate is enough to create one of these denoms, if so, loop again.
+        if (currentDenomIt->second < privateSendClient.nPrivateSendDenomsGoal && nValueLeft >= currentDenomIt->first && nBalanceToDenominate > 0) {
             LogPrint(BCLog::PRIVATESEND,
-                    "CPrivateSendClientSession::CreateDenominated -- 1 - FINSHED - nDenomValue: %f, count: %d, nValueLeft: %f, nBalanceToDenominate: %f\n",
-                    (float) it.first / COIN, it.second, (float) nValueLeft / COIN, (float) nBalanceToDenominate / COIN);
+                    "CPrivateSendClientSession::CreateDenominated -- 1 - NOT finished - nDenomValue: %f, count: %d, nValueLeft: %f, nBalanceToDenominate: %f\n",
+                    (float) currentDenomIt->first / COIN, currentDenomIt->second, (float) nValueLeft / COIN, (float) nBalanceToDenominate / COIN);
+            continue;
         }
 
-        if (finished) break;
+        LogPrint(BCLog::PRIVATESEND,
+                "CPrivateSendClientSession::CreateDenominated -- 1 - FINSHED - nDenomValue: %f, count: %d, nValueLeft: %f, nBalanceToDenominate: %f\n",
+                (float) currentDenomIt->first / COIN, currentDenomIt->second, (float) nValueLeft / COIN, (float) nBalanceToDenominate / COIN);
     }
 
     // Now that nPrivateSendDenomsGoal worth of each denom have been created or the max number of denoms given the value of the input, do something with the remainder.
