@@ -157,6 +157,36 @@ QWidget#contentWidget { /* The actual content with the text/buttons/etc... */
 }
 
 /******************************************************
+AppearanceSetup
+******************************************************/
+
+QDialog#AppearanceSetup {
+    min-width: 600px;
+    max-width: 600px;
+    min-height: 400px;
+    max-height: 400px;
+}
+
+QDialog#AppearanceSetup > QFrame {
+    border-bottom: 1px solid red;
+}
+
+QDialog#AppearanceSetup > QLabel#lblHeading {
+    min-height: 50px;
+    max-height: 50px;
+}
+
+QDialog#AppearanceSetup > QLabel#lblSubHeading {
+    min-height: 30px;
+    max-height: 30px;
+}
+
+QDialog#AppearanceSetup > AppearanceWidget {
+    min-height: 250px;
+    max-height: 250px;
+}
+
+/******************************************************
 AppearanceWidget
 ******************************************************/
 
