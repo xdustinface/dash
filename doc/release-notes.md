@@ -160,6 +160,7 @@ There are a few changes in existing RPC interfaces in this release:
   `denoms_hardcap`
 - `listunspent` has new filter option `coinType` to be able to filter different
   types of coins (all, mixed etc.)
+- `protx diff` returns more detailed information about new quorums
 - `quorum dkgstatus` shows `quorumConnections` for each LLMQ with detailed
   information about each participating masternode
 - `quorum sign` has an optional `quorumHash` argument to pick the exact quorum
