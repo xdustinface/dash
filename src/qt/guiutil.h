@@ -18,6 +18,7 @@
 #include <QLabel>
 
 class QValidatedLineEdit;
+class OptionsModel;
 class SendCoinsRecipient;
 
 QT_BEGIN_NAMESPACE
@@ -94,6 +95,9 @@ namespace GUIUtil
     // Set up widgets for address and amounts
     void setupAddressWidget(QValidatedLineEdit *widget, QWidget *parent, bool fAllowURI = false);
     void setupAmountWidget(QLineEdit *widget, QWidget *parent);
+
+    // Setup appearance settings if not done yet
+    void setupAppearance(QWidget* parent, OptionsModel* model);
 
     // Parse "dash:" URI into recipient object, return true on successful parsing
     bool parseBitcoinURI(const QUrl &uri, SendCoinsRecipient *out);
