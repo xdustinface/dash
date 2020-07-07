@@ -5,8 +5,10 @@
 
 #include <qt/guiutil.h>
 
+#include <qt/appearancewidget.h>
 #include <qt/bitcoinaddressvalidator.h>
 #include <qt/bitcoinunits.h>
+#include <qt/optionsdialog.h>
 #include <qt/qvalidatedlineedit.h>
 #include <qt/walletmodel.h>
 
@@ -46,6 +48,7 @@
 #include <QDebug>
 #include <QDesktopServices>
 #include <QDesktopWidget>
+#include <QDialogButtonBox>
 #include <QDoubleValidator>
 #include <QFileDialog>
 #include <QFont>
@@ -58,6 +61,7 @@
 #include <QTimer>
 #include <QUrlQuery>
 #include <QMouseEvent>
+#include <QVBoxLayout>
 
 static fs::detail::utf8_codecvt_facet utf8;
 
@@ -258,6 +262,48 @@ void setupAmountWidget(QLineEdit *widget, QWidget *parent)
     amountValidator->setBottom(0.0);
     widget->setValidator(amountValidator);
     widget->setAlignment(Qt::AlignRight|Qt::AlignVCenter);
+}
+
+void setupAppearance(QWidget* parent, OptionsModel* model)
+{
+    if (!QSettings().value("fAppearanceSetupDone", false).toBool()) {
+        // Create the dialog
+        QDialog dlg(parent);
+        dlg.setObjectName("AppearanceSetup");
+        dlg.setWindowTitle(QObject::tr("Appearance Setup"));
+        dlg.setWindowIcon(QIcon(":icons/bitcoin"));
+        // And the widgets we add to it
+        QLabel lblHeading(QObject::tr("Please choose your prefered settings for the appearance of %1").arg(QObject::tr(PACKAGE_NAME)), &dlg);
+        lblHeading.setObjectName("lblHeading");
+        lblHeading.setWordWrap(true);
+        QLabel lblSubHeading(QObject::tr("This can also be adjusted later in the \"Appearance\" tab of the preferences."), &dlg);
+        lblSubHeading.setObjectName("lblSubHeading");
+        lblSubHeading.setWordWrap(true);
+        AppearanceWidget appearance(&dlg);
+        appearance.setModel(model);
+        QFrame line(&dlg);
+        line.setFrameShape(QFrame::HLine);
+        QDialogButtonBox buttonBox(QDialogButtonBox::Save);
+        // Put them into a vbox and add the vbox to the dialog
+        QVBoxLayout layout;
+        layout.addWidget(&lblHeading);
+        layout.addWidget(&lblSubHeading);
+        layout.addWidget(&line);
+        layout.addWidget(&appearance);
+        layout.addWidget(&buttonBox);
+        dlg.setLayout(&layout);
+        // Adjust the headings
+        setFont({&lblHeading}, FontWeight::Bold, 16);
+        setFont({&lblSubHeading}, FontWeight::Normal, 14, true);
+        // Make sure the dialog closes and accepts the settings if save has been pressed
+        QObject::connect(&buttonBox, &QDialogButtonBox::accepted, [&]() {
+            QSettings().setValue("fAppearanceSetupDone", true);
+            appearance.accept();
+            dlg.accept();
+        });
+        // And fire it!
+        dlg.exec();
+    }
 }
 
 bool parseBitcoinURI(const QUrl &uri, SendCoinsRecipient *out)
