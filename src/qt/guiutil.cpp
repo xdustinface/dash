@@ -1418,8 +1418,6 @@ void disableMacFocusRect(const QWidget* w)
             c->setAttribute(Qt::WA_MacShowFocusRect, !dashThemeActive());
         }
     }
-#else
-    return;
 #endif
 }
 
