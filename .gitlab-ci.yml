@@ -113,7 +113,7 @@ builder-image:
   stage: test
   extends: .base-template
   script:
-    - ./ci/test_integrationtests.sh --extended --exclude pruning,dbcrash
+    - ./ci/test_integrationtests.sh --extended --exclude pruning,dbcrash,rpcbind_test
   after_script:
     - mkdir -p $CI_PROJECT_DIR/testlogs
   artifacts:
