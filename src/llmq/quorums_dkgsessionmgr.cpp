@@ -27,7 +27,7 @@ CDKGSessionManager::CDKGSessionManager(CDBWrapper& _llmqDb, CBLSWorker& _blsWork
     for (const auto& qt : Params().GetConsensus().llmqs) {
         dkgSessionHandlers.emplace(std::piecewise_construct,
                 std::forward_as_tuple(qt.first),
-                std::forward_as_tuple(qt.second, messageHandlerPool, blsWorker, *this));
+                std::forward_as_tuple(qt.second, blsWorker, *this));
     }
 }
 
@@ -40,9 +40,6 @@ void CDKGSessionManager::StartThreads()
     for (auto& it : dkgSessionHandlers) {
         it.second.StartThread();
     }
-
-    messageHandlerPool.resize(2);
-    RenameThreadPool(messageHandlerPool, "dash-q-msg");
 }
 
 void CDKGSessionManager::StopThreads()
@@ -50,8 +47,6 @@ void CDKGSessionManager::StopThreads()
     for (auto& it : dkgSessionHandlers) {
         it.second.StopThread();
     }
-
-    messageHandlerPool.stop(true);
 }
 
 void CDKGSessionManager::UpdatedBlockTip(const CBlockIndex* pindexNew, bool fInitialDownload)
