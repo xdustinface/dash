@@ -181,7 +181,7 @@ OverviewPage::OverviewPage(const PlatformStyle *platformStyle, QWidget *parent) 
             ui->labelPrivateSendEnabled->setToolTip(tr("Automatic backups are disabled, no mixing available!"));
         }
     } else {
-        if(!privateSendClient.fPrivateSendRunning){
+        if(!privateSendClient.IsMixing()){
             ui->togglePrivateSend->setText(tr("Start Mixing"));
         } else {
             ui->togglePrivateSend->setText(tr("Stop Mixing"));
@@ -487,7 +487,7 @@ void OverviewPage::privateSendStatus()
     }
     ui->labelPrivateSendEnabled->setToolTip(strKeysLeftText);
 
-    if (!privateSendClient.fPrivateSendRunning) {
+    if (!privateSendClient.IsMixing()) {
         if (nBestHeight != privateSendClient.nCachedNumBlocks) {
             privateSendClient.nCachedNumBlocks = nBestHeight;
             updatePrivateSendProgress();
@@ -544,7 +544,7 @@ void OverviewPage::privateSendStatus()
         }
     }
 
-    QString strEnabled = privateSendClient.fPrivateSendRunning ? tr("Enabled") : tr("Disabled");
+    QString strEnabled = privateSendClient.IsMixing() ? tr("Enabled") : tr("Disabled");
     // Show how many keys left in advanced PS UI mode only
     if(fShowAdvancedPSUI) strEnabled += ", " + strKeysLeftText;
     ui->labelPrivateSendEnabled->setText(strEnabled);
@@ -594,7 +594,7 @@ void OverviewPage::togglePrivateSend(){
                 QMessageBox::Ok, QMessageBox::Ok);
         settings.setValue("hasMixed", "hasMixed");
     }
-    if(!privateSendClient.fPrivateSendRunning){
+    if(!privateSendClient.IsMixing()){
         const CAmount nMinAmount = CPrivateSend::GetSmallestDenomination() + CPrivateSend::GetMaxCollateralAmount();
         if(currentBalance < nMinAmount){
             QString strMinAmount(BitcoinUnits::formatWithUnit(nDisplayUnit, nMinAmount));
@@ -622,14 +622,15 @@ void OverviewPage::togglePrivateSend(){
 
     }
 
-    privateSendClient.fPrivateSendRunning = !privateSendClient.fPrivateSendRunning;
     privateSendClient.nCachedNumBlocks = std::numeric_limits<int>::max();
 
-    if(!privateSendClient.fPrivateSendRunning){
+    if (privateSendClient.IsMixing()) {
         ui->togglePrivateSend->setText(tr("Start Mixing"));
         privateSendClient.ResetPool();
+        privateSendClient.StopMixing();
     } else {
         ui->togglePrivateSend->setText(tr("Stop Mixing"));
+        privateSendClient.StartMixing(walletModel->getWallet());
     }
 }
 
@@ -657,5 +658,5 @@ void OverviewPage::DisablePrivateSendCompletely() {
     if (nWalletBackups <= 0) {
         ui->labelPrivateSendEnabled->setText("<span style='" + GUIUtil::getThemedStyleQString(GUIUtil::ThemedStyle::TS_ERROR) + "'>(" + tr("Disabled") + ")</span>");
     }
-    privateSendClient.fPrivateSendRunning = false;
+    privateSendClient.StopMixing();
 }
