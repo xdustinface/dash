@@ -8,6 +8,8 @@ Release is now available from:
 This is a new major version release, bringing new features, various bugfixes
 and other improvements.
 
+This is release is mandatory for masternodes and optional for other nodes.
+
 Please report bugs using the issue tracker at github:
 
   <https://github.com/dashpay/dash/issues>
@@ -41,6 +43,12 @@ Downgrading to a version smaller than 0.14.0.3 is not supported anymore due to
 changes in the "evodb" database format. If you need to use an older version,
 you have to perform a reindex or re-sync the whole chain.
 
+### Downgrade of masternodes to < 0.16
+
+Starting with this release, masternodes will verify protocol versions of other
+masternodes. This will cause PoSe punishment/banning of downgraded masternodes,
+so it is not recommended to downgrade masternodes.
+
 Notable changes
 ===============
 
@@ -61,37 +69,52 @@ process is repeated until a recovered signature is finally created and propagate
 
 The new system is activated with the newly added `SPORK_21_QUORUM_ALL_CONNECTED`.
 
-Masternode Probing
-------------------
+Increased number of masternode connections
+------------------------------------------
+To implement "Concentrated Recovery", it is now required that all members of a LLMQ
+connect to all other members of the same LLMQ. This increases general connection count
+for masternodes a lot. These intra-quorum connections are less resource consuming then
+normal p2p connections as they only exchange LLMQ/masternode related messages, but
+the hardware and network requirements will still be higher then before.
+
+This change will at first only be activated for the smaller LLMQs (50 members) and
+then later for the larger ones (400 members). This is also controlled via `SPORK_21_QUORUM_ALL_CONNECTED`.
+
+Masternode Connection Probing
+-----------------------------
 While each member must have a connection to each other member, it's not necessary
 for all members to actually connect to all other members. This is because only
-one of a pair of two MNs need to initiate the connection while the other one can
-wait for an incoming connection. Probing is done in the case where a MN doesn't
+one of a pair of two masternodes need to initiate the connection while the other one can
+wait for an incoming connection. Probing is done in the case where a masternode doesn't
 really need an outbound connection, but still wants to verify that the other side
 has its port open. This is done by initiating a short lived connection, waiting
-for `MNAUTH` to succeed and then disconnecting again. Members of LLMQs will also
-check all other members for minimum protocol versions while in DKG.
+for `MNAUTH` to succeed and then disconnecting again.
 
-Each probe (and normal outgoing connection) is tracked in the masternode meta
-info (can be seen in `protx list registered 1`), so that we can verify in other
-places when we had the last successful outbound connection to the masternode.
-LLMQ members will re-use the already existing `badMember` field of `QCOMPLAINT`
-message, which makes the code backward compatible with older nodes.
+After this process, each member of a LLMQ knows which members are unable to accept
+connections, after which they will vote on these members to be "bad".
 
-The idea of the min version check is that each member will always vote on other
-members to be bad when the version is lower then `MIN_MASTERNODE_PROTO_VERSION`.
-This won't have any effect until enough (`dkgBadVotesThreshold`) members vote
-for the same member to be bad. When enough members did the vote, premature
-commitments will mark the failed member as bad.
+Masternode Minimum Protocol Version Checks
+------------------------------------------
+Members of LLMQs will now also check all other members for minimum protocol versions
+while in DKG. If a masternode determines that another LLMQ member has a protocol
+version that is too low, it will vote for the other member to be "bad".
 
-This means that masternodes will start to get PoSe punished when 60% of the
-network has upgraded to the latest version and `SPORK_21_QUORUM_ALL_CONNECTED`
-is activated. It will start to sporadically punish/ban and get more often while
-more masternodes upgrade.
+PoSe punishment/banning
+-----------------------
+If 80% of all LLMQ members voted for the same member to be bad, it is excluded
+in the final stages of the DKG. This causes the bad masternode to get PoSe punished
+and then eventually PoSe banned.
 
-Implementation of poll/epoll
-----------------------------
-***TODO: Network performance improvements for linux-based systems***
+Network performance improvements
+--------------------------------
+This version of Dash Core includes multiple optimizations to the network and p2p message
+handling code. The most important one is the introduction of `epoll` on linux-based
+systems. This removes most of the CPU overhead caused by the sub-optimal use of `select`,
+which could easily use up 50-80% of the CPU time spent in the network thread when many
+connections were involved.
+
+Other improvements were made to the p2p message handling code, so that for example LLMQ
+related connections do less work then full/normal p2p connections.
 
 Wallet files
 ------------
