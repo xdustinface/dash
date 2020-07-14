@@ -9,6 +9,7 @@ This is a new major version release, bringing new features, various bugfixes
 and other improvements.
 
 This is release is mandatory for masternodes and optional for other nodes.
+***TODO: this won't be true if block reward reallocation code is going to be included***
 
 Please report bugs using the issue tracker at github:
 
@@ -78,7 +79,9 @@ normal p2p connections as they only exchange LLMQ/masternode related messages, b
 the hardware and network requirements will still be higher than before.
 
 This change will at first only be activated for the smaller LLMQs (50 members) and
-then later for the larger ones (400 members). This is also controlled via `SPORK_21_QUORUM_ALL_CONNECTED`.
+then later for the larger ones (400 members).
+
+This is also controlled via `SPORK_21_QUORUM_ALL_CONNECTED`.
 
 Masternode Connection Probing
 -----------------------------
