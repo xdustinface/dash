@@ -56,12 +56,10 @@ QPushButton - Special case, tabbar replacement buttons
 #btnVerifyMessage {
     background: none;
     border-radius: 0px;
-    color: red;
     border-bottom: 3px solid red;
     padding-bottom: 5px;
-    background-color: transparent;
+    background-color: #00000000;
     border-color: #008de4;
-    color: #333;
 }
 
 /* Debug window buttons */
@@ -80,12 +78,10 @@ QPushButton - Special case, tabbar replacement buttons
 #btnSignMessage:hover:checked,
 #btnVerifyMessage:hover:checked {
     border: none;
-    color: red;
     border-radius: 0px;
     border-bottom: 3px solid red;
-    background-color:transparent;
+    background-color: #00000000;
     border-color: #333;
-    color: #333;
 }
 
 /* Debug window buttons */
@@ -104,12 +100,10 @@ QPushButton - Special case, tabbar replacement buttons
 #btnSignMessage:hover:!checked,
 #btnVerifyMessage:hover:!checked {
     border: none;
-    color: red;
     border-radius: 0px;
     border-bottom: 3px solid red;
-    background-color:transparent;
+    background-color: #00000000;
     border-color: #047ac2;
-    color: #666;
 }
 
 /* Debug window buttons */
@@ -128,12 +122,10 @@ QPushButton - Special case, tabbar replacement buttons
 #btnSignMessage:checked,
 #btnVerifyMessage:checked {
     border: none;
-    color: red;
     border-radius: 0px;
     border-bottom: 3px solid red;
-    background-color:transparent;
+    background-color: #00000000;
     border-color: #333;
-    color: #333;
 }
 
 /******************************************************
