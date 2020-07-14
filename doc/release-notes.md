@@ -8,7 +8,7 @@ Release is now available from:
 This is a new major version release, bringing new features, various bugfixes
 and other improvements.
 
-This is release is mandatory for masternodes and optional for other nodes.
+This release is mandatory for masternodes and optional for other nodes.
 ***TODO: this won't be true if block reward reallocation code is going to be included***
 
 Please report bugs using the issue tracker at github:
