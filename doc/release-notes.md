@@ -73,9 +73,9 @@ Increased number of masternode connections
 ------------------------------------------
 To implement "Concentrated Recovery", it is now required that all members of a LLMQ
 connect to all other members of the same LLMQ. This increases general connection count
-for masternodes a lot. These intra-quorum connections are less resource consuming then
+for masternodes a lot. These intra-quorum connections are less resource consuming than
 normal p2p connections as they only exchange LLMQ/masternode related messages, but
-the hardware and network requirements will still be higher then before.
+the hardware and network requirements will still be higher than before.
 
 This change will at first only be activated for the smaller LLMQs (50 members) and
 then later for the larger ones (400 members). This is also controlled via `SPORK_21_QUORUM_ALL_CONNECTED`.
@@ -114,7 +114,7 @@ which could easily use up 50-80% of the CPU time spent in the network thread whe
 connections were involved.
 
 Other improvements were made to the p2p message handling code, so that for example LLMQ
-related connections do less work then full/normal p2p connections.
+related connections do less work than full/normal p2p connections.
 
 Wallet files
 ------------
