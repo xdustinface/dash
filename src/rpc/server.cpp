@@ -34,6 +34,16 @@ static RPCTimerInterface* timerInterface = nullptr;
 /* Map of name to timer. */
 static std::map<std::string, std::unique_ptr<RPCTimerBase> > deadlineTimers;
 
+// Any commands submitted by this user will have their commands filtered based on the platformAllowedCommands
+static std::string defaultPlatformUser = "platform-user";
+
+static const std::vector<std::pair<std::string /*command*/, std::string /*subcommand*/>> platformAllowedCommands = {
+        {"getbestblockhash", ""},
+        {"getblockhash", ""},
+        {"getblockcount", ""},
+        {"getbestchainlock", ""},
+};
+
 static struct CRPCSignals
 {
     boost::signals2::signal<void ()> Started;
@@ -545,6 +555,25 @@ UniValue CRPCTable::execute(const JSONRPCRequest &request) const
     const CRPCCommand *pcmd = tableRPC[request.strMethod];
     if (!pcmd)
         throw JSONRPCError(RPC_METHOD_NOT_FOUND, "Method not found");
+
+    // Before executing the RPC Command, filter commands from platform rpc user
+    if (fMasternodeMode && request.authUser == gArgs.GetArg("-platform-user", defaultPlatformUser)) {
+        auto it = find_if(platformAllowedCommands.begin(), platformAllowedCommands.end(), [request](const std::pair<std::string /*command*/, std::string /*subcommand*/>& cmd) {
+            // Check if this request matches a valid masternode rpc command
+            if (request.strMethod == cmd.first) {
+                // First arg / command matched, if there is no subcommand return true
+                if (cmd.second.empty()) return true;
+                if (request.params[0].isStr() && request.params[0].getValStr() == cmd.second) {
+                    // Sub command was needed and matched, return true
+                    return true;
+                }
+            }
+            return false;
+        });
+        if (it == platformAllowedCommands.end()) {
+            throw JSONRPCError(RPC_PROTECTED_COMMAND, "Method prohibited for platform user");
+        }
+    }
 
     g_rpcSignals.PreCommand(*pcmd);
 
