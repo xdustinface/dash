@@ -483,19 +483,6 @@
            </layout>
           </item>
           <item>
-           <widget class="QLabel" name="labelPrivateSendLastMessage">
-            <property name="text">
-             <string>(Last Message)</string>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
-            </property>
-            <property name="wordWrap">
-             <bool>true</bool>
-            </property>
-           </widget>
-          </item>
-          <item>
            <layout class="QVBoxLayout" name="VerticalLayout_PS">
             <item>
              <layout class="QHBoxLayout" name="horizontalLayout_3">

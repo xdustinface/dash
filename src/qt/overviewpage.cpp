@@ -470,7 +470,6 @@ void OverviewPage::updateAdvancedPSUI(bool fShowAdvancedPSUI) {
     ui->privateSendProgress->setVisible(fShowAdvancedPSUI);
     ui->labelSubmittedDenomText->setVisible(fShowAdvancedPSUI);
     ui->labelSubmittedDenom->setVisible(fShowAdvancedPSUI);
-    ui->labelPrivateSendLastMessage->setVisible(fShowAdvancedPSUI);
 }
 
 void OverviewPage::privateSendStatus(bool fForce)
@@ -480,8 +479,7 @@ void OverviewPage::privateSendStatus(bool fForce)
     if(!walletModel) return;
 
     auto tempWidgets = {ui->labelSubmittedDenomText,
-                        ui->labelSubmittedDenom,
-                        ui->labelPrivateSendLastMessage};
+                        ui->labelSubmittedDenom};
 
     auto setWidgetsVisible = [&](bool fVisible) {
         for (const auto& it : tempWidgets) {
@@ -508,7 +506,6 @@ void OverviewPage::privateSendStatus(bool fForce)
             updatePrivateSendProgress();
         }
 
-        ui->labelPrivateSendLastMessage->setText("");
         setWidgetsVisible(false);
         ui->togglePrivateSend->setText(tr("Start Mixing"));
 
@@ -588,15 +585,7 @@ void OverviewPage::privateSendStatus(bool fForce)
         updatePrivateSendProgress();
     }
 
-    QString strStatus = QString(privateSendClient.GetStatuses().c_str());
-
-    QString s = tr("Last PrivateSend message:\n") + strStatus;
-
-    if(s != ui->labelPrivateSendLastMessage->text())
-        LogPrint(BCLog::PRIVATESEND, "OverviewPage::privateSendStatus -- Last PrivateSend message: %s\n", strStatus.toStdString());
-
     setWidgetsVisible(true);
-    ui->labelPrivateSendLastMessage->setText(s);
 
     ui->labelSubmittedDenom->setText(QString(privateSendClient.GetSessionDenoms().c_str()));
 }
