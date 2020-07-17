@@ -1070,7 +1070,12 @@ void loadStyleSheet(QWidget* widget, bool fDebugWidget)
                 QString strStyle = QLatin1String(qFile.readAll());
                 // Process all <os=...></os> groups in the stylesheet first
                 QRegularExpressionMatch osStyleMatch;
-                QRegularExpression osStyleExp("^(<os=(?:'|\").+(?:'|\")>)((?:.|\n)+?)(</os>?)$");
+                QRegularExpression osStyleExp(
+                        "^"
+                        "(<os=(?:'|\").+(?:'|\")>)" // group 1
+                        "((?:.|\n)+?)"              // group 2
+                        "(</os>?)"                  // group 3
+                        "$");
                 osStyleExp.setPatternOptions(QRegularExpression::MultilineOption);
                 QRegularExpressionMatchIterator it = osStyleExp.globalMatch(strStyle);
 
