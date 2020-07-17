@@ -1058,6 +1058,7 @@ void loadStyleSheet(QWidget* widget, bool fDebugWidget)
                 return false;
             }
 
+            std::string platformName = gArgs.GetArg("-uiplatform", BitcoinGUI::DEFAULT_UIPLATFORM);
             stylesheet = std::make_unique<QString>();
 
             for (const auto& file : vecFiles) {
@@ -1083,7 +1084,7 @@ void loadStyleSheet(QWidget* widget, bool fDebugWidget)
                     }
 
                     for (int i = 0; i < listMatches.size(); i += 4) {
-                        if (!listMatches[i + 1].contains(QString::fromStdString(BitcoinGUI::DEFAULT_UIPLATFORM))) {
+                        if (!listMatches[i + 1].contains(QString::fromStdString(platformName))) {
                             // If os is not supported for this styles
                             // just remove the full match
                             strStyle.replace(listMatches[i], "");
