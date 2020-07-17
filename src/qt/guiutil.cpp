@@ -132,6 +132,8 @@ static std::map<QWidget*, std::pair<FontWeight, bool>> mapNormalFontUpdates;
 static std::set<QWidget*> setFixedPitchFontUpdates;
 // Contains all widgets where a non-default fontsize has been seet with GUIUtil::setFont
 static std::map<QWidget*, int> mapFontSizeUpdates;
+// Contains a list of supported font weights for all members of GUIUtil::FontFamily
+static std::map<FontFamily, std::vector<QFont::Weight>> mapSupportedWeights;
 
 #ifdef Q_OS_MAC
 // Contains all widgets where the macOS focus rect has been disabled.
@@ -1352,6 +1354,32 @@ bool loadFonts()
 
     setApplicationFont();
 
+    // Initialize supported font weights for all available fonts
+
+    // Generate a vector with supported font weights by comparing the width of a certain test text for all font weights
+    // A width difference from the current value compared to the last supported value means the current value is supported.
+    // This code does not determine the exact weight values which are supported by the font but at least it figures
+    // a list of values which make sense to use as there will be a difference between each of them and thats what we want.
+    auto supportedWeights = [](FontFamily family) -> std::vector<QFont::Weight> {
+        auto getTestWidth = [&](QFont::Weight weight) -> int {
+            QFont font = getFont(family, weight, false, 30);
+            return QFontMetrics(font).width("Check the width of this text to see if the weight change has an impact!");
+        };
+        std::vector<QFont::Weight> vecWeights{ QFont::Thin, QFont::ExtraLight, QFont::Light,
+                                               QFont::Normal, QFont::Medium, QFont::DemiBold,
+                                               QFont::Bold, QFont::Black };
+        std::vector<QFont::Weight> vecSupported{ vecWeights.front() };
+        for (auto weight = vecWeights.begin() + 1; weight != vecWeights.end(); ++weight) {
+            if (getTestWidth(vecSupported.back()) != getTestWidth(*weight)) {
+                vecSupported.push_back(*weight);
+            }
+        }
+        return vecSupported;
+    };
+
+    mapSupportedWeights.insert(std::make_pair(FontFamily::SystemDefault, supportedWeights(FontFamily::SystemDefault)));
+    mapSupportedWeights.insert(std::make_pair(FontFamily::Montserrat, supportedWeights(FontFamily::Montserrat)));
+
     return true;
 }
 
@@ -1476,12 +1504,11 @@ void updateFonts()
     }
 }
 
-QFont getFont(FontWeight weight, bool fItalic, int nPointSize)
+QFont getFont(FontFamily family, QFont::Weight qWeight, bool fItalic, int nPointSize)
 {
     QFont font;
-    QFont::Weight qWeight = toQFontWeight(weight);
 
-    if (fontFamily == FontFamily::Montserrat) {
+    if (family == FontFamily::Montserrat) {
 
         static std::map<QFont::Weight, QString> mapMontserratMapping{
             {QFont::Thin, "Thin"},
@@ -1532,10 +1559,19 @@ QFont getFont(FontWeight weight, bool fItalic, int nPointSize)
     }
 
     if (gArgs.GetBoolArg("-debug-ui", false)) {
-        qDebug() << __func__ << ": font size: " << font.pointSizeF() << " family: " << font.family() << ", style: " << font.styleName() << " match: " << font.exactMatch();
+        qDebug() << __func__ << ": font size: " << font.pointSizeF() << " family: " << font.family() << ", style: " << font.styleName() << ", weight:" << font.weight() << " match: " << font.exactMatch();
     }
 
     return font;
+}
+
+QFont getFont(QFont::Weight qWeight, bool fItalic, int nPointSize)
+{
+    return getFont(fontFamily, qWeight, fItalic, nPointSize);
+}
+QFont getFont(FontWeight weight, bool fItalic, int nPointSize)
+{
+    return getFont(toQFontWeight(weight), fItalic, nPointSize);
 }
 
 QFont getFontNormal()
@@ -1546,6 +1582,11 @@ QFont getFontNormal()
 QFont getFontBold()
 {
     return getFont(FontWeight::Bold);
+}
+
+std::vector<QFont::Weight> getSupportedWeights(FontFamily family)
+{
+    return mapSupportedWeights[family];
 }
 
 QString getActiveTheme()
