@@ -322,8 +322,9 @@ namespace GUIUtil
         GUIUtil::setFont */
     void updateFonts();
 
-    /** Get a properly weighted QFont object with the font Montserrat
-        Use ExtraLight as default as this lines up with the default in css. */
+    /** Get a properly weighted QFont object with the selected font. */
+    QFont getFont(FontFamily family, QFont::Weight qWeight, bool fItalic = false, int nPointSize = -1);
+    QFont getFont(QFont::Weight qWeight, bool fItalic = false, int nPointSize = -1);
     QFont getFont(FontWeight weight, bool fItalic = false, int nPointSize = -1);
 
     /** Get the default normal QFont */
@@ -331,6 +332,8 @@ namespace GUIUtil
 
     /** Get the default bold QFont */
     QFont getFontBold();
+
+    std::vector<QFont::Weight> getSupportedWeights(FontFamily family);
 
     /** Return the name of the currently active theme.*/
     QString getActiveTheme();
