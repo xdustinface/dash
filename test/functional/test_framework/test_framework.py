@@ -863,24 +863,32 @@ class DashTestFramework(BitcoinTestFramework):
             all_ok = True
             member_count = 0
             for mn in mninfos:
+                self.log.info("wait_for_quorum_phase MN-{} -> Phase {}".format(mn.node.index, phase))
                 s = mn.node.quorum("dkgstatus")["session"]
                 if "llmq_test" not in s:
+                    self.log.info('wait_for_quorum_phase MN-{} -> llmq_test not in s'.format(mn.node.index))
                     continue
                 member_count += 1
                 s = s["llmq_test"]
                 if s["quorumHash"] != quorum_hash:
+                    self.log.info('wait_for_quorum_phase MN-{} -> s["quorumHash"] {}, quorumHash {}'.format(mn.node.index, s["quorumHash"], quorum_hash))
                     all_ok = False
                     break
                 if "phase" not in s:
+                    self.log.info('wait_for_quorum_phase MN-{} -> phase not in s'.format(mn.node.index))
                     all_ok = False
                     break
                 if s["phase"] != phase:
+                    self.log.info('wait_for_quorum_phase MN-{} -> s["phase"] {}, phase {}'.format(mn.node.index, s["phase"], phase))
                     all_ok = False
                     break
                 if check_received_messages is not None:
                     if s[check_received_messages] < check_received_messages_count:
                         all_ok = False
                         break
+                    self.log.info("wait_for_quorum_phase MN-{} -> s[check_received_messages] {}, check_received_messages_count {}".format(mn.node.index, s[check_received_messages], check_received_messages_count))
+                    
+            self.log.info("wait_for_quorum_phase MN-{} -> all_ok {}, member_count {}, expected_member_count {}".format(mn.node.index, all_ok, member_count, expected_member_count))
             if all_ok and member_count != expected_member_count:
                 return False
             return all_ok
