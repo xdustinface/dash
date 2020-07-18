@@ -37,7 +37,8 @@ class TimeoutsTest(BitcoinTestFramework):
         self.setup_clean_chain = True
         self.num_nodes = 1
         # set timeout to receive version/verack to 3 seconds
-        self.extra_args = [["-peertimeout=3"]]
+        self.peertimeout = 3
+        self.extra_args = [["-peertimeout={}".format(self.peertimeout)]]
 
     def run_test(self):
         # Setup the p2p connections and start up the network thread.
@@ -74,7 +75,7 @@ class TimeoutsTest(BitcoinTestFramework):
         ]
 
         with self.nodes[0].assert_debug_log(expected_msgs=expected_timeout_logs):
-            sleep(3)
+            sleep(self.peertimeout + 1)
             assert not no_verack_node.connected
             assert not no_version_node.connected
             assert not no_send_node.connected
