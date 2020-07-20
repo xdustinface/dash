@@ -53,7 +53,6 @@ bool AddWallet(CWallet* wallet)
     std::vector<CWallet*>::const_iterator i = std::find(vpwallets.begin(), vpwallets.end(), wallet);
     if (i != vpwallets.end()) return false;
     vpwallets.push_back(wallet);
-    privateSendClientManagers.emplace(std::make_pair(wallet->GetName(), new CPrivateSendClientManager()));
     return true;
 }
 
@@ -4198,6 +4197,8 @@ DBErrors CWallet::LoadWallet(bool& fFirstRunRet)
         return nLoadWalletRet;
 
     uiInterface.LoadWallet(this);
+
+    privateSendClientManagers.emplace(std::make_pair(GetName(), new CPrivateSendClientManager()));
 
     return DBErrors::LOAD_OK;
 }
