@@ -105,6 +105,8 @@ static const std::map<QString, QString> mapStyleToTheme{
     {"scrollbars.css", ""}
 };
 
+/** loadFonts stores the SystemDefault font in osDefaultFont to be able to reference it later again */
+static std::unique_ptr<QFont> osDefaultFont;
 /** Font related default values. */
 static const FontFamily defaultFontFamily = FontFamily::SystemDefault;
 static const int defaultFontSize = 12;
@@ -1306,6 +1308,9 @@ double getScaledFontSize(int nSize)
 
 bool loadFonts()
 {
+    // Before any font changes store the applications default font to use it as SystemDefault.
+    osDefaultFont = std::make_unique<QFont>(QApplication::font());
+
     QString family = fontFamilyToString(FontFamily::Montserrat);
     QString italic = "Italic";
 
@@ -1408,20 +1413,14 @@ bool loadFonts()
         return vecSupported;
     };
 
-    FontFamily prevFontFamily = fontFamily;
-    setFontFamily(FontFamily::SystemDefault);
     mapSupportedWeights.insert(std::make_pair(FontFamily::SystemDefault, supportedWeights(FontFamily::SystemDefault)));
-    setFontFamily(FontFamily::Montserrat);
     mapSupportedWeights.insert(std::make_pair(FontFamily::Montserrat, supportedWeights(FontFamily::Montserrat)));
-    setFontFamily(prevFontFamily);
 
     return true;
 }
 
 void setApplicationFont()
 {
-    static QFont osDefaultFont = QApplication::font();
-
     std::unique_ptr<QFont> font;
 
     if (fontFamily == FontFamily::Montserrat) {
@@ -1438,7 +1437,7 @@ void setApplicationFont()
         font->setWeight(getFontWeightNormal());
 #endif
     } else {
-        font = std::make_unique<QFont>(osDefaultFont);
+        font = std::make_unique<QFont>(*osDefaultFont);
     }
 
     font->setPointSizeF(defaultFontSize);
@@ -1583,7 +1582,7 @@ QFont getFont(FontFamily family, QFont::Weight qWeight, bool fItalic, int nPoint
         font.setStyle(fItalic ? QFont::StyleItalic : QFont::StyleNormal);
 #endif
     } else {
-        font.setFamily(QApplication::font().family());
+        font.setFamily(osDefaultFont->family());
         font.setWeight(qWeight);
         font.setStyle(fItalic ? QFont::StyleItalic : QFont::StyleNormal);
     }
