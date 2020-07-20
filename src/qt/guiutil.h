@@ -337,7 +337,12 @@ namespace GUIUtil
     /** Get the default bold QFont */
     QFont getFontBold();
 
-    std::vector<QFont::Weight> getSupportedWeights(FontFamily family);
+    /** Return supported weights for the current font family */
+    std::vector<QFont::Weight> getSupportedWeights();
+    /** Map arg/setting values to supported weights */
+    QFont::Weight supportedWeightFromArg(int nValue);
+    /** Map supported weights to arg/setting values */
+    int supportedWeightToArg(QFont::Weight weight);
 
     /** Return the name of the currently active theme.*/
     QString getActiveTheme();

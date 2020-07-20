@@ -1617,9 +1617,28 @@ QFont getFontBold()
     return getFont(FontWeight::Bold);
 }
 
-std::vector<QFont::Weight> getSupportedWeights(FontFamily family)
+std::vector<QFont::Weight> getSupportedWeights()
 {
-    return mapSupportedWeights[family];
+    assert(mapSupportedWeights.count(fontFamily));
+    return mapSupportedWeights[fontFamily];
+}
+
+QFont::Weight supportedWeightFromArg(int nValue)
+{
+    auto vecWeights = getSupportedWeights();
+    assert(vecWeights.size() > nValue);
+    return vecWeights[nValue];
+}
+
+int supportedWeightToArg(QFont::Weight weight)
+{
+    auto vecWeights = getSupportedWeights();
+    for (int index = 0; index < vecWeights.size(); ++index) {
+        if (weight == vecWeights[index]) {
+            return index;
+        }
+    }
+    assert(false);
 }
 
 QString getActiveTheme()

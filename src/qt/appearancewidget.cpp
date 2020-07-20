@@ -125,7 +125,7 @@ void AppearanceWidget::updateFontWeightNormal(int nValue, bool fForce)
     }
     const QSignalBlocker blocker(ui->fontWeightNormalSlider);
     ui->fontWeightNormalSlider->setValue(nSliderValue);
-    GUIUtil::setFontWeightNormal(GUIUtil::getSupportedWeights(GUIUtil::getFontFamily())[ui->fontWeightNormalSlider->value()]);
+    GUIUtil::setFontWeightNormal(GUIUtil::supportedWeightFromArg(ui->fontWeightNormalSlider->value()));
 }
 
 void AppearanceWidget::updateFontWeightBold(int nValue, bool fForce)
@@ -136,12 +136,12 @@ void AppearanceWidget::updateFontWeightBold(int nValue, bool fForce)
     }
     const QSignalBlocker blocker(ui->fontWeightBoldSlider);
     ui->fontWeightBoldSlider->setValue(nSliderValue);
-    GUIUtil::setFontWeightBold(GUIUtil::getSupportedWeights(GUIUtil::getFontFamily())[ui->fontWeightBoldSlider->value()]);
+    GUIUtil::setFontWeightBold(GUIUtil::supportedWeightFromArg(ui->fontWeightBoldSlider->value()));
 }
 
 void AppearanceWidget::updateWeightSlider()
 {
-    int nMaximum = GUIUtil::getSupportedWeights(GUIUtil::getFontFamily()).size() - 1;
+    int nMaximum = GUIUtil::getSupportedWeights().size() - 1;
 
     ui->fontWeightNormalSlider->setMinimum(0);
     ui->fontWeightNormalSlider->setMaximum(nMaximum);
