@@ -360,10 +360,16 @@ QVariant OptionsModel::data(const QModelIndex & index, int role) const
             return settings.value("fontFamily");
         case FontScale:
             return settings.value("fontScale");
-        case FontWeightNormal:
-            return settings.value("fontWeightNormal");
-        case FontWeightBold:
-            return settings.value("fontWeightBold");
+        case FontWeightNormal: {
+            QFont::Weight weight;
+            GUIUtil::weightFromArg(settings.value("fontWeightNormal").toInt(), weight);
+            return GUIUtil::supportedWeightToArg(weight);
+        }
+        case FontWeightBold: {
+            QFont::Weight weight;
+            GUIUtil::weightFromArg(settings.value("fontWeightBold").toInt(), weight);
+            return GUIUtil::supportedWeightToArg(weight);
+        }
         case Language:
             return settings.value("language");
 #ifdef ENABLE_WALLET
@@ -550,16 +556,20 @@ bool OptionsModel::setData(const QModelIndex & index, const QVariant & value, in
                 settings.setValue("fontScale", value);
             }
             break;
-        case FontWeightNormal:
-            if (settings.value("fontWeightNormal") != value) {
-                settings.setValue("fontWeightNormal", value);
+        case FontWeightNormal: {
+            int nWeight = GUIUtil::weightToArg(GUIUtil::supportedWeightFromArg(value.toInt()));
+            if (settings.value("fontWeightNormal") != nWeight) {
+                settings.setValue("fontWeightNormal", nWeight);
             }
             break;
-        case FontWeightBold:
-            if (settings.value("fontWeightBold") != value) {
-                settings.setValue("fontWeightBold", value);
+        }
+        case FontWeightBold: {
+            int nWeight = GUIUtil::weightToArg(GUIUtil::supportedWeightFromArg(value.toInt()));
+            if (settings.value("fontWeightBold") != nWeight) {
+                settings.setValue("fontWeightBold", nWeight);
             }
             break;
+        }
         case Language:
             if (settings.value("language") != value) {
                 settings.setValue("language", value);

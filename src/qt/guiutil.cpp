@@ -273,8 +273,8 @@ void setupAppearance(QWidget* parent, OptionsModel* model)
         if (fontFamily == FontFamily::SystemDefault && getSupportedWeights().size() < 4) {
             fontWeightNormal = mapSupportedWeights[FontFamily::SystemDefault].front();
             fontWeightBold = mapSupportedWeights[FontFamily::SystemDefault].back();
-            QSettings().setValue("fontWeightNormal", supportedWeightToArg(fontWeightNormal));
-            QSettings().setValue("fontWeightBold", supportedWeightToArg(fontWeightBold));
+            QSettings().setValue("fontWeightNormal", weightToArg(fontWeightNormal));
+            QSettings().setValue("fontWeightBold", weightToArg(fontWeightBold));
         }
         // Create the dialog
         QDialog dlg(parent);
