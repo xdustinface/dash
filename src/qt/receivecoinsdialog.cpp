@@ -9,7 +9,6 @@
 #include <qt/addresstablemodel.h>
 #include <qt/bitcoinunits.h>
 #include <qt/optionsmodel.h>
-#include <qt/platformstyle.h>
 #include <qt/receiverequestdialog.h>
 #include <qt/recentrequeststablemodel.h>
 #include <qt/walletmodel.h>
@@ -20,12 +19,11 @@
 #include <QScrollBar>
 #include <QTextDocument>
 
-ReceiveCoinsDialog::ReceiveCoinsDialog(const PlatformStyle *_platformStyle, QWidget *parent) :
+ReceiveCoinsDialog::ReceiveCoinsDialog(QWidget* parent) :
     QDialog(parent),
     ui(new Ui::ReceiveCoinsDialog),
     columnResizingFixer(0),
-    model(0),
-    platformStyle(_platformStyle)
+    model(0)
 {
     ui->setupUi(this);
 
@@ -33,11 +31,6 @@ ReceiveCoinsDialog::ReceiveCoinsDialog(const PlatformStyle *_platformStyle, QWid
     GUIUtil::setFont({ui->label,
                       ui->label_2,
                       ui->label_3}, GUIUtil::FontWeight::Normal, 15);
-
-    ui->clearButton->setIcon(platformStyle->Icon(":/icons/remove"));
-    ui->receiveButton->setIcon(platformStyle->Icon(":/icons/receiving_addresses"));
-    ui->showRequestButton->setIcon(platformStyle->Icon(":/icons/edit"));
-    ui->removeRequestButton->setIcon(platformStyle->Icon(":/icons/remove"));
 
     // context menu actions
     QAction *copyURIAction = new QAction(tr("Copy URI"), this);

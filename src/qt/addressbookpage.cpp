@@ -16,7 +16,6 @@
 #include <qt/editaddressdialog.h>
 #include <qt/guiutil.h>
 #include <qt/optionsmodel.h>
-#include <qt/platformstyle.h>
 #include <qt/qrdialog.h>
 
 #include <QIcon>
@@ -59,7 +58,7 @@ protected:
     }
 };
 
-AddressBookPage::AddressBookPage(const PlatformStyle *platformStyle, Mode _mode, Tabs _tab, QWidget *parent) :
+AddressBookPage::AddressBookPage(Mode _mode, Tabs _tab, QWidget* parent) :
     QDialog(parent),
     ui(new Ui::AddressBookPage),
     model(0),
@@ -67,11 +66,6 @@ AddressBookPage::AddressBookPage(const PlatformStyle *platformStyle, Mode _mode,
     tab(_tab)
 {
     ui->setupUi(this);
-
-    ui->newAddress->setIcon(platformStyle->Icon(":/icons/add"));
-    ui->copyAddress->setIcon(platformStyle->Icon(":/icons/editcopy"));
-    ui->deleteAddress->setIcon(platformStyle->Icon(":/icons/remove"));
-    ui->exportButton->setIcon(platformStyle->Icon(":/icons/export"));
 
     ui->showAddressQRCode->setIcon(QIcon());
 
