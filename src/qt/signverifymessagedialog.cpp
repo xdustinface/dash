@@ -35,7 +35,7 @@ SignVerifyMessageDialog::SignVerifyMessageDialog(QWidget* parent) :
     ui->signatureOut_SM->setPlaceholderText(tr("Click \"Sign Message\" to generate signature"));
 
     ui->messageIn_VM->setPlaceholderText(tr("Enter a message to be verified"));
-    ui->signatureIn_VM->setPlaceholderText(tr("Enter a signature to be verified"));
+    ui->signatureIn_VM->setPlaceholderText(tr("Enter a signature for the message to be verified"));
 
     // These icons are needed on Mac also
     ui->addressBookButton_SM->setIcon(QIcon(":/icons/address-book"));
