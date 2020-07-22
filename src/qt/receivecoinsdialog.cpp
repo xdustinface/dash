@@ -32,7 +32,7 @@ ReceiveCoinsDialog::ReceiveCoinsDialog(QWidget* parent) :
                       ui->label_2,
                       ui->label_3}, GUIUtil::FontWeight::Normal, 15);
 
-    ui->reqLabel->setPlaceholderText(tr("Enter a label for this request to add its address to your address book"));
+    ui->reqLabel->setPlaceholderText(tr("Enter a label which gets assigned to the generated address in your address book"));
     ui->reqMessage->setPlaceholderText(tr("Enter a message which gets added to this request"));
 
     // context menu actions
