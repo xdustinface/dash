@@ -410,8 +410,8 @@ BOOST_FIXTURE_TEST_CASE(rescan, TestChain100Setup)
     // before the missing block, and success for a key whose creation time is
     // after.
     {
-        CWallet wallet("dummy", WalletDatabase::CreateDummy());
-        AddWallet(&wallet);
+        std::shared_ptr<CWallet> pwallet = std::make_shared<CWallet>("dummy", WalletDatabase::CreateDummy());
+        AddWallet(pwallet);
         UniValue keys;
         keys.setArray();
         UniValue key;
@@ -442,7 +442,7 @@ BOOST_FIXTURE_TEST_CASE(rescan, TestChain100Setup)
                       "downloading and rescanning the relevant blocks (see -reindex and -rescan "
                       "options).\"}},{\"success\":true}]",
                               0, oldTip->GetBlockTimeMax(), TIMESTAMP_WINDOW));
-        RemoveWallet(&wallet);
+        RemoveWallet(pwallet.get());
     }
 }
 
@@ -469,38 +469,38 @@ BOOST_FIXTURE_TEST_CASE(importwallet_rescan, TestChain100Setup)
 
     // Import key into wallet and call dumpwallet to create backup file.
     {
-        CWallet wallet("dummy", WalletDatabase::CreateDummy());
-        LOCK(wallet.cs_wallet);
-        wallet.mapKeyMetadata[coinbaseKey.GetPubKey().GetID()].nCreateTime = KEY_TIME;
-        wallet.AddKeyPubKey(coinbaseKey, coinbaseKey.GetPubKey());
+        std::shared_ptr<CWallet> pwallet = std::make_shared<CWallet>("dummy", WalletDatabase::CreateDummy());
+        LOCK(pwallet->cs_wallet);
+        pwallet->mapKeyMetadata[coinbaseKey.GetPubKey().GetID()].nCreateTime = KEY_TIME;
+        pwallet->AddKeyPubKey(coinbaseKey, coinbaseKey.GetPubKey());
 
         JSONRPCRequest request;
         request.params.setArray();
         request.params.push_back((pathTemp / "wallet.backup").string());
-        AddWallet(&wallet);
+        AddWallet(pwallet);
         ::dumpwallet(request);
     }
 
     // Call importwallet RPC and verify all blocks with timestamps >= BLOCK_TIME
     // were scanned, and no prior blocks were scanned.
     {
-        CWallet wallet("dummy", WalletDatabase::CreateDummy());
+        std::shared_ptr<CWallet> pwallet = std::make_shared<CWallet>("dummy", WalletDatabase::CreateDummy());
 
         JSONRPCRequest request;
         request.params.setArray();
         request.params.push_back((pathTemp / "wallet.backup").string());
-        AddWallet(&wallet);
+        AddWallet(pwallet);
         ::importwallet(request);
 
-        LOCK(wallet.cs_wallet);
-        BOOST_CHECK_EQUAL(wallet.mapWallet.size(), 3);
+        LOCK(pwallet->cs_wallet);
+        BOOST_CHECK_EQUAL(pwallet->mapWallet.size(), 3);
         BOOST_CHECK_EQUAL(coinbaseTxns.size(), 103);
         for (size_t i = 0; i < coinbaseTxns.size(); ++i) {
-            bool found = wallet.GetWalletTx(coinbaseTxns[i].GetHash());
+            bool found = pwallet->GetWalletTx(coinbaseTxns[i].GetHash());
             bool expected = i >= 100;
             BOOST_CHECK_EQUAL(found, expected);
         }
-        RemoveWallet(&wallet);
+        RemoveWallet(pwallet.get());
     }
 
     SetMockTime(0);
@@ -561,24 +561,24 @@ static int64_t AddTx(CWallet& wallet, uint32_t lockTime, int64_t mockTime, int64
 BOOST_AUTO_TEST_CASE(ComputeTimeSmart)
 {
     // New transaction should use clock time if lower than block time.
-    BOOST_CHECK_EQUAL(AddTx(m_wallet, 1, 100, 120), 100);
+    BOOST_CHECK_EQUAL(AddTx(*m_wallet, 1, 100, 120), 100);
 
     // Test that updating existing transaction does not change smart time.
-    BOOST_CHECK_EQUAL(AddTx(m_wallet, 1, 200, 220), 100);
+    BOOST_CHECK_EQUAL(AddTx(*m_wallet, 1, 200, 220), 100);
 
     // New transaction should use clock time if there's no block time.
-    BOOST_CHECK_EQUAL(AddTx(m_wallet, 2, 300, 0), 300);
+    BOOST_CHECK_EQUAL(AddTx(*m_wallet, 2, 300, 0), 300);
 
     // New transaction should use block time if lower than clock time.
-    BOOST_CHECK_EQUAL(AddTx(m_wallet, 3, 420, 400), 400);
+    BOOST_CHECK_EQUAL(AddTx(*m_wallet, 3, 420, 400), 400);
 
     // New transaction should use latest entry time if higher than
     // min(block time, clock time).
-    BOOST_CHECK_EQUAL(AddTx(m_wallet, 4, 500, 390), 400);
+    BOOST_CHECK_EQUAL(AddTx(*m_wallet, 4, 500, 390), 400);
 
     // If there are future entries, new transaction should use time of the
     // newest entry that is no more than 300 seconds ahead of the clock time.
-    BOOST_CHECK_EQUAL(AddTx(m_wallet, 5, 50, 600), 300);
+    BOOST_CHECK_EQUAL(AddTx(*m_wallet, 5, 50, 600), 300);
 
     // Reset mock time for other tests.
     SetMockTime(0);
@@ -587,12 +587,12 @@ BOOST_AUTO_TEST_CASE(ComputeTimeSmart)
 BOOST_AUTO_TEST_CASE(LoadReceiveRequests)
 {
     CTxDestination dest = CKeyID();
-    LOCK(m_wallet.cs_wallet);
-    m_wallet.AddDestData(dest, "misc", "val_misc");
-    m_wallet.AddDestData(dest, "rr0", "val_rr0");
-    m_wallet.AddDestData(dest, "rr1", "val_rr1");
+    LOCK(m_wallet->cs_wallet);
+    m_wallet->AddDestData(dest, "misc", "val_misc");
+    m_wallet->AddDestData(dest, "rr0", "val_rr0");
+    m_wallet->AddDestData(dest, "rr1", "val_rr1");
 
-    auto values = m_wallet.GetDestValues("rr");
+    auto values = m_wallet->GetDestValues("rr");
     BOOST_CHECK_EQUAL(values.size(), 2);
     BOOST_CHECK_EQUAL(values[0], "val_rr0");
     BOOST_CHECK_EQUAL(values[1], "val_rr1");
@@ -604,9 +604,9 @@ public:
     ListCoinsTestingSetup()
     {
         CreateAndProcessBlock({}, GetScriptForRawPubKey(coinbaseKey.GetPubKey()));
-        wallet = MakeUnique<CWallet>("mock", WalletDatabase::CreateMock());
+        wallet = std::make_shared<CWallet>("mock", WalletDatabase::CreateMock());
         bool firstRun;
-        wallet->LoadWallet(firstRun);
+        CWallet::LoadWallet(wallet, firstRun);
         AddKey(*wallet, coinbaseKey);
         WalletRescanReserver reserver(wallet.get());
         reserver.reserve();
@@ -615,7 +615,6 @@ public:
 
     ~ListCoinsTestingSetup()
     {
-        wallet.reset();
     }
 
     CWalletTx& AddTx(CRecipient recipient)
@@ -643,7 +642,7 @@ public:
         return it->second;
     }
 
-    std::unique_ptr<CWallet> wallet;
+    std::shared_ptr<CWallet> wallet;
 };
 
 BOOST_FIXTURE_TEST_CASE(ListCoins, ListCoinsTestingSetup)

@@ -8,16 +8,16 @@
 #include <wallet/db.h>
 
 WalletTestingSetup::WalletTestingSetup(const std::string& chainName):
-    TestingSetup(chainName), m_wallet("mock", WalletDatabase::CreateMock())
+    TestingSetup(chainName), m_wallet(std::make_shared<CWallet>("mock", WalletDatabase::CreateMock()))
 {
     bool fFirstRun;
-    m_wallet.LoadWallet(fFirstRun);
-    RegisterValidationInterface(&m_wallet);
+    CWallet::LoadWallet(m_wallet, fFirstRun);
+    RegisterValidationInterface(m_wallet.get());
 
     RegisterWalletRPCCommands(tableRPC);
 }
 
 WalletTestingSetup::~WalletTestingSetup()
 {
-    UnregisterValidationInterface(&m_wallet);
+    UnregisterValidationInterface(m_wallet.get());
 }

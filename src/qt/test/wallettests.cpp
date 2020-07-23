@@ -115,36 +115,36 @@ void TestGUI()
     for (int i = 0; i < 5; ++i) {
         test.CreateAndProcessBlock({}, GetScriptForRawPubKey(test.coinbaseKey.GetPubKey()));
     }
-    CWallet wallet("mock", WalletDatabase::CreateMock());
+    std::shared_ptr<CWallet> wallet = std::make_shared<CWallet>("mock", WalletDatabase::CreateMock());
     bool firstRun;
-    wallet.LoadWallet(firstRun);
+    CWallet::LoadWallet(wallet, firstRun);
     {
-        LOCK(wallet.cs_wallet);
-        wallet.SetAddressBook(test.coinbaseKey.GetPubKey().GetID(), "", "receive");
-        wallet.AddKeyPubKey(test.coinbaseKey, test.coinbaseKey.GetPubKey());
+        LOCK(wallet->cs_wallet);
+        wallet->SetAddressBook(test.coinbaseKey.GetPubKey().GetID(), "", "receive");
+        wallet->AddKeyPubKey(test.coinbaseKey, test.coinbaseKey.GetPubKey());
     }
     {
         LOCK(cs_main);
-        WalletRescanReserver reserver(&wallet);
+        WalletRescanReserver reserver(wallet.get());
         reserver.reserve();
-        wallet.ScanForWalletTransactions(chainActive.Genesis(), nullptr, reserver, true);
+        wallet->ScanForWalletTransactions(chainActive.Genesis(), nullptr, reserver, true);
     }
-    wallet.SetBroadcastTransactions(true);
+    wallet->SetBroadcastTransactions(true);
 
     // Create widgets for sending coins and listing transactions.
     std::unique_ptr<const PlatformStyle> platformStyle(PlatformStyle::instantiate("other"));
     SendCoinsDialog sendCoinsDialog(platformStyle.get());
     TransactionView transactionView(platformStyle.get());
     OptionsModel optionsModel;
-    WalletModel walletModel(platformStyle.get(), &wallet, &optionsModel);
+    WalletModel walletModel(platformStyle.get(), wallet.get(), &optionsModel);
     sendCoinsDialog.setModel(&walletModel);
     transactionView.setModel(&walletModel);
 
     // Send two transactions, and verify they are added to transaction list.
     TransactionTableModel* transactionTableModel = walletModel.getTransactionTableModel();
     QCOMPARE(transactionTableModel->rowCount({}), 105);
-    uint256 txid1 = SendCoins(wallet, sendCoinsDialog, CKeyID(), 5 * COIN);
-    uint256 txid2 = SendCoins(wallet, sendCoinsDialog, CKeyID(), 10 * COIN);
+    uint256 txid1 = SendCoins(*wallet, sendCoinsDialog, CKeyID(), 5 * COIN);
+    uint256 txid2 = SendCoins(*wallet, sendCoinsDialog, CKeyID(), 10 * COIN);
     QCOMPARE(transactionTableModel->rowCount({}), 107);
     QVERIFY(FindTx(*transactionTableModel, txid1).isValid());
     QVERIFY(FindTx(*transactionTableModel, txid2).isValid());

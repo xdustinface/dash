@@ -44,13 +44,13 @@
 #include <boost/algorithm/string/replace.hpp>
 
 static CCriticalSection cs_wallets;
-static std::vector<CWallet*> vpwallets GUARDED_BY(cs_wallets);
+static std::vector<std::shared_ptr<CWallet>> vpwallets GUARDED_BY(cs_wallets);
 
-bool AddWallet(CWallet* wallet)
+bool AddWallet(const std::shared_ptr<CWallet>& wallet)
 {
     LOCK(cs_wallets);
-    assert(wallet);
-    std::vector<CWallet*>::const_iterator i = std::find(vpwallets.begin(), vpwallets.end(), wallet);
+    assert(wallet.get());
+    std::vector<std::shared_ptr<CWallet>>::const_iterator i = std::find(vpwallets.begin(), vpwallets.end(), wallet);
     if (i != vpwallets.end()) return false;
     vpwallets.push_back(wallet);
     privateSendClientManagers.emplace(std::make_pair(wallet->GetName(), new CPrivateSendClientManager()));
@@ -61,7 +61,7 @@ bool RemoveWallet(CWallet* wallet)
 {
     LOCK(cs_wallets);
     assert(wallet);
-    std::vector<CWallet*>::iterator i = std::find(vpwallets.begin(), vpwallets.end(), wallet);
+    std::vector<std::shared_ptr<CWallet>>::iterator i = std::find_if(vpwallets.begin(), vpwallets.end(), [&](const std::shared_ptr<CWallet>& pwallet) {return pwallet.get() == wallet;});
     if (i == vpwallets.end()) return false;
     vpwallets.erase(i);
     auto it = privateSendClientManagers.find(wallet->GetName());
@@ -80,14 +80,19 @@ bool HasWallets()
 std::vector<CWallet*> GetWallets()
 {
     LOCK(cs_wallets);
-    return vpwallets;
+    std::vector<CWallet*> vecWallets;
+    vecWallets.resize(vpwallets.size());
+    for (const std::shared_ptr<CWallet>& pwallet : vpwallets) {
+        vecWallets.emplace_back(pwallet.get());
+    }
+    return vecWallets;
 }
 
 CWallet* GetWallet(const std::string& name)
 {
     LOCK(cs_wallets);
-    for (CWallet* wallet : vpwallets) {
-        if (wallet->GetName() == name) return wallet;
+    for (std::shared_ptr<CWallet> wallet : vpwallets) {
+        if (wallet->GetName() == name) return wallet.get();
     }
     return nullptr;
 }
@@ -4157,20 +4162,20 @@ bool CWallet::AddAccountingEntry(const CAccountingEntry& acentry, WalletBatch *b
     return true;
 }
 
-DBErrors CWallet::LoadWallet(bool& fFirstRunRet)
+DBErrors CWallet::LoadWallet(const std::shared_ptr<CWallet>& wallet, bool& fFirstRunRet)
 {
-    LOCK2(cs_main, cs_wallet);
+    LOCK2(cs_main, wallet->cs_wallet);
 
     fFirstRunRet = false;
-    DBErrors nLoadWalletRet = WalletBatch(*database,"cr+").LoadWallet(this);
+    DBErrors nLoadWalletRet = WalletBatch(*wallet->database,"cr+").LoadWallet(wallet.get());
     if (nLoadWalletRet == DBErrors::NEED_REWRITE)
     {
-        if (database->Rewrite("\x04pool"))
+        if (wallet->database->Rewrite("\x04pool"))
         {
-            setInternalKeyPool.clear();
-            setExternalKeyPool.clear();
-            nKeysLeftSinceAutoBackup = 0;
-            m_pool_key_to_index.clear();
+            wallet->setInternalKeyPool.clear();
+            wallet->setExternalKeyPool.clear();
+            wallet->nKeysLeftSinceAutoBackup = 0;
+            wallet->m_pool_key_to_index.clear();
             // Note: can't top-up keypool here, because wallet is locked.
             // User will be prompted to unlock wallet the next operation
             // that requires a new key.
@@ -4178,17 +4183,17 @@ DBErrors CWallet::LoadWallet(bool& fFirstRunRet)
     }
 
     {
-        LOCK(cs_KeyStore);
+        LOCK(wallet->cs_KeyStore);
         // This wallet is in its first run if all of these are empty
-        fFirstRunRet = mapKeys.empty() && mapHdPubKeys.empty() && mapCryptedKeys.empty() && mapWatchKeys.empty() && setWatchOnly.empty() && mapScripts.empty();
+        fFirstRunRet = wallet->mapKeys.empty() && wallet->mapHdPubKeys.empty() && wallet->mapCryptedKeys.empty() && wallet->mapWatchKeys.empty() && wallet->setWatchOnly.empty() && wallet->mapScripts.empty();
     }
 
     {
-        LOCK2(cs_main, cs_wallet);
-        for (auto& pair : mapWallet) {
+        LOCK2(cs_main, wallet->cs_wallet);
+        for (auto& pair : wallet->mapWallet) {
             for(unsigned int i = 0; i < pair.second.tx->vout.size(); ++i) {
-                if (IsMine(pair.second.tx->vout[i]) && !IsSpent(pair.first, i)) {
-                    setWalletUTXO.insert(COutPoint(pair.first, i));
+                if (wallet->IsMine(pair.second.tx->vout[i]) && !wallet->IsSpent(pair.first, i)) {
+                    wallet->setWalletUTXO.insert(COutPoint(pair.first, i));
                 }
             }
         }
@@ -4197,7 +4202,7 @@ DBErrors CWallet::LoadWallet(bool& fFirstRunRet)
     if (nLoadWalletRet != DBErrors::LOAD_OK)
         return nLoadWalletRet;
 
-    uiInterface.LoadWallet(this);
+    uiInterface.LoadWallet(wallet);
 
     return DBErrors::LOAD_OK;
 }
@@ -5075,7 +5080,7 @@ bool CWallet::Verify(std::string wallet_file, bool salvage_wallet, std::string& 
     return WalletBatch::VerifyDatabaseFile(wallet_path, warning_string, error_string);
 }
 
-CWallet* CWallet::CreateWalletFromFile(const std::string& name, const fs::path& path)
+std::shared_ptr<CWallet> CWallet::CreateWalletFromFile(const std::string& name, const fs::path& path)
 {
     const std::string& walletFile = name;
 
@@ -5099,9 +5104,8 @@ CWallet* CWallet::CreateWalletFromFile(const std::string& name, const fs::path& 
     bool fFirstRun = true;
     // Make a temporary wallet unique pointer so memory doesn't get leaked if
     // wallet creation fails.
-    auto temp_wallet = MakeUnique<CWallet>(name, WalletDatabase::Create(path));
-    CWallet *walletInstance = temp_wallet.get();
-    DBErrors nLoadWalletRet = walletInstance->LoadWallet(fFirstRun);
+    auto walletInstance = std::make_shared<CWallet>(name, WalletDatabase::Create(path));
+    DBErrors nLoadWalletRet = CWallet::LoadWallet(walletInstance, fFirstRun);
     if (nLoadWalletRet != DBErrors::LOAD_OK)
     {
         if (nLoadWalletRet == DBErrors::CORRUPT) {
@@ -5248,7 +5252,7 @@ CWallet* CWallet::CreateWalletFromFile(const std::string& name, const fs::path& 
 
         nStart = GetTimeMillis();
         {
-            WalletRescanReserver reserver(walletInstance);
+            WalletRescanReserver reserver(walletInstance.get());
             if (!reserver.reserve()) {
                 InitError(_("Failed to rescan the wallet during initialization"));
                 return nullptr;
@@ -5286,7 +5290,7 @@ CWallet* CWallet::CreateWalletFromFile(const std::string& name, const fs::path& 
     }
 
     // Register with the validation interface. It's ok to do this after rescan since we're still holding cs_main.
-    RegisterValidationInterface(temp_wallet.release());
+    RegisterValidationInterface(walletInstance.get());
 
     walletInstance->SetBroadcastTransactions(gArgs.GetBoolArg("-walletbroadcast", DEFAULT_WALLETBROADCAST));
 

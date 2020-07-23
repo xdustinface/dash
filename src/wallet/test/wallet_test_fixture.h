@@ -17,7 +17,7 @@ struct WalletTestingSetup: public TestingSetup {
     explicit WalletTestingSetup(const std::string& chainName = CBaseChainParams::MAIN);
     ~WalletTestingSetup();
 
-    CWallet m_wallet;
+    std::shared_ptr<CWallet> m_wallet;
 };
 
 #endif // BITCOIN_WALLET_TEST_WALLET_TEST_FIXTURE_H

@@ -37,7 +37,7 @@
 #include <utility>
 #include <vector>
 
-bool AddWallet(CWallet* wallet);
+bool AddWallet(const std::shared_ptr<CWallet>& wallet);
 bool RemoveWallet(CWallet* wallet);
 bool HasWallets();
 std::vector<CWallet*> GetWallets();
@@ -1097,7 +1097,7 @@ public:
     CAmount GetChange(const CTransaction& tx) const;
     void SetBestChain(const CBlockLocator& loc) override;
 
-    DBErrors LoadWallet(bool& fFirstRunRet);
+    static DBErrors LoadWallet(const std::shared_ptr<CWallet>& wallet, bool& fFirstRunRet);
     void AutoLockMasternodeCollaterals();
     DBErrors ZapWalletTx(std::vector<CWalletTx>& vWtx);
     DBErrors ZapSelectTx(std::vector<uint256>& vHashIn, std::vector<uint256>& vHashOut) EXCLUSIVE_LOCKS_REQUIRED(cs_wallet);
@@ -1184,7 +1184,7 @@ public:
     static bool Verify(std::string wallet_file, bool salvage_wallet, std::string& error_string, std::string& warning_string);
 
     /* Initializes the wallet, returns a new CWallet instance or a null pointer in case of an error */
-    static CWallet* CreateWalletFromFile(const std::string& name, const fs::path& path);
+    static std::shared_ptr<CWallet> CreateWalletFromFile(const std::string& name, const fs::path& path);
 
     /**
      * Wallet post-init setup

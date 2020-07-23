@@ -93,7 +93,7 @@ public:
     boost::signals2::signal<void ()> NotifyAlertChanged;
 
     /** A wallet has been loaded. */
-    boost::signals2::signal<void (CWallet* wallet)> LoadWallet;
+    boost::signals2::signal<void (const std::shared_ptr<CWallet>& wallet)> LoadWallet;
 
     /**
      * Show progress e.g. for verifychain.

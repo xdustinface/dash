@@ -173,7 +173,7 @@ static void ShowProgress(SplashScreen *splash, const std::string &title, int nPr
 }
 
 #ifdef ENABLE_WALLET
-void SplashScreen::ConnectWallet(CWallet* wallet)
+void SplashScreen::ConnectWallet(const std::shared_ptr<CWallet>& wallet)
 {
     wallet->ShowProgress.connect(boost::bind(ShowProgress, this, _1, _2, false));
     connectedWallets.push_back(wallet);
@@ -197,7 +197,7 @@ void SplashScreen::unsubscribeFromCoreSignals()
     uiInterface.ShowProgress.disconnect(boost::bind(ShowProgress, this, _1, _2, _3));
 #ifdef ENABLE_WALLET
     uiInterface.LoadWallet.disconnect(boost::bind(&SplashScreen::ConnectWallet, this, _1));
-    for (CWallet* const & pwallet : connectedWallets) {
+    for (const std::shared_ptr<CWallet>& pwallet : connectedWallets) {
         pwallet->ShowProgress.disconnect(boost::bind(ShowProgress, this, _1, _2, false));
     }
 #endif

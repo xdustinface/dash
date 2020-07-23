@@ -45,14 +45,14 @@ private:
     /** Disconnect core signals to splash screen */
     void unsubscribeFromCoreSignals();
     /** Connect wallet signals to splash screen */
-    void ConnectWallet(CWallet*);
+    void ConnectWallet(const std::shared_ptr<CWallet>& pwallet);
 
     QPixmap pixmap;
     QString curMessage;
     QColor curColor;
     int curAlignment;
 
-    QList<CWallet*> connectedWallets;
+    QList<std::shared_ptr<CWallet>> connectedWallets;
 };
 
 #endif // BITCOIN_QT_SPLASHSCREEN_H

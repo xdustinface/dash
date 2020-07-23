@@ -2929,7 +2929,7 @@ UniValue loadwallet(const JSONRPCRequest& request)
         throw JSONRPCError(RPC_WALLET_ERROR, "Wallet file verification failed: " + error);
     }
 
-    CWallet * const wallet = CWallet::CreateWalletFromFile(wallet_file, fs::absolute(wallet_file, GetWalletDir()));
+    std::shared_ptr<CWallet> wallet = CWallet::CreateWalletFromFile(wallet_file, fs::absolute(wallet_file, GetWalletDir()));
     if (!wallet) {
         throw JSONRPCError(RPC_WALLET_ERROR, "Wallet loading failed.");
     }
