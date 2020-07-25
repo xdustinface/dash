@@ -62,17 +62,16 @@ SplashScreen::SplashScreen(Qt::WindowFlags f, const NetworkStyle *networkStyle) 
     QPixmap pixmapLogo = networkStyle->getSplashImage();
     pixmapLogo.setDevicePixelRatio(scale);
 
-    if (Params().NetworkIDString() == CBaseChainParams::MAIN) {
-        QImage imgLogo = pixmapLogo.toImage().convertToFormat(QImage::Format_ARGB32);
-        QColor logoColor = GUIUtil::getThemedQColor(GUIUtil::ThemedColor::BLUE);
-        for (int x = imgLogo.width(); x--;) {
-            for (int y = imgLogo.height(); y--;) {
-                const QRgb rgb = imgLogo.pixel(x, y);
-                imgLogo.setPixel(x, y, qRgba(logoColor.red(), logoColor.green(), logoColor.blue(), qAlpha(rgb)));
-            }
+    // Adjust logo color based on the current theme
+    QImage imgLogo = pixmapLogo.toImage().convertToFormat(QImage::Format_ARGB32);
+    QColor logoColor = GUIUtil::getThemedQColor(GUIUtil::ThemedColor::BLUE);
+    for (int x = imgLogo.width(); x--;) {
+        for (int y = imgLogo.height(); y--;) {
+            const QRgb rgb = imgLogo.pixel(x, y);
+            imgLogo.setPixel(x, y, qRgba(logoColor.red(), logoColor.green(), logoColor.blue(), qAlpha(rgb)));
         }
-        pixmapLogo.convertFromImage(imgLogo);
     }
+    pixmapLogo.convertFromImage(imgLogo);
 
     pixmap = QPixmap(width * scale, height * scale);
     pixmap.setDevicePixelRatio(scale);
