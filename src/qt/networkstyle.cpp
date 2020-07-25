@@ -73,25 +73,19 @@ NetworkStyle::NetworkStyle(const QString &_appName, const int iconColorHueShift,
     GUIUtil::migrateQtSettings();
     // load pixmap
     QPixmap appIconPixmap(":/icons/bitcoin");
-    QPixmap splashImagePixmap(":/images/splash");
 
     if(iconColorHueShift != 0 && iconColorSaturationReduction != 0)
     {
         // generate QImage from QPixmap
         QImage appIconImg = appIconPixmap.toImage();
-        QImage splashImageImg = splashImagePixmap.toImage();
-
         rotateColors(appIconImg, iconColorHueShift, iconColorSaturationReduction);
-        rotateColors(splashImageImg, iconColorHueShift, iconColorSaturationReduction);
-
         //convert back to QPixmap
         appIconPixmap.convertFromImage(appIconImg);
-        splashImagePixmap.convertFromImage(splashImageImg);
     }
 
     appIcon             = QIcon(appIconPixmap);
     trayAndWindowIcon   = QIcon(appIconPixmap.scaled(QSize(256,256)));
-    splashImage         = splashImagePixmap;
+    splashImage         = QPixmap(":/images/splash");
 }
 
 const NetworkStyle *NetworkStyle::instantiate(const QString &networkId)
