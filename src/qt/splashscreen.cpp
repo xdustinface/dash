@@ -113,10 +113,10 @@ SplashScreen::SplashScreen(Qt::WindowFlags f, const NetworkStyle *networkStyle) 
         pixPaint.setFont(fontBold);
         fm = pixPaint.fontMetrics();
         int titleAddTextWidth = fm.width(titleAddText);
-        // Draw the backround rectangle with the network-specific color (grab the color from the icon)
-        QRect rect = QRect(width - titleAddTextWidth - 20, 5, width, fm.height() + 10);
-        QColor col = networkStyle->getTrayAndWindowIcon().pixmap(16).toImage().pixelColor(16, 16);
-        pixPaint.fillRect(rect, col);
+        // Draw the badge backround with the network-specific color
+        QRect badgeRect = QRect(width - titleAddTextWidth - 20, 5, width, fm.height() + 10);
+        QColor badgeColor = networkStyle->getBadgeColor();
+        pixPaint.fillRect(badgeRect, badgeColor);
         // Draw the text itself using white color, regardless of the current theme
         pixPaint.setPen(QColor(255, 255, 255));
         pixPaint.drawText(width - titleAddTextWidth - 10, paddingTop + 10, titleAddText);
