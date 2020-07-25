@@ -28,6 +28,20 @@ static const struct {
 };
 static const unsigned network_styles_count = sizeof(network_styles)/sizeof(*network_styles);
 
+void NetworkStyle::rotateColor(QColor& col, const int iconColorHueShift, const int iconColorSaturationReduction)
+{
+    int h, s, l, a;
+    col.getHsl(&h, &s, &l, &a);
+
+    // rotate color on RGB color circle
+    h += iconColorHueShift;
+    // change saturation value
+    s -= iconColorSaturationReduction;
+    s = std::max(s, 0);
+
+    col.setHsl(h,s,l,a);
+}
+
 void NetworkStyle::rotateColors(QImage& img, const int iconColorHueShift, const int iconColorSaturationReduction) {
     int h,s,l,a;
 
@@ -39,24 +53,9 @@ void NetworkStyle::rotateColors(QImage& img, const int iconColorHueShift, const 
         // loop through pixels
         for(int x=0;x<img.width();x++)
         {
-            // preserve alpha because QColor::getHsl doesn't return the alpha value
-            a = qAlpha(scL[x]);
-            QColor col(scL[x]);
-
-            // get hue value
-            col.getHsl(&h,&s,&l);
-
-            // rotate color on RGB color circle
-            // 70° should end up with the typical "testnet" green (in bitcoin)
-            h+=iconColorHueShift;
-
-            // change saturation value
-            s -= iconColorSaturationReduction;
-            s = std::max(s, 0);
-
-            col.setHsl(h,s,l,a);
-
-            // set the pixel
+            QColor col;
+            col.setRgba(scL[x]);
+            rotateColor(col, iconColorHueShift, iconColorSaturationReduction);
             scL[x] = col.rgba();
         }
     }

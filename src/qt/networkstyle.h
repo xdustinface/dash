@@ -32,6 +32,7 @@ private:
     QIcon trayAndWindowIcon;
     QString titleAddText;
 
+    void rotateColor(QColor& col, const int iconColorHueShift, const int iconColorSaturationReduction);
     void rotateColors(QImage& img, const int iconColorHueShift, const int iconColorSaturationReduction);
 };
 
