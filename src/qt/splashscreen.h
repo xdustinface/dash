@@ -6,6 +6,7 @@
 #define BITCOIN_QT_SPLASHSCREEN_H
 
 #include <functional>
+#include <memory>
 #include <QSplashScreen>
 
 class CWallet;
