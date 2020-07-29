@@ -156,8 +156,8 @@ QList<TransactionRecord> TransactionRecord::decomposeTransaction(const CWallet *
                         fMakeCollateral =
                             wtx.tx->vout[0].nValue == nMaxCollateralAmount ||
                             wtx.tx->vout[1].nValue == nMaxCollateralAmount ||
-                            (wtx.tx->vout[0].nValue == nPreMaxCollateralAmount && CPrivateSend::IsCollateralAmount(wtx.tx->vout[1].nValue)) ||
-                            (wtx.tx->vout[1].nValue == nPreMaxCollateralAmount && CPrivateSend::IsCollateralAmount(wtx.tx->vout[0].nValue));
+                            (wtx.tx->vout[0].nValue == nPreMaxCollateralAmount && wtx.tx->vout[1].nValue <= CPrivateSend::GetMaxCollateralAmount()) ||
+                            (wtx.tx->vout[1].nValue == nPreMaxCollateralAmount && wtx.tx->vout[0].nValue <= CPrivateSend::GetMaxCollateralAmount());
                     }
                     if (fMakeCollateral) {
                         sub.type = TransactionRecord::PrivateSendMakeCollaterals;
