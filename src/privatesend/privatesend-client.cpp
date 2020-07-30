@@ -1498,6 +1498,11 @@ bool CPrivateSendClientSession::MakeCollateralAmounts(const CompactTallyItem& ta
         }
     }
 
+    if(wtx.tx->vout[nChangePosRet].nValue < CPrivateSend::GetCollateralAmount()) {
+        LogPrint(BCLog::PRIVATESEND, "CPrivateSendClientSession::MakeCollateralAmounts -- Not enough change in tx: %s\n", wtx.tx->ToString());
+        return false;
+    }
+
     reservekeyCollateral.KeepKey();
 
     LogPrint(BCLog::PRIVATESEND, "CPrivateSendClientSession::MakeCollateralAmounts -- txid=%s\n", wtx.GetHash().GetHex());
