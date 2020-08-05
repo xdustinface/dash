@@ -1424,8 +1424,8 @@ bool CPrivateSendClientSession::MakeCollateralAmounts(const CompactTallyItem& ta
 
     if (!CPrivateSendClientOptions::IsEnabled() || !mixingWallet) return false;
 
-    // Skip way too tiny amounts
-    if (tallyItem.nAmount < CPrivateSend::GetCollateralAmount()) {
+    // Denominated input is always a single one, so we can check its amount directly and return early
+    if (!fTryDenominated && tallyItem.vecOutPoints.size() == 1 && CPrivateSend::IsDenominatedAmount(tallyItem.nAmount)) {
         return false;
     }
 
@@ -1434,82 +1434,74 @@ bool CPrivateSendClientSession::MakeCollateralAmounts(const CompactTallyItem& ta
         return false;
     }
 
-    // denominated input is always a single one, so we can check its amount directly and return early
-    if (!fTryDenominated && tallyItem.vecOutPoints.size() == 1 && CPrivateSend::IsDenominatedAmount(tallyItem.nAmount)) {
+    CTransactionBuilder txBuilder(mixingWallet, tallyItem);
+
+    LogPrint(BCLog::PRIVATESEND, "CPrivateSendClientSession::%s -- Start %s\n", __func__, txBuilder.ToString());
+
+    // Skip way too tiny amounts. Smallest we want is minimum collateral amount in a one output tx
+    if (!txBuilder.TryAddOutput(CPrivateSend::GetCollateralAmount())) {
         return false;
     }
 
-    CWalletTx wtx;
-    CAmount nFeeRet = 0;
-    int nChangePosRet = -1;
-    std::string strFail = "";
-    std::vector<CRecipient> vecSend;
+    auto getAdjustedAmount = [&](CAmount nAmount) -> CAmount {
+        // If amount is denominated remove one duff, this will to into fees!
+        return CPrivateSend::IsDenominatedAmount(nAmount) ? nAmount - 1 : nAmount;
+    };
 
-    // make our collateral address
-    CReserveKey reservekeyCollateral(mixingWallet);
-    // make our change address
-    CReserveKey reservekeyChange(mixingWallet);
+    int nCase{0}; // Just for debug logs
+    if (txBuilder.TryAddOutputs({CPrivateSend::GetMaxCollateralAmount(), CPrivateSend::GetCollateralAmount()})) {
+        nCase = 1;
+        // <case1>, see TransactionRecord::decomposeTransaction
+        // Out1 == CPrivateSend::GetMaxCollateralAmount()
+        // Out2 >= CPrivateSend::GetCollateralAmount()
 
-    CScript scriptCollateral;
-    CPubKey vchPubKey;
-    assert(reservekeyCollateral.GetReservedKey(vchPubKey, false)); // should never fail, as we just unlocked
-    scriptCollateral = GetScriptForDestination(vchPubKey.GetID());
+        txBuilder.AddOutput(CPrivateSend::GetMaxCollateralAmount());
+        // Note, here we first add a zero amount output to get the remainder after all fees and then assign it
+        CTransactionBuilderOutput* out = txBuilder.AddOutput();
+        out->UpdateAmount(getAdjustedAmount(txBuilder.GetAmountLeft()));
 
-    CAmount nCollateralAmount{0};
-    if (tallyItem.nAmount > CPrivateSend::GetMaxCollateralAmount() + CPrivateSend::GetCollateralAmount()*2) {
-        // Change output will be large enough to be valid as a collateral or a source input for another run
-        nCollateralAmount = CPrivateSend::GetMaxCollateralAmount();
-    } else {
-        // Change output might be too small for another collateral if we try to create the largest collateral
-        // here, create a slightly smaller one instead
-        nCollateralAmount = CPrivateSend::GetMaxCollateralAmount() - CPrivateSend::GetCollateralAmount();
-    }
-    vecSend.push_back((CRecipient){scriptCollateral, nCollateralAmount, false});
+    } else if (txBuilder.TryAddOutputs({CPrivateSend::GetCollateralAmount(), CPrivateSend::GetCollateralAmount()})) {
+        nCase = 2;
+        // <case2>, see TransactionRecord::decomposeTransaction
+        // Out1 CPrivateSend::IsCollateralAmount()
+        // Out2 CPrivateSend::IsCollateralAmount()
 
-    // try to use non-denominated and not mn-like funds first, select them explicitly
-    CCoinControl coinControl;
-    coinControl.fAllowOtherInputs = false;
-    coinControl.fAllowWatchOnly = false;
-    coinControl.nCoinType = CoinType::ONLY_NONDENOMINATED;
-    // send change to the same address so that we were able create more denoms out of it later
-    coinControl.destChange = tallyItem.txdest;
-    for (const auto& outpoint : tallyItem.vecOutPoints) {
-        coinControl.Select(outpoint);
-    }
+        // First add two outputs to get the available value after all fees
+        CTransactionBuilderOutput* out1 = txBuilder.AddOutput();
+        CTransactionBuilderOutput* out2 = txBuilder.AddOutput();
 
-    bool fSuccess = mixingWallet->CreateTransaction(vecSend, wtx, reservekeyChange,
-        nFeeRet, nChangePosRet, strFail, coinControl);
-    if (!fSuccess) {
-        LogPrint(BCLog::PRIVATESEND, "CPrivateSendClientSession::MakeCollateralAmounts -- ONLY_NONDENOMINATED: %s\n", strFail);
-        // If we failed then most likely there are not enough funds on this address.
-        if (fTryDenominated) {
-            // Try to also use denominated coins (we can't mix denominated without collaterals anyway).
-            coinControl.nCoinType = CoinType::ALL_COINS;
-            if (!mixingWallet->CreateTransaction(vecSend, wtx, reservekeyChange,
-                    nFeeRet, nChangePosRet, strFail, coinControl)) {
-                LogPrint(BCLog::PRIVATESEND, "CPrivateSendClientSession::MakeCollateralAmounts -- ALL_COINS Error: %s\n", strFail);
-                reservekeyCollateral.ReturnKey();
-                return false;
-            }
-        } else {
-            // Nothing else we can do.
-            reservekeyCollateral.ReturnKey();
-            return false;
-        }
+        // Create two equal outputs from the available value. This adds one duff to the fee if txBuilder.GetAmountLeft() is odd.
+        CAmount nAmountOutputs = getAdjustedAmount(txBuilder.GetAmountLeft() / 2);
+
+        assert(CPrivateSend::IsCollateralAmount(nAmountOutputs));
+
+        out1->UpdateAmount(nAmountOutputs);
+        out2->UpdateAmount(nAmountOutputs);
+
+    } else { // still at least possible to add one CPrivateSend::GetCollateralAmount() output
+        nCase = 3;
+        // <case3>, see TransactionRecord::decomposeTransaction
+        // Out1 CPrivateSend::IsCollateralAmount()
+        // Out2 Skipped
+        CTransactionBuilderOutput* out = txBuilder.AddOutput();
+        out->UpdateAmount(getAdjustedAmount(txBuilder.GetAmountLeft()));
+
+        assert(CPrivateSend::IsCollateralAmount(out->GetAmount()));
     }
 
-    reservekeyCollateral.KeepKey();
+    LogPrint(BCLog::PRIVATESEND, "CPrivateSendClientSession::%s -- Done with case %d: %s\n", __func__, nCase, txBuilder.ToString());
 
-    LogPrint(BCLog::PRIVATESEND, "CPrivateSendClientSession::MakeCollateralAmounts -- txid=%s\n", wtx.GetHash().GetHex());
+    assert(txBuilder.IsDust(txBuilder.GetAmountLeft()));
 
-    // use the same nCachedLastSuccessBlock as for DS mixing to prevent race
-    CValidationState state;
-    if (!mixingWallet->CommitTransaction(wtx, reservekeyChange, &connman, state)) {
-        LogPrint(BCLog::PRIVATESEND, "CPrivateSendClientSession::MakeCollateralAmounts -- CommitTransaction failed! Reason given: %s\n", state.GetRejectReason());
+    std::string strResult;
+    if (!txBuilder.Commit(strResult)) {
+        LogPrint(BCLog::PRIVATESEND, "CPrivateSendClientSession::%s -- Commit failed: %s\n", __func__, strResult);
         return false;
     }
 
     privateSendClientManagers.at(mixingWallet->GetName())->UpdatedSuccessBlock();
+
+    LogPrint(BCLog::PRIVATESEND, "CPrivateSendClientSession::%s -- txid: %s\n", __func__, strResult);
 
     return true;
 }
