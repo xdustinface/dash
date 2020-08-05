@@ -1557,32 +1557,24 @@ bool CPrivateSendClientSession::CreateDenominated(CAmount nBalanceToDenominate, 
 
     if (!CPrivateSendClientOptions::IsEnabled() || !mixingWallet) return false;
 
-    std::vector<CRecipient> vecSend;
-    CKeyHolderStorage keyHolderStorageDenom;
+    // denominated input is always a single one, so we can check its amount directly and return early
+    if (tallyItem.vecOutPoints.size() == 1 && CPrivateSend::IsDenominatedAmount(tallyItem.nAmount)) {
+        return false;
+    }
 
-    CCoinControl coinControl;
-    // Every input will require at least this much fees in duffs
-    const CAmount nInputFee = GetMinimumFee(148, coinControl, ::mempool, ::feeEstimator, nullptr /* feeCalc */);
-    // Every output will require at least this much fees in duffs
-    const CAmount nOutputFee = GetMinimumFee(34, coinControl, ::mempool, ::feeEstimator, nullptr /* feeCalc */);
+    CTransactionBuilder txBuilder(mixingWallet, tallyItem);
 
-    CAmount nValueLeft = tallyItem.nAmount;
-    // Leave some room for fees, assuming we are going to spend all the outpoints
-    nValueLeft -= tallyItem.vecOutPoints.size() * nInputFee;
-
-    LogPrint(BCLog::PRIVATESEND, "CPrivateSendClientSession::CreateDenominated -- 0 - %s nValueLeft: %f\n", EncodeDestination(tallyItem.txdest), (float)nValueLeft / COIN);
+    LogPrint(BCLog::PRIVATESEND, "CPrivateSendClientSession::%s -- Start %s\n", __func__, txBuilder.ToString());
 
     // ****** Add an output for mixing collaterals ************ /
 
-    if (fCreateMixingCollaterals) {
-        CScript scriptCollateral = keyHolderStorageDenom.AddKey(mixingWallet);
-        vecSend.push_back((CRecipient){scriptCollateral, CPrivateSend::GetMaxCollateralAmount(), false});
-        nValueLeft -= CPrivateSend::GetMaxCollateralAmount() + nOutputFee;
+    if (fCreateMixingCollaterals && !txBuilder.AddOutput(CPrivateSend::GetMaxCollateralAmount())) {
+        LogPrint(BCLog::PRIVATESEND, "CPrivateSendClientSession::%s -- Failed to add collateral output\n", __func__);
+        return false;
     }
 
     // ****** Add outputs for denoms ************ /
 
-    int nOutputsTotal = 0;
     bool fAddFinal = true;
     std::vector<CAmount> vecStandardDenoms = CPrivateSend::GetStandardDenominations();
 
@@ -1600,8 +1592,7 @@ bool CPrivateSendClientSession::CreateDenominated(CAmount nBalanceToDenominate, 
     // Now, in this system, so long as we don't reach PRIVATESEND_DENOM_OUTPUTS_THRESHOLD outputs the process repeats in
     // the same transaction, creating up to nPrivateSendDenomsHardCap per denomination in a single transaction.
 
-    while (nValueLeft >= CPrivateSend::GetSmallestDenomination() && nOutputsTotal < PRIVATESEND_DENOM_OUTPUTS_THRESHOLD) {
-
+    while (txBuilder.TryAddOutput(CPrivateSend::GetSmallestDenomination()) && txBuilder.CountOutputs() < PRIVATESEND_DENOM_OUTPUTS_THRESHOLD) {
         for (auto it = vecStandardDenoms.rbegin(); it != vecStandardDenoms.rend(); ++it) {
             CAmount nDenomValue = *it;
             auto currentDenomIt = mapDenomCount.find(nDenomValue);
@@ -1609,72 +1600,76 @@ bool CPrivateSendClientSession::CreateDenominated(CAmount nBalanceToDenominate, 
             int nOutputs = 0;
 
             auto needMoreOutputs = [&]() {
-                bool fRegular = ((nValueLeft >= nDenomValue + nOutputFee) && nBalanceToDenominate >= nDenomValue);
-                bool fFinal = (fAddFinal
-                               && nValueLeft >= nDenomValue + nOutputFee
-                               && nBalanceToDenominate > 0
-                               && nBalanceToDenominate < nDenomValue);
-                if (fFinal) {
-                    fAddFinal = false; // add final denom only once, only the smalest possible one
-                    LogPrint(BCLog::PRIVATESEND, /* Continued */
-                             "CPrivateSendClientSession::CreateDenominated -- 1 - FINAL - nDenomValue: %f, nValueLeft: %f, nBalanceToDenominate: %f\n",
-                             (float) nDenomValue / COIN, (float) nValueLeft / COIN, (float) nBalanceToDenominate / COIN);
+                if (txBuilder.TryAddOutput(nDenomValue)) {
+                    if (fAddFinal && nBalanceToDenominate > 0 && nBalanceToDenominate < nDenomValue) {
+                        fAddFinal = false; // add final denom only once, only the smalest possible one
+                        LogPrint(BCLog::PRIVATESEND, "CPrivateSendClientSession::%s -- 1 - FINAL - nDenomValue: %f, nBalanceToDenominate: %f, nOutputs: %d, %s\n",
+                                                     __func__, (float) nDenomValue / COIN, (float) nBalanceToDenominate / COIN, nOutputs, txBuilder.ToString());
+                        return true;
+                    } else if (nBalanceToDenominate >= nDenomValue) {
+                        return true;
+                    }
                 }
-
-                return fRegular || fFinal;
+                return false;
             };
 
             // add each output up to 11 times or until it can't be added again or until we reach nPrivateSendDenomsGoal
             while (needMoreOutputs() && nOutputs <= 10 && currentDenomIt->second < CPrivateSendClientOptions::GetDenomsGoal()) {
-                CScript scriptDenom = keyHolderStorageDenom.AddKey(mixingWallet);
+                // Add output and subtract denomination amount
+                if (txBuilder.AddOutput(nDenomValue)) {
+                    ++nOutputs;
+                    ++currentDenomIt->second;
+                    nBalanceToDenominate -= nDenomValue;
+                    LogPrint(BCLog::PRIVATESEND, "CPrivateSendClientSession::%s -- 1 - nDenomValue: %f, nBalanceToDenominate: %f, nOutputs: %d, %s\n",
+                                                 __func__, (float) nDenomValue / COIN, (float) nBalanceToDenominate / COIN, nOutputs, txBuilder.ToString());
+                } else {
+                    LogPrint(BCLog::PRIVATESEND, "CPrivateSendClientSession::%s -- 1 - Error: AddOutput failed for nDenomValue: %f, nBalanceToDenominate: %f, nOutputs: %d, %s\n",
+                                                 __func__, (float) nDenomValue / COIN, (float) nBalanceToDenominate / COIN, nOutputs, txBuilder.ToString());
+                    return false;
+                }
 
-                vecSend.push_back((CRecipient) {scriptDenom, nDenomValue, false});
-
-                // increment outputs and subtract denomination amount
-                nOutputs++;
-                currentDenomIt->second++;
-                nValueLeft -= nDenomValue + nOutputFee;
-                nBalanceToDenominate -= nDenomValue;
-                LogPrint(BCLog::PRIVATESEND, /* Continued */
-                         "CPrivateSendClientSession::CreateDenominated -- 1 - nDenomValue: %f, totalOutputs: %d, nOutputsTotal: %d, nOutputs: %d, nValueLeft: %f, nBalanceToDenominate: %f\n",
-                         (float) nDenomValue / COIN, nOutputsTotal + nOutputs, nOutputsTotal, nOutputs, (float) nValueLeft / COIN, (float) nBalanceToDenominate / COIN);
             }
 
-            nOutputsTotal += nOutputs;
-            if (nValueLeft == 0 || nBalanceToDenominate <= 0) break;
+            if (txBuilder.GetAmountLeft() == 0 || nBalanceToDenominate <= 0) break;
         }
 
         bool finished = true;
         for (const auto it : mapDenomCount) {
             // Check if this specific denom could use another loop, check that there aren't nPrivateSendDenomsGoal of this
             // denom and that our nValueLeft/nBalanceToDenominate is enough to create one of these denoms, if so, loop again.
-            if (it.second < CPrivateSendClientOptions::GetDenomsGoal() && (nValueLeft >= it.first + nOutputFee) && nBalanceToDenominate > 0) {
+            if (it.second < CPrivateSendClientOptions::GetDenomsGoal() && txBuilder.TryAddOutput(it.first) && nBalanceToDenominate >= it.first) {
                 finished = false;
-                LogPrint(BCLog::PRIVATESEND, /* Continued */
-                        "CPrivateSendClientSession::CreateDenominated -- 1 - NOT finished - nDenomValue: %f, count: %d, nValueLeft: %f, nBalanceToDenominate: %f\n",
-                        (float) it.first / COIN, it.second, (float) nValueLeft / COIN, (float) nBalanceToDenominate / COIN);
+                LogPrint(BCLog::PRIVATESEND, "CPrivateSendClientSession::%s -- 1 - NOT finished - nDenomValue: %f, count: %d, nBalanceToDenominate: %f, %s\n",
+                                             __func__, (float) it.first / COIN, it.second, (float) nBalanceToDenominate / COIN, txBuilder.ToString());
                 break;
             }
-            LogPrint(BCLog::PRIVATESEND, /* Continued */
-                    "CPrivateSendClientSession::CreateDenominated -- 1 - FINSHED - nDenomValue: %f, count: %d, nValueLeft: %f, nBalanceToDenominate: %f\n",
-                    (float) it.first / COIN, it.second, (float) nValueLeft / COIN, (float) nBalanceToDenominate / COIN);
+            LogPrint(BCLog::PRIVATESEND, "CPrivateSendClientSession::%s -- 1 - FINSHED - nDenomValue: %f, count: %d, nBalanceToDenominate: %f, %s\n",
+                                         __func__, (float) it.first / COIN, it.second, (float) nBalanceToDenominate / COIN, txBuilder.ToString());
         }
 
         if (finished) break;
     }
 
     // Now that nPrivateSendDenomsGoal worth of each denom have been created or the max number of denoms given the value of the input, do something with the remainder.
-    if ((nValueLeft >= CPrivateSend::GetSmallestDenomination() + nOutputFee) && nBalanceToDenominate >= CPrivateSend::GetSmallestDenomination()
-           && nOutputsTotal < PRIVATESEND_DENOM_OUTPUTS_THRESHOLD) {
-
+    if (txBuilder.TryAddOutput(CPrivateSend::GetSmallestDenomination()) && nBalanceToDenominate >= CPrivateSend::GetSmallestDenomination() && txBuilder.CountOutputs() < PRIVATESEND_DENOM_OUTPUTS_THRESHOLD) {
         CAmount nLargestDenomValue = vecStandardDenoms.front();
+
+        LogPrint(BCLog::PRIVATESEND, "CPrivateSendClientSession::%s -- 2 - Process remainder: %s\n", __func__, txBuilder.ToString());
+
+        auto countPossibleOutputs = [&](CAmount nAmount) -> int {
+            std::vector<CAmount> vecOutputs;
+            while (txBuilder.TryAddOutputs(vecOutputs)) {
+                vecOutputs.push_back(nAmount);
+            }
+            return vecOutputs.size();
+        };
 
         // Go big to small
         for (auto nDenomValue : vecStandardDenoms) {
             int nOutputs = 0;
 
             // Number of denoms we can create given our denom and the amount of funds we have left
-            int denomsToCreateValue = nValueLeft / (nDenomValue + nOutputFee);
+            int denomsToCreateValue = countPossibleOutputs(nDenomValue);
             // Prefer overshooting the targed balance by larger denoms (hence `+1`) instead of a more
             // accurate approximation by many smaller denoms. This is ok because when we get here we
             // should have nPrivateSendDenomsGoal of each smaller denom already. Also, without `+1`
@@ -1685,78 +1680,51 @@ bool CPrivateSendClientSession::CreateDenominated(CAmount nBalanceToDenominate, 
             int denomsToCreateBal = (nBalanceToDenominate / nDenomValue) + 1;
             // Use the smaller value
             int denomsToCreate = denomsToCreateValue > denomsToCreateBal ? denomsToCreateBal : denomsToCreateValue;
+            LogPrint(BCLog::PRIVATESEND, "CPrivateSendClientSession::%s -- 2 - nBalanceToDenominate: %f, nDenomValue: %f, denomsToCreateValue: %d, denomsToCreateBal: %d\n",
+                                         __func__, (float) nBalanceToDenominate / COIN, (float) nDenomValue / COIN, denomsToCreateValue, denomsToCreateBal);
             auto it = mapDenomCount.find(nDenomValue);
             for (int i = 0; i < denomsToCreate; i++) {
                 // Never go above the cap unless it's the largest denom
                 if (nDenomValue != nLargestDenomValue && it->second >= CPrivateSendClientOptions::GetDenomsHardCap()) break;
 
-                CScript scriptDenom = keyHolderStorageDenom.AddKey(mixingWallet);
-                vecSend.push_back((CRecipient) {scriptDenom, nDenomValue, false});
-
-                // increment outputs and subtract denomination amount
-                nOutputs++;
-                it->second++;
-                nValueLeft -= nDenomValue + nOutputFee;
-                nBalanceToDenominate -= nDenomValue;
-                LogPrint(BCLog::PRIVATESEND, /* Continued */
-                         "CPrivateSendClientSession::CreateDenominated -- 2 - nDenomValue: %f, totalOutputs: %d, nOutputsTotal: %d, nOutputs: %d, nValueLeft: %f, nBalanceToDenominate: %f\n",
-                         (float) nDenomValue / COIN, nOutputsTotal + nOutputs, nOutputsTotal, nOutputs, (float) nValueLeft / COIN, (float) nBalanceToDenominate / COIN);
-                if (nOutputs + nOutputsTotal >= PRIVATESEND_DENOM_OUTPUTS_THRESHOLD) break;
+                // Increment helpers, add output and subtract denomination amount
+                if (txBuilder.AddOutput(nDenomValue)) {
+                    nOutputs++;
+                    it->second++;
+                    nBalanceToDenominate -= nDenomValue;
+                } else {
+                    LogPrint(BCLog::PRIVATESEND, "CPrivateSendClientSession::%s -- 2 - Error: AddOutput failed: denomsToCreate: %d/%d, %s\n", __func__, i, denomsToCreate, txBuilder.ToString());
+                    break;
+                }
+                LogPrint(BCLog::PRIVATESEND, "CPrivateSendClientSession::%s -- 2 - nDenomValue: %f, nBalanceToDenominate: %f, nOutputs: %d, %s\n",
+                                             __func__, (float) nDenomValue / COIN, (float) nBalanceToDenominate / COIN, nOutputs, txBuilder.ToString());
+                if (txBuilder.CountOutputs() >= PRIVATESEND_DENOM_OUTPUTS_THRESHOLD) break;
             }
-            nOutputsTotal += nOutputs;
-            if (nOutputsTotal >= PRIVATESEND_DENOM_OUTPUTS_THRESHOLD) break;
+            if (txBuilder.CountOutputs() >= PRIVATESEND_DENOM_OUTPUTS_THRESHOLD) break;
         }
     }
 
-    LogPrint(BCLog::PRIVATESEND, "CPrivateSendClientSession::CreateDenominated -- 3 - nOutputsTotal: %d, nValueLeft: %f, nBalanceToDenominate: %f\n",
-            nOutputsTotal, (float)nValueLeft / COIN, (float)nBalanceToDenominate / COIN);
+    LogPrint(BCLog::PRIVATESEND, "CPrivateSendClientSession::%s -- 3 - nBalanceToDenominate: %f, %s\n", __func__, (float) nBalanceToDenominate / COIN, txBuilder.ToString());
 
     for (const auto it : mapDenomCount) {
-        LogPrint(BCLog::PRIVATESEND, /* Continued */
-                "CPrivateSendClientSession::CreateDenominated -- 3 - DONE - nDenomValue: %f, count: %d\n",
-                (float) it.first / COIN, it.second);
+        LogPrint(BCLog::PRIVATESEND, "CPrivateSendClientSession::%s -- 3 - DONE - nDenomValue: %f, count: %d\n", __func__, (float) it.first / COIN, it.second);
     }
 
     // No reasons to create mixing collaterals if we can't create denoms to mix
-    if (nOutputsTotal == 0) return false;
-
-    // if we have anything left over, it will be automatically send back as change - there is no need to send it manually
-
-    coinControl.fAllowOtherInputs = false;
-    coinControl.fAllowWatchOnly = false;
-    coinControl.nCoinType = CoinType::ONLY_NONDENOMINATED;
-    // send change to the same address so that we were able create more denoms out of it later
-    coinControl.destChange = tallyItem.txdest;
-    for (const auto& outpoint : tallyItem.vecOutPoints) {
-        coinControl.Select(outpoint);
-    }
-
-    CWalletTx wtx;
-    CAmount nFeeRet = 0;
-    int nChangePosRet = -1;
-    std::string strFail = "";
-    // make our change address
-    CReserveKey reservekeyChange(mixingWallet);
-
-    bool fSuccess = mixingWallet->CreateTransaction(vecSend, wtx, reservekeyChange,
-        nFeeRet, nChangePosRet, strFail, coinControl);
-    if (!fSuccess) {
-        LogPrint(BCLog::PRIVATESEND, "CPrivateSendClientSession::CreateDenominated -- Error: %s\n", strFail);
-        keyHolderStorageDenom.ReturnAll();
+    if ((fCreateMixingCollaterals && txBuilder.CountOutputs() == 1) || txBuilder.CountOutputs() == 0) {
         return false;
     }
 
-    keyHolderStorageDenom.KeepAll();
-
-    CValidationState state;
-    if (!mixingWallet->CommitTransaction(wtx, reservekeyChange, &connman, state)) {
-        LogPrint(BCLog::PRIVATESEND, "CPrivateSendClientSession::CreateDenominated -- CommitTransaction failed! Reason given: %s\n", state.GetRejectReason());
+    std::string strResult;
+    if (!txBuilder.Commit(strResult)) {
+        LogPrint(BCLog::PRIVATESEND, "CPrivateSendClientSession::%s -- Commit failed: %s\n", __func__, strResult);
         return false;
     }
 
     // use the same nCachedLastSuccessBlock as for DS mixing to prevent race
     privateSendClientManagers.at(mixingWallet->GetName())->UpdatedSuccessBlock();
-    LogPrint(BCLog::PRIVATESEND, "CPrivateSendClientSession::CreateDenominated -- txid=%s\n", wtx.GetHash().GetHex());
+
+    LogPrint(BCLog::PRIVATESEND, "CPrivateSendClientSession::%s -- txid: %s\n", __func__, strResult);
 
     return true;
 }
