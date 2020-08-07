@@ -39,6 +39,8 @@ public:
     bool fOverrideFeeRate;
     //! Override the default payTxFee if set
     boost::optional<CFeeRate> m_feerate;
+    //! Override the dust feerate estimation with m_dust_feerate in CreateTransaction if set
+    boost::optional<CFeeRate> m_dust_feerate;
     //! Override the default confirmation target if set
     boost::optional<unsigned int> m_confirm_target;
     //! Fee estimation mode to control arguments to estimateSmartFee
