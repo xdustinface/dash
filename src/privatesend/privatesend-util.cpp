@@ -134,9 +134,8 @@ CTransactionBuilder::CTransactionBuilder(CWallet* pwalletIn, const CompactTallyI
     }
     // Calculate required bytes for the dummy tx with tallyItem's inputs only
     nBytesBase = ::GetSerializeSize(dummyTx, SER_NETWORK, PROTOCOL_VERSION);
-    // Add one output and use the size difference to calculate the output size
-    dummyTx.vout.push_back(CTxOut(0, dummyScript));
-    nBytesOutput = ::GetSerializeSize(dummyTx, SER_NETWORK, PROTOCOL_VERSION) - nBytesBase;
+    // Calculate the output size
+    nBytesOutput = ::GetSerializeSize(CTxOut(0, dummyScript), SER_NETWORK, PROTOCOL_VERSION);
     // Just to make sure..
     Clear();
 }
