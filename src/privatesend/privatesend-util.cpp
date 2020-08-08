@@ -169,7 +169,7 @@ void CTransactionBuilder::Clear()
 
 bool CTransactionBuilder::TryAddOutput(CAmount nAmount) const
 {
-    return GetAmountLeft(tallyItem.nAmount, GetAmountUsed() + nAmount, GetFee(GetBytesTotal() + nBytesOutput, coinControl.m_feerate.get())) >= 0;
+    return GetAmountLeft(tallyItem.nAmount, GetAmountUsed() + nAmount, GetFee(GetBytesTotal() + nBytesOutput)) >= 0;
 }
 
 bool CTransactionBuilder::TryAddOutputs(const std::vector<CAmount>& vecAmounts) const
@@ -178,7 +178,7 @@ bool CTransactionBuilder::TryAddOutputs(const std::vector<CAmount>& vecAmounts) 
     for (auto nAmount : vecAmounts) {
         nAmountSum += nAmount;
     }
-    return GetAmountLeft(tallyItem.nAmount, GetAmountUsed() + nAmountSum, GetFee(GetBytesTotal() + nBytesOutput * vecAmounts.size(), coinControl.m_feerate.get())) >= 0;
+    return GetAmountLeft(tallyItem.nAmount, GetAmountUsed() + nAmountSum, GetFee(GetBytesTotal() + nBytesOutput * vecAmounts.size())) >= 0;
 }
 
 CTransactionBuilderOutput* CTransactionBuilder::AddOutput(CAmount nAmount)
@@ -205,9 +205,9 @@ CAmount CTransactionBuilder::GetAmountUsed() const
     return nAmountUsed;
 }
 
-CAmount CTransactionBuilder::GetFee(int nBytes, const CFeeRate& feeRate)
+CAmount CTransactionBuilder::GetFee(int nBytes) const
 {
-    CAmount nFeeCalc = feeRate.GetFee(nBytes);
+    CAmount nFeeCalc = coinControl.m_feerate->GetFee(nBytes);
     CAmount nRequiredFee = GetRequiredFee(nBytes);
     if (nRequiredFee > nFeeCalc) {
         nFeeCalc = nRequiredFee;
@@ -216,11 +216,6 @@ CAmount CTransactionBuilder::GetFee(int nBytes, const CFeeRate& feeRate)
         nFeeCalc = ::maxTxFee;
     }
     return nFeeCalc;
-}
-
-CAmount CTransactionBuilder::GetFee() const
-{
-    return GetFee(GetBytesTotal(), coinControl.m_feerate.get());
 }
 
 bool CTransactionBuilder::IsDust(CAmount nAmount) const
@@ -251,7 +246,7 @@ bool CTransactionBuilder::Commit(std::string& strResult)
     CAmount nAmountLeft = GetAmountLeft();
     CAmount nFeeAdditional = nAmountLeft && IsDust(nAmountLeft) ? nAmountLeft : 0;
     int nBytesAdditional = !IsDust(nAmountLeft) ? nBytesOutput : 0;
-    CAmount nFeeCalc = GetFee(GetBytesTotal() + nBytesAdditional, coinControl.m_feerate.get()) + nFeeAdditional;
+    CAmount nFeeCalc = GetFee(GetBytesTotal() + nBytesAdditional) + nFeeAdditional;
 
     // If there is a either remainder which is considered to be dust (will be added to fee in this case) or no amount left there should be no change output, return if there is a change output.
     if (nChangePosRet != -1 && IsDust(nAmountLeft)) {
@@ -294,5 +289,5 @@ std::string CTransactionBuilder::ToString()
         GetAmountUsed(),
         CountOutputs(),
         coinControl.m_feerate->GetFeePerK(),
-        GetFee());
+        GetFee(GetBytesTotal()));
 }

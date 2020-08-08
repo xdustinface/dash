@@ -109,13 +109,9 @@ public:
     // Helper to calculate static remainders for output trying
     static CAmount GetAmountLeft(const CAmount nAmount, const CAmount nAmountUsed, const CAmount nFee);
     // Get the amount currently left to add more outputs. Does respect fees.
-    CAmount GetAmountLeft() const { return GetAmountInitial() - GetAmountUsed() - GetFee(GetBytesTotal(), coinControl.m_feerate.get()); }
+    CAmount GetAmountLeft() const { return GetAmountInitial() - GetAmountUsed() - GetFee(GetBytesTotal()); }
     // Get the amount currently used by added outputs. Does not include fees.
     CAmount GetAmountUsed() const;
-    // Helper to calculate static fees for output tryingd
-    static CAmount GetFee(int nBytes, const CFeeRate& feeRate);
-    // Get fees based on the number of total used byes and the feerate set in CoinControl
-    CAmount GetFee() const;
     // Get the total number of bytes used already by this transaction
     int GetBytesTotal() const { return nBytesBase + vecOutputs.size() * nBytesOutput; }
     // Get the number of bytes added by a single output
@@ -128,6 +124,10 @@ public:
     bool Commit(std::string& strResult);
     // Convert to a string
     std::string ToString();
+
+private:
+    // Get fees based on the number of bytes and the feerate set in CoinControl
+    CAmount GetFee(int nBytes) const;
 };
 
 #endif // BITCOIN_PRIVATESEND_PRIVATESEND_UTIL_H
