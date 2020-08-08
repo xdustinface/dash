@@ -150,14 +150,17 @@ QList<TransactionRecord> TransactionRecord::decomposeTransaction(const CWallet *
                     sub.type = TransactionRecord::PrivateSendCollateralPayment;
                 } else {
                     bool fMakeCollateral{false};
-                    if (wtx.tx->vout.size() == 1) {
-                        fMakeCollateral = !CPrivateSend::IsDenominatedAmount(wtx.tx->vout[0].nValue) && CPrivateSend::IsCollateralAmount(wtx.tx->vout[0].nValue); // <case3>, see CPrivateSendClientSession::MakeCollateralAmounts;
-                    } else if (wtx.tx->vout.size() == 2) {
+                    if (wtx.tx->vout.size() == 2) {
                         CAmount nAmount0 = wtx.tx->vout[0].nValue;
                         CAmount nAmount1 = wtx.tx->vout[1].nValue;
+                        // <case1>, see CPrivateSendClientSession::MakeCollateralAmounts
                         fMakeCollateral = (nAmount0 == CPrivateSend::GetMaxCollateralAmount() && !CPrivateSend::IsDenominatedAmount(nAmount1) && nAmount1 >= CPrivateSend::GetCollateralAmount()) ||
-                                          (nAmount1 == CPrivateSend::GetMaxCollateralAmount() && !CPrivateSend::IsDenominatedAmount(nAmount0) && nAmount0 >= CPrivateSend::GetCollateralAmount()) || // <case1>, see CPrivateSendClientSession::MakeCollateralAmounts
-                                          (nAmount0 == nAmount1 && !CPrivateSend::IsDenominatedAmount(nAmount0) && CPrivateSend::IsCollateralAmount(nAmount0)); // <case2>, see CPrivateSendClientSession::MakeCollateralAmounts
+                                          (nAmount1 == CPrivateSend::GetMaxCollateralAmount() && !CPrivateSend::IsDenominatedAmount(nAmount0) && nAmount0 >= CPrivateSend::GetCollateralAmount()) ||
+                        // <case2>, see CPrivateSendClientSession::MakeCollateralAmounts
+                                          (nAmount0 == nAmount1 && !CPrivateSend::IsDenominatedAmount(nAmount0) && CPrivateSend::IsCollateralAmount(nAmount0));
+                    } else if (wtx.tx->vout.size() == 1) {
+                        // <case3>, see CPrivateSendClientSession::MakeCollateralAmounts
+                        fMakeCollateral = !CPrivateSend::IsDenominatedAmount(wtx.tx->vout[0].nValue) && CPrivateSend::IsCollateralAmount(wtx.tx->vout[0].nValue);
                     }
                     if (fMakeCollateral) {
                         sub.type = TransactionRecord::PrivateSendMakeCollaterals;
