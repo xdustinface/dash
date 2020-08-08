@@ -243,23 +243,30 @@ bool CTransactionBuilder::Commit(std::string& strResult)
     }
 
     CAmount nAmountLeft = GetAmountLeft();
-    CAmount nFeeAdditional = nAmountLeft && IsDust(nAmountLeft) ? nAmountLeft : 0;
-    int nBytesAdditional = !IsDust(nAmountLeft) ? nBytesOutput : 0;
-    CAmount nFeeCalc = GetFee(GetBytesTotal() + nBytesAdditional) + nFeeAdditional;
-
+    bool fDust = IsDust(nAmountLeft);
     // If there is a either remainder which is considered to be dust (will be added to fee in this case) or no amount left there should be no change output, return if there is a change output.
-    if (nChangePosRet != -1 && IsDust(nAmountLeft)) {
+    if (nChangePosRet != -1 && fDust) {
         strResult = strprintf("Unexpected change output %s at position %d", wtx.tx->vout[nChangePosRet].ToString(), nChangePosRet);
         return false;
     }
 
     // If there is a remainder which is not considered to be dust it should end up in a change output, return if not.
-    if (!IsDust(nAmountLeft) && nChangePosRet == -1) {
-        strResult = strprintf("Change output missing: %d", GetAmountLeft());
+    if (nChangePosRet == -1 && !fDust) {
+        strResult = strprintf("Change output missing: %d", nAmountLeft);
         return false;
     }
 
+    CAmount nFeeAdditional{0};
+    int nBytesAdditional{0};
+
+    if (fDust) {
+        nFeeAdditional = nAmountLeft;
+    } else {
+        nBytesAdditional = nBytesOutput;
+    }
+
     // If the calculated fee does not match the fee returned by CreateTransaction aka if this check fails something is messed!
+    CAmount nFeeCalc = GetFee(GetBytesTotal() + nBytesAdditional) + nFeeAdditional;
     if (nFeeRet != nFeeCalc) {
         strResult = strprintf("Fee validation failed -> nFeeRet: %d, nFeeCalc: %d, nFeeAdditional: %d, nBytesAdditional: %d, %s", nFeeRet, nFeeCalc, nFeeAdditional, nBytesAdditional, ToString());
         return false;
