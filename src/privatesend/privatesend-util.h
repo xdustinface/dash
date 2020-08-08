@@ -113,7 +113,7 @@ public:
     // Create and Commit the transaction to the wallet
     bool Commit(std::string& strResult);
     // Convert to a string
-    std::string ToString();
+    std::string ToString() const;
 
 private:
     // Clear the output vector and keep/return the included keys depending on the value of fKeepKeys

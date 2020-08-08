@@ -278,7 +278,7 @@ bool CTransactionBuilder::Commit(std::string& strResult)
     return true;
 }
 
-std::string CTransactionBuilder::ToString()
+std::string CTransactionBuilder::ToString() const
 {
     return strprintf("CTransactionBuilder(Amount left: %d, Bytes base: %d, Bytes output %d, Bytes total: %d, Amount used: %d, Outputs: %d, Fee rate: %d, Fee: %d)",
         GetAmountLeft(),
