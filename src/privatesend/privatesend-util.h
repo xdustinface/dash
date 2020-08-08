@@ -100,8 +100,6 @@ public:
     bool TryAddOutputs(const std::vector<CAmount>& vecAmounts) const;
     // Add an output with the amount nAmount. Returns a pointer to the output if it could be added and nullptr if not due to insufficient amomunt left.
     CTransactionBuilderOutput* AddOutput(CAmount nAmount = 0);
-    // Get a reference to the coinControl
-    const CCoinControl& GetCoinControl() const { return coinControl; }
     // Get amount we had available when we started
     CAmount GetAmountInitial() const { return tallyItem.nAmount; }
     // Helper to calculate static remainders for output trying
