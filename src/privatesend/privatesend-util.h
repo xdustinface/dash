@@ -94,8 +94,6 @@ class CTransactionBuilder
 public:
     CTransactionBuilder(CWallet* pwalletIn, const CompactTallyItem& tallyItemIn);
     ~CTransactionBuilder();
-    // Clear the output vector and keep/return the included keys depending on the value of fKeepKeys
-    void Clear();
     // Try to add a single output with the amount nAmount. Returns true if its possble and false if not.
     bool TryAddOutput(CAmount nAmount) const;
     // Try to add multiple outputs as vector of amounts. Returns true if its possible to add all of them and false if not.
@@ -110,10 +108,6 @@ public:
     static CAmount GetAmountLeft(const CAmount nAmount, const CAmount nAmountUsed, const CAmount nFee);
     // Get the amount currently left to add more outputs. Does respect fees.
     CAmount GetAmountLeft() const { return GetAmountInitial() - GetAmountUsed() - GetFee(GetBytesTotal()); }
-    // Get the amount currently used by added outputs. Does not include fees.
-    CAmount GetAmountUsed() const;
-    // Get the total number of bytes used already by this transaction
-    int GetBytesTotal() const { return nBytesBase + vecOutputs.size() * nBytesOutput; }
     // Check if an amounts should be considered as dust
     bool IsDust(CAmount nAmount) const;
     // Get the total number of added outputs
@@ -124,6 +118,12 @@ public:
     std::string ToString();
 
 private:
+    // Clear the output vector and keep/return the included keys depending on the value of fKeepKeys
+    void Clear();
+    // Get the total number of bytes used already by this transaction
+    int GetBytesTotal() const { return nBytesBase + vecOutputs.size() * nBytesOutput; }
+    // Get the amount currently used by added outputs. Does not include fees.
+    CAmount GetAmountUsed() const;
     // Get fees based on the number of bytes and the feerate set in CoinControl
     CAmount GetFee(int nBytes) const;
 };
