@@ -114,8 +114,6 @@ public:
     CAmount GetAmountUsed() const;
     // Get the total number of bytes used already by this transaction
     int GetBytesTotal() const { return nBytesBase + vecOutputs.size() * nBytesOutput; }
-    // Get the number of bytes added by a single output
-    int GetBytesOutput() const { return nBytesOutput; }
     // Check if an amounts should be considered as dust
     bool IsDust(CAmount nAmount) const;
     // Get the total number of added outputs
