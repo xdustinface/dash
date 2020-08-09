@@ -1629,7 +1629,7 @@ bool CPrivateSendClientSession::CreateDenominated(CAmount nBalanceToDenominate, 
         for (const auto it : mapDenomCount) {
             // Check if this specific denom could use another loop, check that there aren't nPrivateSendDenomsGoal of this
             // denom and that our nValueLeft/nBalanceToDenominate is enough to create one of these denoms, if so, loop again.
-            if (it.second < CPrivateSendClientOptions::GetDenomsGoal() && txBuilder.TryAddOutput(it.first) && nBalanceToDenominate >= it.first) {
+            if (it.second < CPrivateSendClientOptions::GetDenomsGoal() && txBuilder.TryAddOutput(it.first) && nBalanceToDenominate > 0) {
                 finished = false;
                 LogPrint(BCLog::PRIVATESEND, "CPrivateSendClientSession::%s -- 1 - NOT finished - nDenomValue: %f, count: %d, nBalanceToDenominate: %f, %s\n",
                                              __func__, (float) it.first / COIN, it.second, (float) nBalanceToDenominate / COIN, txBuilder.ToString());
