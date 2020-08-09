@@ -1444,7 +1444,7 @@ bool CPrivateSendClientSession::MakeCollateralAmounts(const CompactTallyItem& ta
     }
 
     auto getAdjustedAmount = [&](CAmount nAmount) -> CAmount {
-        // If amount is denominated remove one duff, this will to into fees!
+        // If amount is denominated remove one duff, this will go into fees!
         return CPrivateSend::IsDenominatedAmount(nAmount) ? nAmount - 1 : nAmount;
     };
 
