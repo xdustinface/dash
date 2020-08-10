@@ -74,8 +74,6 @@ class CTransactionBuilder
     // Its a member just to make sure ReturnKey can be called in destructor just in case it gets generated/kept
     // somewhere in CWallet code.
     CReserveKey dummyReserveKey;
-    // Fee rate used to evaluate if an amount should be considered as dust or not
-    CFeeRate dustFeeRate;
     // Contains all utxos available to generate this transactions. They are all from the same address.
     CompactTallyItem tallyItem;
     // Contains the number of bytes required for a transaction with only the inputs of tallyItems, no outputs
