@@ -109,7 +109,7 @@ CTransactionBuilder::CTransactionBuilder(CWallet* pwalletIn, const CompactTallyI
     tallyItem(tallyItemIn)
 {
     // Generate d feerate which will be used to consider if the remainder is dust and will go into fees or not
-    coinControl.m_dust_feerate = ::GetDiscardRate(::feeEstimator);
+    coinControl.m_discard_feerate = ::GetDiscardRate(::feeEstimator);
     // Generate a feerate which will be used by calculations of this class and also by CWallet::CreateTransaction
     coinControl.m_feerate = ::feeEstimator.estimateSmartFee(::nTxConfirmTarget, nullptr, true);
     // Fee will always go back to origin
@@ -219,7 +219,7 @@ CAmount CTransactionBuilder::GetFee(int nBytes) const
 
 bool CTransactionBuilder::IsDust(CAmount nAmount) const
 {
-    return ::IsDust(CTxOut(nAmount, ::GetScriptForDestination(tallyItem.txdest)), coinControl.m_dust_feerate.get());
+    return ::IsDust(CTxOut(nAmount, ::GetScriptForDestination(tallyItem.txdest)), coinControl.m_discard_feerate.get());
 }
 
 bool CTransactionBuilder::Commit(std::string& strResult)
