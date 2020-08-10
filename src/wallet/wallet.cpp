@@ -3734,7 +3734,7 @@ bool CWallet::CreateTransaction(const std::vector<CRecipient>& vecSend, CWalletT
     assert(txNew.nLockTime <= (unsigned int)chainActive.Height());
     assert(txNew.nLockTime < LOCKTIME_THRESHOLD);
     FeeCalculation feeCalc;
-    CFeeRate discard_rate = coin_control.m_dust_feerate ? *coin_control.m_dust_feerate : GetDiscardRate(::feeEstimator);
+    CFeeRate discard_rate = coin_control.m_discard_feerate ? *coin_control.m_discard_feerate : GetDiscardRate(::feeEstimator);
     CAmount nFeeNeeded;
     unsigned int nBytes;
     {
@@ -3809,7 +3809,7 @@ bool CWallet::CreateTransaction(const std::vector<CRecipient>& vecSend, CWalletT
                         }
                     }
 
-                    if (IsDust(txout, discard_rate)) {
+                    if (IsDust(txout, ::dustRelayFee)) {
                         if (recipient.fSubtractFeeFromAmount && nFeeRet > 0)
                         {
                             if (txout.nValue < 0)
