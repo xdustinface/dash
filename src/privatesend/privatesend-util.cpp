@@ -108,7 +108,7 @@ CTransactionBuilder::CTransactionBuilder(CWallet* pwalletIn, const CompactTallyI
     dummyReserveKey(pwalletIn),
     tallyItem(tallyItemIn)
 {
-    // Generate d feerate which will be used to consider if the remainder is dust and will go into fees or not
+    // Generate a feerate which will be used to consider if the remainder is dust and will go into fees or not
     coinControl.m_discard_feerate = ::GetDiscardRate(::feeEstimator);
     // Generate a feerate which will be used by calculations of this class and also by CWallet::CreateTransaction
     coinControl.m_feerate = ::feeEstimator.estimateSmartFee(::nTxConfirmTarget, nullptr, true);
