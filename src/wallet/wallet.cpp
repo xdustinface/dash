@@ -3809,7 +3809,8 @@ bool CWallet::CreateTransaction(const std::vector<CRecipient>& vecSend, CWalletT
                         }
                     }
 
-                    if (IsDust(txout, ::dustRelayFee)) {
+                    if (IsDust(txout, ::dustRelayFee))
+                    {
                         if (recipient.fSubtractFeeFromAmount && nFeeRet > 0)
                         {
                             if (txout.nValue < 0)
