@@ -100,8 +100,6 @@ public:
     CTransactionBuilderOutput* AddOutput(CAmount nAmountOutput = 0);
     // Get amount we had available when we started
     CAmount GetAmountInitial() const { return tallyItem.nAmount; }
-    // Helper to calculate static amount left by simply subtracting an used amount and a fee from a provided initial amount.
-    static CAmount GetAmountLeft(const CAmount nAmountInitial, const CAmount nAmountUsed, const CAmount nFee);
     // Get the amount currently left to add more outputs. Does respect fees.
     CAmount GetAmountLeft() const { return GetAmountInitial() - GetAmountUsed() - GetFee(GetBytesTotal()); }
     // Check if an amounts should be considered as dust
@@ -118,6 +116,8 @@ private:
     void Clear();
     // Get the total number of bytes used already by this transaction
     int GetBytesTotal() const { return nBytesBase + vecOutputs.size() * nBytesOutput; }
+    // Helper to calculate static amount left by simply subtracting an used amount and a fee from a provided initial amount.
+    static CAmount GetAmountLeft(const CAmount nAmountInitial, const CAmount nAmountUsed, const CAmount nFee);
     // Get the amount currently used by added outputs. Does not include fees.
     CAmount GetAmountUsed() const;
     // Get fees based on the number of bytes and the feerate set in CoinControl.
