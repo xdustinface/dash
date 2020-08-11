@@ -93,15 +93,15 @@ public:
     CTransactionBuilder(CWallet* pwalletIn, const CompactTallyItem& tallyItemIn);
     ~CTransactionBuilder();
     // Try to add a single output with the amount nAmount. Returns true if its possble and false if not.
-    bool TryAddOutput(CAmount nAmount) const;
+    bool TryAddOutput(CAmount nAmountOutput) const;
     // Try to add multiple outputs as vector of amounts. Returns true if its possible to add all of them and false if not.
-    bool TryAddOutputs(const std::vector<CAmount>& vecAmounts) const;
+    bool TryAddOutputs(const std::vector<CAmount>& vecOutputAmounts) const;
     // Add an output with the amount nAmount. Returns a pointer to the output if it could be added and nullptr if not due to insufficient amomunt left.
-    CTransactionBuilderOutput* AddOutput(CAmount nAmount = 0);
+    CTransactionBuilderOutput* AddOutput(CAmount nAmountOutput = 0);
     // Get amount we had available when we started
     CAmount GetAmountInitial() const { return tallyItem.nAmount; }
-    // Helper to calculate static remainders for output trying
-    static CAmount GetAmountLeft(const CAmount nAmount, const CAmount nAmountUsed, const CAmount nFee);
+    // Helper to calculate static amount left by simply subtracting an used amount and a fee from a provided initial amount.
+    static CAmount GetAmountLeft(const CAmount nAmountInitial, const CAmount nAmountUsed, const CAmount nFee);
     // Get the amount currently left to add more outputs. Does respect fees.
     CAmount GetAmountLeft() const { return GetAmountInitial() - GetAmountUsed() - GetFee(GetBytesTotal()); }
     // Check if an amounts should be considered as dust
@@ -120,7 +120,9 @@ private:
     int GetBytesTotal() const { return nBytesBase + vecOutputs.size() * nBytesOutput; }
     // Get the amount currently used by added outputs. Does not include fees.
     CAmount GetAmountUsed() const;
-    // Get fees based on the number of bytes and the feerate set in CoinControl
+    // Get fees based on the number of bytes and the feerate set in CoinControl.
+    // NOTE: To get the total transaction fee this should only be called once with the total number of bytes for the transaction to avoid
+    // calling CFeeRate::GetFee multiple times with subtotals as this may add rounding errors with each further call.
     CAmount GetFee(int nBytes) const;
 };
 
