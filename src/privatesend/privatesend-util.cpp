@@ -166,33 +166,34 @@ void CTransactionBuilder::Clear()
     dummyReserveKey.ReturnKey();
 }
 
-bool CTransactionBuilder::TryAddOutput(CAmount nAmount) const
+bool CTransactionBuilder::TryAddOutput(CAmount nAmountOutput) const
 {
-    return GetAmountLeft(tallyItem.nAmount, GetAmountUsed() + nAmount, GetFee(GetBytesTotal() + nBytesOutput)) >= 0;
+    return GetAmountLeft(GetAmountInitial(), GetAmountUsed() + nAmountOutput, GetFee(GetBytesTotal() + nBytesOutput)) >= 0;
 }
 
-bool CTransactionBuilder::TryAddOutputs(const std::vector<CAmount>& vecAmounts) const
+bool CTransactionBuilder::TryAddOutputs(const std::vector<CAmount>& vecOutputAmounts) const
 {
-    CAmount nAmountSum{0};
-    for (auto nAmount : vecAmounts) {
-        nAmountSum += nAmount;
+    CAmount nAmountAdditional{0};
+    int nBytesAdditional = nBytesOutput * vecOutputAmounts.size();
+    for (const auto nAmountOutput : vecOutputAmounts) {
+        nAmountAdditional += nAmountOutput;
     }
-    return GetAmountLeft(tallyItem.nAmount, GetAmountUsed() + nAmountSum, GetFee(GetBytesTotal() + nBytesOutput * vecAmounts.size())) >= 0;
+    return GetAmountLeft(GetAmountInitial(), GetAmountUsed() + nAmountAdditional, GetFee(GetBytesTotal() + nBytesAdditional)) >= 0;
 }
 
-CTransactionBuilderOutput* CTransactionBuilder::AddOutput(CAmount nAmount)
+CTransactionBuilderOutput* CTransactionBuilder::AddOutput(CAmount nAmountOutput)
 {
     LOCK(cs_outputs);
-    if (TryAddOutput(nAmount)) {
-        vecOutputs.push_back(std::make_unique<CTransactionBuilderOutput>(this, pwallet, nAmount));
+    if (TryAddOutput(nAmountOutput)) {
+        vecOutputs.push_back(std::make_unique<CTransactionBuilderOutput>(this, pwallet, nAmountOutput));
         return vecOutputs.back().get();
     }
     return nullptr;
 }
 
-CAmount CTransactionBuilder::GetAmountLeft(const CAmount nAmount, const CAmount nAmountUsed, const CAmount nFee)
+CAmount CTransactionBuilder::GetAmountLeft(const CAmount nAmountInitial, const CAmount nAmountUsed, const CAmount nFee)
 {
-    return nAmount - nAmountUsed - nFee;
+    return nAmountInitial - nAmountUsed - nFee;
 }
 
 CAmount CTransactionBuilder::GetAmountUsed() const
