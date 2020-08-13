@@ -1685,7 +1685,7 @@ bool CPrivateSendClientSession::CreateDenominated(CAmount nBalanceToDenominate, 
                     it->second++;
                     nBalanceToDenominate -= nDenomValue;
                 } else {
-                    LogPrint(BCLog::PRIVATESEND, "CPrivateSendClientSession::%s -- 2 - Error: AddOutput failed: denomsToCreate: %d/%d, %s\n", __func__, i, denomsToCreate, txBuilder.ToString());
+                    LogPrint(BCLog::PRIVATESEND, "CPrivateSendClientSession::%s -- 2 - Error: AddOutput failed at %d/%d, %s\n", __func__, i + 1, denomsToCreate, txBuilder.ToString());
                     break;
                 }
                 LogPrint(BCLog::PRIVATESEND, "CPrivateSendClientSession::%s -- 2 - nDenomValue: %f, nBalanceToDenominate: %f, nOutputs: %d, %s\n",

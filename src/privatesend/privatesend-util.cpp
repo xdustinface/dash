@@ -112,7 +112,7 @@ CTransactionBuilder::CTransactionBuilder(CWallet* pwalletIn, const CompactTallyI
     coinControl.m_discard_feerate = ::GetDiscardRate(::feeEstimator);
     // Generate a feerate which will be used by calculations of this class and also by CWallet::CreateTransaction
     coinControl.m_feerate = ::feeEstimator.estimateSmartFee(::nTxConfirmTarget, nullptr, true);
-    // Fee will always go back to origin
+    // Change always goes back to origin
     coinControl.destChange = tallyItemIn.txdest;
     // Only allow tallyItems inputs for tx creation
     coinControl.fAllowOtherInputs = false;
@@ -298,7 +298,8 @@ bool CTransactionBuilder::Commit(std::string& strResult)
 
 std::string CTransactionBuilder::ToString() const
 {
-    return strprintf("CTransactionBuilder(Amount left: %d, Bytes base: %d, Bytes output %d, Bytes total: %d, Amount used: %d, Outputs: %d, Fee rate: %d, Fee: %d)",
+    return strprintf("CTransactionBuilder(Amount initial: %d, Amount left: %d, Bytes base: %d, Bytes output: %d, Bytes total: %d, Amount used: %d, Outputs: %d, Fee rate: %d, Discard fee rate: %d, Fee: %d)",
+        GetAmountInitial(),
         GetAmountLeft(),
         nBytesBase,
         nBytesOutput,
@@ -306,5 +307,6 @@ std::string CTransactionBuilder::ToString() const
         GetAmountUsed(),
         CountOutputs(),
         coinControl.m_feerate->GetFeePerK(),
+        coinControl.m_discard_feerate->GetFeePerK(),
         GetFee(GetBytesTotal()));
 }
