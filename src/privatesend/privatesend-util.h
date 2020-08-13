@@ -123,7 +123,7 @@ private:
     // Get fees based on the number of bytes and the feerate set in CoinControl.
     // NOTE: To get the total transaction fee this should only be called once with the total number of bytes for the transaction to avoid
     // calling CFeeRate::GetFee multiple times with subtotals as this may add rounding errors with each further call.
-    CAmount GetFee(int nBytes) const;
+    CAmount GetFee(unsigned int nBytes) const;
 };
 
 #endif // BITCOIN_PRIVATESEND_PRIVATESEND_UTIL_H

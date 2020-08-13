@@ -213,7 +213,7 @@ CAmount CTransactionBuilder::GetAmountUsed() const
     return nAmountUsed;
 }
 
-CAmount CTransactionBuilder::GetFee(int nBytes) const
+CAmount CTransactionBuilder::GetFee(unsigned int nBytes) const
 {
     CAmount nFeeCalc = coinControl.m_feerate->GetFee(nBytes);
     CAmount nRequiredFee = GetRequiredFee(nBytes);
