@@ -115,7 +115,7 @@ private:
     // Clear the output vector and keep/return the included keys depending on the value of fKeepKeys
     void Clear();
     // Get the total number of bytes used already by this transaction
-    int GetBytesTotal() const { return nBytesBase + vecOutputs.size() * nBytesOutput; }
+    unsigned int GetBytesTotal() const;
     // Helper to calculate static amount left by simply subtracting an used amount and a fee from a provided initial amount.
     static CAmount GetAmountLeft(const CAmount nAmountInitial, const CAmount nAmountUsed, const CAmount nFee);
     // Get the amount currently used by added outputs. Does not include fees.
