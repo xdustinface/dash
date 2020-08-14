@@ -3975,8 +3975,7 @@ bool CWallet::CreateTransaction(const std::vector<CRecipient>& vecSend, CWalletT
                     // change output. Only try this once.
                     if (nChangePosInOut == -1 && nSubtractFeeFromAmount == 0 && pick_new_inputs) {
                         // Adding another output can change the serialized size of the vout size
-                        unsigned int nBytesCompactSizeDiff = GetSizeOfCompactSize(txNew.vout.size() + 1) - GetSizeOfCompactSize(0);
-                        unsigned int tx_size_with_change = nBytes + change_prototype_size + nBytesCompactSizeDiff;
+                        unsigned int tx_size_with_change = nBytes + change_prototype_size + GetSizeOfCompactSizeDiff(0, txNew.vout.size() + 1);
                         CAmount fee_needed_with_change = GetMinimumFee(tx_size_with_change, coin_control, ::mempool, ::feeEstimator, nullptr);
                         CAmount minimum_value_for_change = GetDustThreshold(change_prototype_txout, discard_rate);
                         if (nFeeRet >= fee_needed_with_change + minimum_value_for_change) {
