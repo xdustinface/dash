@@ -1653,7 +1653,7 @@ bool CPrivateSendClientSession::CreateDenominated(CAmount nBalanceToDenominate, 
             while(true) {
                 // Create an potential output
                 vecOutputs.push_back(nAmount);
-                if (!txBuilder.TryAddOutputs(vecOutputs) || txBuilder.CountOutputs() + vecOutputs.size() >= PRIVATESEND_DENOM_OUTPUTS_THRESHOLD) {
+                if (!txBuilder.TryAddOutputs(vecOutputs) || txBuilder.CountOutputs() + vecOutputs.size() > PRIVATESEND_DENOM_OUTPUTS_THRESHOLD) {
                     // If its not possible to add it due to insufficient amount left or total number of outputs exceeds
                     // PRIVATESEND_DENOM_OUTPUTS_THRESHOLD drop the output again and stop trying.
                     vecOutputs.pop_back();
