@@ -2830,11 +2830,11 @@ void CWallet::AvailableCoins(std::vector<COutput> &vCoins, bool fOnlySafe, const
             bool found = false;
             if (nCoinType == CoinType::ONLY_FULLY_MIXED) {
                 if (!CPrivateSend::IsDenominatedAmount(pcoin->tx->vout[i].nValue)) continue;
-                int nRounds = GetCappedOutpointPrivateSendRounds(COutPoint(wtxid, i));
+                int nRounds = GetRealOutpointPrivateSendRounds(COutPoint(wtxid, i));
                 found = nRounds >= CPrivateSendClientOptions::GetRounds();
             } else if(nCoinType == CoinType::ONLY_READY_TO_MIX) {
                 if (!CPrivateSend::IsDenominatedAmount(pcoin->tx->vout[i].nValue)) continue;
-                int nRounds = GetCappedOutpointPrivateSendRounds(COutPoint(wtxid, i));
+                int nRounds = GetRealOutpointPrivateSendRounds(COutPoint(wtxid, i));
                 found = nRounds < CPrivateSendClientOptions::GetRounds();
             } else if(nCoinType == CoinType::ONLY_NONDENOMINATED) {
                 if (CPrivateSend::IsCollateralAmount(pcoin->tx->vout[i].nValue)) continue; // do not use collateral amounts
