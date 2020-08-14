@@ -239,6 +239,12 @@ inline unsigned int GetSizeOfCompactSize(uint64_t nSize)
     else                         return sizeof(unsigned char) + sizeof(uint64_t);
 }
 
+inline unsigned int GetSizeOfCompactSizeDiff(uint64_t nSizePrev, uint64_t nSizeNew)
+{
+    assert(nSizePrev <= nSizeNew);
+    return GetSizeOfCompactSize(nSizeNew) - GetSizeOfCompactSize(nSizePrev);
+}
+
 inline void WriteCompactSize(CSizeComputer& os, uint64_t nSize);
 
 template<typename Stream>
