@@ -168,7 +168,9 @@ void CTransactionBuilder::Clear()
 
 bool CTransactionBuilder::TryAddOutput(CAmount nAmountOutput) const
 {
-    return GetAmountLeft(GetAmountInitial(), GetAmountUsed() + nAmountOutput, GetFee(GetBytesTotal() + nBytesOutput)) >= 0;
+    // Adding another output can change the serialized size of the vout size hence + GetSizeOfCompactSizeDiff()
+    unsigned int nBytes = GetBytesTotal() + nBytesOutput + GetSizeOfCompactSizeDiff(1);
+    return GetAmountLeft(GetAmountInitial(), GetAmountUsed() + nAmountOutput, GetFee(nBytes)) >= 0;
 }
 
 bool CTransactionBuilder::TryAddOutputs(const std::vector<CAmount>& vecOutputAmounts) const
@@ -178,7 +180,9 @@ bool CTransactionBuilder::TryAddOutputs(const std::vector<CAmount>& vecOutputAmo
     for (const auto nAmountOutput : vecOutputAmounts) {
         nAmountAdditional += nAmountOutput;
     }
-    return GetAmountLeft(GetAmountInitial(), GetAmountUsed() + nAmountAdditional, GetFee(GetBytesTotal() + nBytesAdditional)) >= 0;
+    // Adding other outputs can change the serialized size of the vout size hence + GetSizeOfCompactSizeDiff()
+    unsigned int nBytes = GetBytesTotal() + nBytesAdditional + GetSizeOfCompactSizeDiff(vecOutputAmounts.size());
+    return GetAmountLeft(GetAmountInitial(), GetAmountUsed() + nAmountAdditional, GetFee(nBytes)) >= 0;
 }
 
 CTransactionBuilderOutput* CTransactionBuilder::AddOutput(CAmount nAmountOutput)
@@ -193,10 +197,8 @@ CTransactionBuilderOutput* CTransactionBuilder::AddOutput(CAmount nAmountOutput)
 
 unsigned int CTransactionBuilder::GetBytesTotal() const
 {
-    unsigned int nBytesAll = nBytesBase + vecOutputs.size() * nBytesOutput;
-    // Adding outputs can change the serialized size of the vout size
-    unsigned int nBytesCompactSizeDiff = GetSizeOfCompactSize(vecOutputs.size()) - GetSizeOfCompactSize(0);
-    return nBytesAll + nBytesCompactSizeDiff;
+    // Adding other outputs can change the serialized size of the vout size hence + GetSizeOfCompactSizeDiff()
+   return nBytesBase + vecOutputs.size() * nBytesOutput + ::GetSizeOfCompactSizeDiff(0, vecOutputs.size());
 }
 
 CAmount CTransactionBuilder::GetAmountLeft(const CAmount nAmountInitial, const CAmount nAmountUsed, const CAmount nFee)
@@ -224,6 +226,12 @@ CAmount CTransactionBuilder::GetFee(unsigned int nBytes) const
         nFeeCalc = ::maxTxFee;
     }
     return nFeeCalc;
+}
+
+int CTransactionBuilder::GetSizeOfCompactSizeDiff(size_t nAdd) const
+{
+    size_t nSize = vecOutputs.size();
+    return ::GetSizeOfCompactSizeDiff(nSize, nSize + nAdd);
 }
 
 bool CTransactionBuilder::IsDust(CAmount nAmount) const
@@ -271,9 +279,8 @@ bool CTransactionBuilder::Commit(std::string& strResult)
     if (fDust) {
         nFeeAdditional = nAmountLeft;
     } else {
-        // Adding another output can change the serialized size of the vout size
-        unsigned int nBytesCompactSizeDiff = GetSizeOfCompactSize(vecOutputs.size() + 1) - GetSizeOfCompactSize(vecOutputs.size());
-        nBytesAdditional = nBytesOutput + nBytesCompactSizeDiff;
+        // Add a change output and GetSizeOfCompactSizeDiff(1) as another output can changes the serialized size of the vout size in CTransaction
+        nBytesAdditional = nBytesOutput + GetSizeOfCompactSizeDiff(1);
     }
 
     // If the calculated fee does not match the fee returned by CreateTransaction aka if this check fails something is messed!

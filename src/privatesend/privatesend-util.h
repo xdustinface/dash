@@ -124,6 +124,8 @@ private:
     // NOTE: To get the total transaction fee this should only be called once with the total number of bytes for the transaction to avoid
     // calling CFeeRate::GetFee multiple times with subtotals as this may add rounding errors with each further call.
     CAmount GetFee(unsigned int nBytes) const;
+    // Helper to get GetSizeOfCompactSizeDiff(vecOutputs.size(), vecOutputs.size() + nAdd)
+    int GetSizeOfCompactSizeDiff(size_t nAdd) const;
 };
 
 #endif // BITCOIN_PRIVATESEND_PRIVATESEND_UTIL_H
