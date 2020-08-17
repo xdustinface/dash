@@ -2835,7 +2835,24 @@ void CWallet::AvailableCoins(std::vector<COutput> &vCoins, bool fOnlySafe, const
             } else if(nCoinType == CoinType::ONLY_READY_TO_MIX) {
                 if (!CPrivateSend::IsDenominatedAmount(pcoin->tx->vout[i].nValue)) continue;
                 int nRounds = GetRealOutpointPrivateSendRounds(COutPoint(wtxid, i));
-                found = nRounds < CPrivateSendClientOptions::GetRounds();
+
+                // Mix again if we don't have N rounds yet
+                if (nRounds < CPrivateSendClientOptions::GetRounds()) found = true;
+                // try to mix a "random" number of rounds more than minimum
+                // If we have already mixed N + MaxOffset rounds, don't mix again.
+                // Otherwise, we should mix again 50% of the time, this results in an exponential decay
+                // N rounds 50% N+1 25% N+2 12.5%... until we reach N + GetRandomRounds() rounds where we stop
+                else if (nRounds < CPrivateSendClientOptions::GetRounds() + CPrivateSendClientOptions::GetRandomRounds()) {
+                    // This salt is needed to prevent an attacker from learning how many extra times this input was mixed
+                    // based only on information in the blockchain
+                    auto psMan = privateSendClientManagers.at(GetName());
+                    uint256 salt;
+                    if (psMan) salt = psMan->nSalt;
+                    if (Hash(wtxid.begin(), wtxid.end(), salt.begin(), salt.end()).GetCheapHash() % 2 == 0) {
+                        found = true;
+                    }
+                }
+
             } else if(nCoinType == CoinType::ONLY_NONDENOMINATED) {
                 if (CPrivateSend::IsCollateralAmount(pcoin->tx->vout[i].nValue)) continue; // do not use collateral amounts
                 found = !CPrivateSend::IsDenominatedAmount(pcoin->tx->vout[i].nValue);

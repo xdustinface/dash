@@ -54,6 +54,8 @@ static const int PRIVATESEND_DENOM_OUTPUTS_THRESHOLD = 500;
 static const int PRIVATESEND_KEYS_THRESHOLD_WARNING = 100;
 // Stop mixing completely, it's too dangerous to continue when we have only this many keys left
 static const int PRIVATESEND_KEYS_THRESHOLD_STOP = 50;
+// Pseudorandomly mix up to this many times in addition to base round count
+static const int PRIVATESEND_RANDOM_ROUNDS = 3;
 
 // The main object for accessing mixing
 extern std::map<const std::string, CPrivateSendClientManager*> privateSendClientManagers;
@@ -284,6 +286,7 @@ class CPrivateSendClientOptions
 public:
     static int GetSessions() { return CPrivateSendClientOptions::Get().nPrivateSendSessions; }
     static int GetRounds() { return CPrivateSendClientOptions::Get().nPrivateSendRounds; }
+    static int GetRandomRounds() { return CPrivateSendClientOptions::Get().nPrivateSendRandomRounds; }
     static int GetAmount() { return CPrivateSendClientOptions::Get().nPrivateSendAmount; }
     static int GetDenomsGoal() { return CPrivateSendClientOptions::Get().nPrivateSendDenomsGoal; }
     static int GetDenomsHardCap() { return CPrivateSendClientOptions::Get().nPrivateSendDenomsHardCap; }
@@ -305,6 +308,7 @@ private:
     CCriticalSection cs_ps_options;
     int nPrivateSendSessions;
     int nPrivateSendRounds;
+    int nPrivateSendRandomRounds;
     int nPrivateSendAmount;
     int nPrivateSendDenomsGoal;
     int nPrivateSendDenomsHardCap;
@@ -313,6 +317,7 @@ private:
 
     CPrivateSendClientOptions() :
         nPrivateSendRounds(DEFAULT_PRIVATESEND_ROUNDS),
+        nPrivateSendRandomRounds(PRIVATESEND_RANDOM_ROUNDS),
         nPrivateSendAmount(DEFAULT_PRIVATESEND_AMOUNT),
         nPrivateSendDenomsGoal(DEFAULT_PRIVATESEND_DENOMS_GOAL),
         nPrivateSendDenomsHardCap(DEFAULT_PRIVATESEND_DENOMS_HARDCAP),
