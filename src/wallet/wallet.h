@@ -1222,6 +1222,16 @@ public:
     void NotifyChainLock(const CBlockIndex* pindexChainLock, const llmq::CChainLockSig& clsig) override;
 
     /**
+     * Fetches PrivateSend salt from database
+     */
+    const uint256 GetPrivateSendSalt();
+
+    /**
+    * Writes PrivateSend salt to database
+    */
+    bool WritePrivateSendSalt(uint256& salt);
+
+    /**
      * Blocks until the wallet state is up-to-date to /at least/ the current
      * chain at the time this function is entered
      * Obviously holding cs_main/cs_wallet when going into this call may cause

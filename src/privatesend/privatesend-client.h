@@ -224,8 +224,12 @@ private:
     bool CheckAutomaticBackup();
 
 public:
-    int nCachedNumBlocks;    //used for the overview screen
-    bool fCreateAutoBackups; //builtin support for automatic backups
+    // used for the overview screen
+    int nCachedNumBlocks;
+    // builtin support for automatic backups
+    bool fCreateAutoBackups;
+    // Pulled from wallet DB ("ps_salt") and used when mixing a random number of rounds
+    uint256 nSalt;
 
     CPrivateSendClientManager() :
         vecMasternodesUsed(),

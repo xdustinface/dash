@@ -244,6 +244,11 @@ bool CPrivateSendClientManager::StartMixing(CWallet* pwallet) {
     }
     assert(pwallet != nullptr);
     mixingWallet = pwallet;
+    nSalt = mixingWallet->GetPrivateSendSalt();
+    if (nSalt.IsNull()) {
+        nSalt = GetRandHash();
+        pwallet->WritePrivateSendSalt(nSalt);
+    }
     return true;
 }
 

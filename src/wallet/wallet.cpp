@@ -2951,6 +2951,20 @@ const CTxOut& CWallet::FindNonChangeParentOutput(const CTransaction& tx, int out
     return ptx->vout[n];
 }
 
+const uint256 CWallet::GetPrivateSendSalt()
+{
+    uint256 ps_salt;
+    WalletBatch batch(*database);
+    batch.ReadPrivateSendSalt(ps_salt);
+    return ps_salt;
+}
+
+bool CWallet::WritePrivateSendSalt(uint256 &salt)
+{
+    WalletBatch batch(*database);
+    return batch.WritePrivateSendSalt(salt);
+}
+
 static void ApproximateBestSubset(const std::vector<CInputCoin>& vValue, const CAmount& nTotalLower, const CAmount& nTargetValue,
                                   std::vector<char>& vfBest, CAmount& nBest, int iterations = 1000)
 {
