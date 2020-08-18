@@ -61,6 +61,7 @@ public:
         fAllowWatchOnly = false;
         setSelected.clear();
         m_feerate.reset();
+        m_discard_feerate.reset();
         fOverrideFeeRate = false;
         m_confirm_target.reset();
         m_fee_mode = FeeEstimateMode::UNSET;
