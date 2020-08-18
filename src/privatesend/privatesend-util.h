@@ -92,10 +92,10 @@ class CTransactionBuilder
 public:
     CTransactionBuilder(CWallet* pwalletIn, const CompactTallyItem& tallyItemIn);
     ~CTransactionBuilder();
-    // Try to add a single output with the amount nAmount. Returns true if its possble and false if not.
-    bool TryAddOutput(CAmount nAmountOutput) const;
-    // Try to add multiple outputs as vector of amounts. Returns true if its possible to add all of them and false if not.
-    bool TryAddOutputs(const std::vector<CAmount>& vecOutputAmounts) const;
+    // Check it would be possible to add a single output with the amount nAmount. Returns true if its possible and false if not.
+    bool CouldAddOutput(CAmount nAmountOutput) const;
+    // Check if its possible to add multiple outputs as vector of amounts. Returns true if its possible to add all of them and false if not.
+    bool CouldAddOutputs(const std::vector<CAmount>& vecOutputAmounts) const;
     // Add an output with the amount nAmount. Returns a pointer to the output if it could be added and nullptr if not due to insufficient amomunt left.
     CTransactionBuilderOutput* AddOutput(CAmount nAmountOutput = 0);
     // Get amount we had available when we started
