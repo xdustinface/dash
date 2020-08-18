@@ -1439,7 +1439,7 @@ bool CPrivateSendClientSession::MakeCollateralAmounts(const CompactTallyItem& ta
     LogPrint(BCLog::PRIVATESEND, "CPrivateSendClientSession::%s -- Start %s\n", __func__, txBuilder.ToString());
 
     // Skip way too tiny amounts. Smallest we want is minimum collateral amount in a one output tx
-    if (!txBuilder.TryAddOutput(CPrivateSend::GetCollateralAmount())) {
+    if (!txBuilder.CouldAddOutput(CPrivateSend::GetCollateralAmount())) {
         return false;
     }
 
@@ -1449,7 +1449,7 @@ bool CPrivateSendClientSession::MakeCollateralAmounts(const CompactTallyItem& ta
     };
 
     int nCase{0}; // Just for debug logs
-    if (txBuilder.TryAddOutputs({CPrivateSend::GetMaxCollateralAmount(), CPrivateSend::GetCollateralAmount()})) {
+    if (txBuilder.CouldAddOutputs({CPrivateSend::GetMaxCollateralAmount(), CPrivateSend::GetCollateralAmount()})) {
         nCase = 1;
         // <case1>, see TransactionRecord::decomposeTransaction
         // Out1 == CPrivateSend::GetMaxCollateralAmount()
@@ -1460,7 +1460,7 @@ bool CPrivateSendClientSession::MakeCollateralAmounts(const CompactTallyItem& ta
         CTransactionBuilderOutput* out = txBuilder.AddOutput();
         out->UpdateAmount(getAdjustedAmount(txBuilder.GetAmountLeft()));
 
-    } else if (txBuilder.TryAddOutputs({CPrivateSend::GetCollateralAmount(), CPrivateSend::GetCollateralAmount()})) {
+    } else if (txBuilder.CouldAddOutputs({CPrivateSend::GetCollateralAmount(), CPrivateSend::GetCollateralAmount()})) {
         nCase = 2;
         // <case2>, see TransactionRecord::decomposeTransaction
         // Out1 CPrivateSend::IsCollateralAmount()
@@ -1584,7 +1584,7 @@ bool CPrivateSendClientSession::CreateDenominated(CAmount nBalanceToDenominate, 
     // Now, in this system, so long as we don't reach PRIVATESEND_DENOM_OUTPUTS_THRESHOLD outputs the process repeats in
     // the same transaction, creating up to nPrivateSendDenomsHardCap per denomination in a single transaction.
 
-    while (txBuilder.TryAddOutput(CPrivateSend::GetSmallestDenomination()) && txBuilder.CountOutputs() < PRIVATESEND_DENOM_OUTPUTS_THRESHOLD) {
+    while (txBuilder.CouldAddOutput(CPrivateSend::GetSmallestDenomination()) && txBuilder.CountOutputs() < PRIVATESEND_DENOM_OUTPUTS_THRESHOLD) {
         for (auto it = vecStandardDenoms.rbegin(); it != vecStandardDenoms.rend(); ++it) {
             CAmount nDenomValue = *it;
             auto currentDenomIt = mapDenomCount.find(nDenomValue);
@@ -1592,7 +1592,7 @@ bool CPrivateSendClientSession::CreateDenominated(CAmount nBalanceToDenominate, 
             int nOutputs = 0;
 
             auto needMoreOutputs = [&]() {
-                if (txBuilder.TryAddOutput(nDenomValue)) {
+                if (txBuilder.CouldAddOutput(nDenomValue)) {
                     if (fAddFinal && nBalanceToDenominate > 0 && nBalanceToDenominate < nDenomValue) {
                         fAddFinal = false; // add final denom only once, only the smalest possible one
                         LogPrint(BCLog::PRIVATESEND, "CPrivateSendClientSession::%s -- 1 - FINAL - nDenomValue: %f, nBalanceToDenominate: %f, nOutputs: %d, %s\n",
@@ -1629,7 +1629,7 @@ bool CPrivateSendClientSession::CreateDenominated(CAmount nBalanceToDenominate, 
         for (const auto it : mapDenomCount) {
             // Check if this specific denom could use another loop, check that there aren't nPrivateSendDenomsGoal of this
             // denom and that our nValueLeft/nBalanceToDenominate is enough to create one of these denoms, if so, loop again.
-            if (it.second < CPrivateSendClientOptions::GetDenomsGoal() && txBuilder.TryAddOutput(it.first) && nBalanceToDenominate > 0) {
+            if (it.second < CPrivateSendClientOptions::GetDenomsGoal() && txBuilder.CouldAddOutput(it.first) && nBalanceToDenominate > 0) {
                 finished = false;
                 LogPrint(BCLog::PRIVATESEND, "CPrivateSendClientSession::%s -- 1 - NOT finished - nDenomValue: %f, count: %d, nBalanceToDenominate: %f, %s\n",
                                              __func__, (float) it.first / COIN, it.second, (float) nBalanceToDenominate / COIN, txBuilder.ToString());
@@ -1643,7 +1643,7 @@ bool CPrivateSendClientSession::CreateDenominated(CAmount nBalanceToDenominate, 
     }
 
     // Now that nPrivateSendDenomsGoal worth of each denom have been created or the max number of denoms given the value of the input, do something with the remainder.
-    if (txBuilder.TryAddOutput(CPrivateSend::GetSmallestDenomination()) && nBalanceToDenominate >= CPrivateSend::GetSmallestDenomination() && txBuilder.CountOutputs() < PRIVATESEND_DENOM_OUTPUTS_THRESHOLD) {
+    if (txBuilder.CouldAddOutput(CPrivateSend::GetSmallestDenomination()) && nBalanceToDenominate >= CPrivateSend::GetSmallestDenomination() && txBuilder.CountOutputs() < PRIVATESEND_DENOM_OUTPUTS_THRESHOLD) {
         CAmount nLargestDenomValue = vecStandardDenoms.front();
 
         LogPrint(BCLog::PRIVATESEND, "CPrivateSendClientSession::%s -- 2 - Process remainder: %s\n", __func__, txBuilder.ToString());
@@ -1653,7 +1653,7 @@ bool CPrivateSendClientSession::CreateDenominated(CAmount nBalanceToDenominate, 
             while(true) {
                 // Create an potential output
                 vecOutputs.push_back(nAmount);
-                if (!txBuilder.TryAddOutputs(vecOutputs) || txBuilder.CountOutputs() + vecOutputs.size() > PRIVATESEND_DENOM_OUTPUTS_THRESHOLD) {
+                if (!txBuilder.CouldAddOutputs(vecOutputs) || txBuilder.CountOutputs() + vecOutputs.size() > PRIVATESEND_DENOM_OUTPUTS_THRESHOLD) {
                     // If its not possible to add it due to insufficient amount left or total number of outputs exceeds
                     // PRIVATESEND_DENOM_OUTPUTS_THRESHOLD drop the output again and stop trying.
                     vecOutputs.pop_back();

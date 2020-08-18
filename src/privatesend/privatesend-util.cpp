@@ -172,14 +172,14 @@ void CTransactionBuilder::Clear()
     dummyReserveKey.ReturnKey();
 }
 
-bool CTransactionBuilder::TryAddOutput(CAmount nAmountOutput) const
+bool CTransactionBuilder::CouldAddOutput(CAmount nAmountOutput) const
 {
     // Adding another output can change the serialized size of the vout size hence + GetSizeOfCompactSizeDiff()
     unsigned int nBytes = GetBytesTotal() + nBytesOutput + GetSizeOfCompactSizeDiff(1);
     return GetAmountLeft(GetAmountInitial(), GetAmountUsed() + nAmountOutput, GetFee(nBytes)) >= 0;
 }
 
-bool CTransactionBuilder::TryAddOutputs(const std::vector<CAmount>& vecOutputAmounts) const
+bool CTransactionBuilder::CouldAddOutputs(const std::vector<CAmount>& vecOutputAmounts) const
 {
     CAmount nAmountAdditional{0};
     int nBytesAdditional = nBytesOutput * vecOutputAmounts.size();
@@ -194,7 +194,7 @@ bool CTransactionBuilder::TryAddOutputs(const std::vector<CAmount>& vecOutputAmo
 CTransactionBuilderOutput* CTransactionBuilder::AddOutput(CAmount nAmountOutput)
 {
     LOCK(cs_outputs);
-    if (TryAddOutput(nAmountOutput)) {
+    if (CouldAddOutput(nAmountOutput)) {
         vecOutputs.push_back(std::make_unique<CTransactionBuilderOutput>(this, pwallet, nAmountOutput));
         return vecOutputs.back().get();
     }
