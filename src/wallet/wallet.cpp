@@ -3841,8 +3841,73 @@ bool CWallet::CreateTransaction(const std::vector<CRecipient>& vecSend, CWalletT
                     }
                 }
 
-                const CAmount nChange = nValueIn - nValueToSelect;
+                // Fill vin
+                //
+                // Note how the sequence number is set to max()-1 so that the
+                // nLockTime set above actually works.
+                txNew.vin.clear();
+                for (const auto& coin : setCoins) {
+                    CTxIn txin = CTxIn(coin.outpoint,CScript(),
+                                              CTxIn::SEQUENCE_FINAL - 1);
+                    txNew.vin.push_back(txin);
+                }
+
+                auto calculateFee = [&](CAmount& nFee) -> bool {
+                    // Fill in dummy signatures for fee calculation.
+                    int nIn = 0;
+                    for (const auto& coin : setCoins)
+                    {
+                        const CScript& scriptPubKey = coin.txout.scriptPubKey;
+                        SignatureData sigdata;
+                        if (!ProduceSignature(DummySignatureCreator(this), scriptPubKey, sigdata))
+                        {
+                            strFailReason = _("Signing transaction failed");
+                            return false;
+                        } else {
+                            UpdateTransaction(txNew, nIn, sigdata);
+                        }
+
+                        nIn++;
+                    }
+
+                    nBytes = ::GetSerializeSize(txNew, SER_NETWORK, PROTOCOL_VERSION);
+
+                    if (nExtraPayloadSize != 0) {
+                        // account for extra payload in fee calculation
+                        nBytes += GetSizeOfCompactSize(nExtraPayloadSize) + nExtraPayloadSize;
+                    }
+
+                    if (nBytes > MAX_STANDARD_TX_SIZE) {
+                        // Do not create oversized transactions (bad-txns-oversize).
+                        strFailReason = _("Transaction too large");
+                        return false;
+                    }
+
+                    // Remove scriptSigs to eliminate the fee calculation dummy signatures
+                    for (auto& txin : txNew.vin) {
+                        txin.scriptSig = CScript();
+                    }
+
+                    nFee = GetMinimumFee(nBytes, coin_control, ::mempool, ::feeEstimator, &feeCalc);
+
+                    // If we made it here and we aren't even able to meet the relay fee on the next pass, give up
+                    // because we must be at the maximum allowed fee.
+                    if (nFee < ::minRelayTxFee.GetFee(nBytes))
+                    {
+                        strFailReason = _("Transaction too large for fee policy");
+                        return false;
+                    }
+
+                    return true;
+                };
+
+                if (!calculateFee(nFeeNeeded)) {
+                    return false;
+                }
+
                 CTxOut newTxOut;
+                const CAmount nAmountLeft = nValueIn - nValueToSelect;
+                const CAmount nChange = nAmountLeft - nFeeNeeded;
 
                 if (nChange > 0)
                 {
@@ -3851,8 +3916,21 @@ bool CWallet::CreateTransaction(const std::vector<CRecipient>& vecSend, CWalletT
                         nChangePosInOut = -1;
                         nFeeRet += nChange;
                     } else {
-                        // Fill a vout to ourself
-                        newTxOut = CTxOut(nChange, scriptChange);
+                        // Fill a vout to ourself with zero amount until we know the correct change
+                        newTxOut = CTxOut(0, scriptChange);
+                        txNew.vout.push_back(newTxOut);
+
+                        // Calculate the fee with the change output added
+                        CAmount nFeeNeededWithChange{0};
+                        if (!calculateFee(nFeeNeededWithChange)) {
+                            return false;
+                        }
+
+                        // Remove the change output again, it will be added later again if required
+                        txNew.vout.pop_back();
+
+                        // Set the change amount properly
+                        newTxOut.nValue = nAmountLeft - nFeeNeededWithChange;
 
                         // Never create dust outputs; if we would, just
                         // add the dust to the fee.
@@ -3877,21 +3955,11 @@ bool CWallet::CreateTransaction(const std::vector<CRecipient>& vecSend, CWalletT
 
                             std::vector<CTxOut>::iterator position = txNew.vout.begin()+nChangePosInOut;
                             txNew.vout.insert(position, newTxOut);
+                            nFeeNeeded = nFeeNeededWithChange;
                         }
                     }
                 } else {
                     nChangePosInOut = -1;
-                }
-
-                // Fill vin
-                //
-                // Note how the sequence number is set to max()-1 so that the
-                // nLockTime set above actually works.
-                txNew.vin.clear();
-                for (const auto& coin : setCoins) {
-                    CTxIn txin = CTxIn(coin.outpoint,CScript(),
-                                              CTxIn::SEQUENCE_FINAL - 1);
-                    txNew.vin.push_back(txin);
                 }
 
                 // If no specific change position was requested, apply BIP69
@@ -3912,51 +3980,6 @@ bool CWallet::CreateTransaction(const std::vector<CRecipient>& vecSend, CWalletT
                         }
                         i++;
                     }
-                }
-
-                // Fill in dummy signatures for fee calculation.
-                int nIn = 0;
-                for (const auto& coin : setCoins)
-                {
-                    const CScript& scriptPubKey = coin.txout.scriptPubKey;
-                    SignatureData sigdata;
-                    if (!ProduceSignature(DummySignatureCreator(this), scriptPubKey, sigdata))
-                    {
-                        strFailReason = _("Signing transaction failed");
-                        return false;
-                    } else {
-                        UpdateTransaction(txNew, nIn, sigdata);
-                    }
-
-                    nIn++;
-                }
-
-                nBytes = ::GetSerializeSize(txNew, SER_NETWORK, PROTOCOL_VERSION);
-
-                if (nExtraPayloadSize != 0) {
-                    // account for extra payload in fee calculation
-                    nBytes += GetSizeOfCompactSize(nExtraPayloadSize) + nExtraPayloadSize;
-                }
-
-                if (nBytes > MAX_STANDARD_TX_SIZE) {
-                    // Do not create oversized transactions (bad-txns-oversize).
-                    strFailReason = _("Transaction too large");
-                    return false;
-                }
-
-                // Remove scriptSigs to eliminate the fee calculation dummy signatures
-                for (auto& txin : txNew.vin) {
-                    txin.scriptSig = CScript();
-                }
-
-                nFeeNeeded = GetMinimumFee(nBytes, coin_control, ::mempool, ::feeEstimator, &feeCalc);
-
-                // If we made it here and we aren't even able to meet the relay fee on the next pass, give up
-                // because we must be at the maximum allowed fee.
-                if (nFeeNeeded < ::minRelayTxFee.GetFee(nBytes))
-                {
-                    strFailReason = _("Transaction too large for fee policy");
-                    return false;
                 }
 
                 if (nFeeRet >= nFeeNeeded) {
