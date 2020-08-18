@@ -3739,7 +3739,6 @@ bool CWallet::CreateTransaction(const std::vector<CRecipient>& vecSend, CWalletT
     unsigned int nBytes;
     {
         std::set<CInputCoin> setCoins;
-        std::vector<CTxDSIn> vecTxDSInTmp;
         LOCK2(cs_main, mempool.cs);
         LOCK(cs_wallet);
         {
@@ -3888,18 +3887,16 @@ bool CWallet::CreateTransaction(const std::vector<CRecipient>& vecSend, CWalletT
                 //
                 // Note how the sequence number is set to max()-1 so that the
                 // nLockTime set above actually works.
-                vecTxDSInTmp.clear();
+                txNew.vin.clear();
                 for (const auto& coin : setCoins) {
                     CTxIn txin = CTxIn(coin.outpoint,CScript(),
                                               CTxIn::SEQUENCE_FINAL - 1);
-                    vecTxDSInTmp.push_back(CTxDSIn(txin, coin.txout.scriptPubKey));
                     txNew.vin.push_back(txin);
                 }
 
                 // If no specific change position was requested, apply BIP69
                 if (nChangePosRequest == -1) {
                     std::sort(txNew.vin.begin(), txNew.vin.end(), CompareInputBIP69());
-                    std::sort(vecTxDSInTmp.begin(), vecTxDSInTmp.end(), CompareInputBIP69());
                     std::sort(txNew.vout.begin(), txNew.vout.end(), CompareOutputBIP69());
                 }
 
@@ -3919,9 +3916,9 @@ bool CWallet::CreateTransaction(const std::vector<CRecipient>& vecSend, CWalletT
 
                 // Fill in dummy signatures for fee calculation.
                 int nIn = 0;
-                for (const auto& txdsin : vecTxDSInTmp)
+                for (const auto& coin : setCoins)
                 {
-                    const CScript& scriptPubKey = txdsin.prevPubKey;
+                    const CScript& scriptPubKey = coin.txout.scriptPubKey;
                     SignatureData sigdata;
                     if (!ProduceSignature(DummySignatureCreator(this), scriptPubKey, sigdata))
                     {
@@ -4033,9 +4030,9 @@ bool CWallet::CreateTransaction(const std::vector<CRecipient>& vecSend, CWalletT
         {
             CTransaction txNewConst(txNew);
             int nIn = 0;
-            for(const auto& txdsin : vecTxDSInTmp)
+            for(const auto& coin : setCoins)
             {
-                const CScript& scriptPubKey = txdsin.prevPubKey;
+                const CScript& scriptPubKey = coin.txout.scriptPubKey;
                 SignatureData sigdata;
 
                 if (!ProduceSignature(TransactionSignatureCreator(this, &txNewConst, nIn, SIGHASH_ALL), scriptPubKey, sigdata))
