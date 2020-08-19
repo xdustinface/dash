@@ -204,7 +204,7 @@ CTransactionBuilderOutput* CTransactionBuilder::AddOutput(CAmount nAmountOutput)
 unsigned int CTransactionBuilder::GetBytesTotal() const
 {
     // Adding other outputs can change the serialized size of the vout size hence + GetSizeOfCompactSizeDiff()
-   return nBytesBase + vecOutputs.size() * nBytesOutput + ::GetSizeOfCompactSizeDiff(0, vecOutputs.size());
+    return nBytesBase + vecOutputs.size() * nBytesOutput + ::GetSizeOfCompactSizeDiff(0, vecOutputs.size());
 }
 
 CAmount CTransactionBuilder::GetAmountLeft(const CAmount nAmountInitial, const CAmount nAmountUsed, const CAmount nFee)
@@ -289,7 +289,7 @@ bool CTransactionBuilder::Commit(std::string& strResult)
         nBytesAdditional = nBytesOutput + GetSizeOfCompactSizeDiff(1);
     }
 
-    // If the calculated fee does not match the fee returned by CreateTransaction aka if this check fails something is messed!
+    // If the calculated fee does not match the fee returned by CreateTransaction aka if this check fails something is wrong!
     CAmount nFeeCalc = GetFee(GetBytesTotal() + nBytesAdditional) + nFeeAdditional;
     if (nFeeRet != nFeeCalc) {
         strResult = strprintf("Fee validation failed -> nFeeRet: %d, nFeeCalc: %d, nFeeAdditional: %d, nBytesAdditional: %d, %s", nFeeRet, nFeeCalc, nFeeAdditional, nBytesAdditional, ToString());
