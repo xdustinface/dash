@@ -802,6 +802,16 @@ private:
      */
     const CBlockIndex* m_last_block_processed = nullptr;
 
+    // Pulled from wallet DB ("ps_salt") and used when mixing a random number of rounds.
+    // This salt is needed to prevent an attacker from learning how many extra times
+    // the input was mixed based only on information in the blockchain.
+    uint256 nPrivateSendSalt;
+
+    /**
+     * Fetches PrivateSend salt from database or generates and saves a new one if no salt was found in the db
+     */
+    void GetPrivateSendSalt();
+
 public:
     /*
      * Main wallet lock.
@@ -1220,16 +1230,6 @@ public:
 
     void NotifyTransactionLock(const CTransaction &tx, const llmq::CInstantSendLock& islock) override;
     void NotifyChainLock(const CBlockIndex* pindexChainLock, const llmq::CChainLockSig& clsig) override;
-
-    /**
-     * Fetches PrivateSend salt from database
-     */
-    const uint256 GetPrivateSendSalt();
-
-    /**
-    * Writes PrivateSend salt to database
-    */
-    bool WritePrivateSendSalt(uint256& salt);
 
     /**
      * Blocks until the wallet state is up-to-date to /at least/ the current

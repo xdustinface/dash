@@ -2843,12 +2843,7 @@ void CWallet::AvailableCoins(std::vector<COutput> &vCoins, bool fOnlySafe, const
                 // Otherwise, we should mix again 50% of the time, this results in an exponential decay
                 // N rounds 50% N+1 25% N+2 12.5%... until we reach N + GetRandomRounds() rounds where we stop
                 else if (nRounds < CPrivateSendClientOptions::GetRounds() + CPrivateSendClientOptions::GetRandomRounds()) {
-                    // This salt is needed to prevent an attacker from learning how many extra times this input was mixed
-                    // based only on information in the blockchain
-                    auto psMan = privateSendClientManagers.at(GetName());
-                    uint256 salt;
-                    if (psMan) salt = psMan->nSalt;
-                    if (Hash(wtxid.begin(), wtxid.end(), salt.begin(), salt.end()).GetCheapHash() % 2 == 0) {
+                    if (Hash(wtxid.begin(), wtxid.end(), nPrivateSendSalt.begin(), nPrivateSendSalt.end()).GetCheapHash() % 2 == 0) {
                         found = true;
                     }
                 }
@@ -2968,18 +2963,19 @@ const CTxOut& CWallet::FindNonChangeParentOutput(const CTransaction& tx, int out
     return ptx->vout[n];
 }
 
-const uint256 CWallet::GetPrivateSendSalt()
+void CWallet::GetPrivateSendSalt()
 {
-    uint256 ps_salt;
-    WalletBatch batch(*database);
-    batch.ReadPrivateSendSalt(ps_salt);
-    return ps_salt;
-}
+    // Avoid fetching it multiple times
+    assert(nPrivateSendSalt.IsNull());
 
-bool CWallet::WritePrivateSendSalt(uint256 &salt)
-{
     WalletBatch batch(*database);
-    return batch.WritePrivateSendSalt(salt);
+    batch.ReadPrivateSendSalt(nPrivateSendSalt);
+
+    while (nPrivateSendSalt.IsNull()) {
+        // We never generated/saved it
+        nPrivateSendSalt = GetRandHash();
+        batch.WritePrivateSendSalt(nPrivateSendSalt);
+    }
 }
 
 static void ApproximateBestSubset(const std::vector<CInputCoin>& vValue, const CAmount& nTotalLower, const CAmount& nTargetValue,
@@ -4224,6 +4220,8 @@ DBErrors CWallet::LoadWallet(bool& fFirstRunRet)
             }
         }
     }
+
+    GetPrivateSendSalt();
 
     if (nLoadWalletRet != DBErrors::LOAD_OK)
         return nLoadWalletRet;

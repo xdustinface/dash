@@ -173,7 +173,7 @@ bool WalletBatch::ReadPrivateSendSalt(uint256& salt)
     return m_batch.Read(std::string("ps_salt"), salt);
 }
 
-bool WalletBatch::WritePrivateSendSalt(uint256& salt)
+bool WalletBatch::WritePrivateSendSalt(const uint256& salt)
 {
     return WriteIC(std::string("ps_salt"), salt);
 }
