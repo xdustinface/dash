@@ -1681,6 +1681,25 @@ bool CWallet::IsDenominated(const COutPoint& outpoint) const
     return CPrivateSend::IsDenominatedAmount(it->second.tx->vout[outpoint.n].nValue);
 }
 
+bool CWallet::IsFullyMixed(const COutPoint& outpoint) const
+{
+    // Mix again if we don't have N rounds yet
+    int nRounds = GetRealOutpointPrivateSendRounds(outpoint);
+    if (nRounds < CPrivateSendClientOptions::GetRounds()) return false;
+
+    // Try to mix a "random" number of rounds more than minimum.
+    // If we have already mixed N + MaxOffset rounds, don't mix again.
+    // Otherwise, we should mix again 50% of the time, this results in an exponential decay
+    // N rounds 50% N+1 25% N+2 12.5%... until we reach N + GetRandomRounds() rounds where we stop.
+    if (nRounds < CPrivateSendClientOptions::GetRounds() + CPrivateSendClientOptions::GetRandomRounds()) {
+        if (Hash(outpoint.hash.begin(), outpoint.hash.end(), nPrivateSendSalt.begin(), nPrivateSendSalt.end()).GetCheapHash() % 2 == 0) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
 isminetype CWallet::IsMine(const CTxOut& txout) const
 {
     return ::IsMine(*this, txout.scriptPubKey);
@@ -2363,8 +2382,7 @@ CAmount CWalletTx::GetAnonymizedCredit(bool fUseCache) const
 
         if (pwallet->IsSpent(hashTx, i) || !CPrivateSend::IsDenominatedAmount(txout.nValue)) continue;
 
-        const int nRounds = pwallet->GetCappedOutpointPrivateSendRounds(outpoint);
-        if (nRounds >= CPrivateSendClientOptions::GetRounds()) {
+        if (pwallet->IsFullyMixed(outpoint)) {
             nCredit += pwallet->GetCredit(txout, ISMINE_SPENDABLE);
             if (!MoneyRange(nCredit))
                 throw std::runtime_error(std::string(__func__) + ": value out of range");
@@ -2830,24 +2848,10 @@ void CWallet::AvailableCoins(std::vector<COutput> &vCoins, bool fOnlySafe, const
             bool found = false;
             if (nCoinType == CoinType::ONLY_FULLY_MIXED) {
                 if (!CPrivateSend::IsDenominatedAmount(pcoin->tx->vout[i].nValue)) continue;
-                int nRounds = GetRealOutpointPrivateSendRounds(COutPoint(wtxid, i));
-                found = nRounds >= CPrivateSendClientOptions::GetRounds();
+                found = IsFullyMixed(COutPoint(wtxid, i));
             } else if(nCoinType == CoinType::ONLY_READY_TO_MIX) {
                 if (!CPrivateSend::IsDenominatedAmount(pcoin->tx->vout[i].nValue)) continue;
-                int nRounds = GetRealOutpointPrivateSendRounds(COutPoint(wtxid, i));
-
-                // Mix again if we don't have N rounds yet
-                if (nRounds < CPrivateSendClientOptions::GetRounds()) found = true;
-                // try to mix a "random" number of rounds more than minimum
-                // If we have already mixed N + MaxOffset rounds, don't mix again.
-                // Otherwise, we should mix again 50% of the time, this results in an exponential decay
-                // N rounds 50% N+1 25% N+2 12.5%... until we reach N + GetRandomRounds() rounds where we stop
-                else if (nRounds < CPrivateSendClientOptions::GetRounds() + CPrivateSendClientOptions::GetRandomRounds()) {
-                    if (Hash(wtxid.begin(), wtxid.end(), nPrivateSendSalt.begin(), nPrivateSendSalt.end()).GetCheapHash() % 2 == 0) {
-                        found = true;
-                    }
-                }
-
+                found = !IsFullyMixed(COutPoint(wtxid, i));
             } else if(nCoinType == CoinType::ONLY_NONDENOMINATED) {
                 if (CPrivateSend::IsCollateralAmount(pcoin->tx->vout[i].nValue)) continue; // do not use collateral amounts
                 found = !CPrivateSend::IsDenominatedAmount(pcoin->tx->vout[i].nValue);
@@ -3243,8 +3247,7 @@ bool CWallet::SelectCoins(const std::vector<COutput>& vAvailableCoins, const CAm
             if (nCoinType == CoinType::ONLY_FULLY_MIXED) {
                 // Make sure to include mixed preset inputs only,
                 // even if some non-mixed inputs were manually selected via CoinControl
-                int nRounds = GetRealOutpointPrivateSendRounds(outpoint);
-                if (nRounds < CPrivateSendClientOptions::GetRounds()) continue;
+                if (!IsFullyMixed(outpoint)) continue;
             }
             nValueFromPresetInputs += pcoin->tx->vout[outpoint.n].nValue;
             setPresetCoins.insert(CInputCoin(pcoin, outpoint.n));
@@ -3447,7 +3450,7 @@ bool CWallet::SelectCoinsGroupedByAddresses(std::vector<CompactTallyItem>& vecTa
                 // otherwise they will just lead to higher fee / lower priority
                 if(wtx.tx->vout[i].nValue <= nSmallestDenom/10) continue;
                 // ignore mixed
-                if (GetCappedOutpointPrivateSendRounds(COutPoint(outpoint.hash, i)) >= CPrivateSendClientOptions::GetRounds()) continue;
+                if (IsFullyMixed(COutPoint(outpoint.hash, i))) continue;
             }
 
             if (itTallyItem == mapTally.end()) {
