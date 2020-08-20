@@ -3995,7 +3995,20 @@ bool CWallet::CreateTransaction(const std::vector<CRecipient>& vecSend, CWalletT
                 // If subtracting fee from recipients, we now know what fee we
                 // need to subtract, we have no reason to reselect inputs
                 if (nSubtractFeeFromAmount > 0) {
+                    // If we are in here the second time it means we already subtracted the fee from the
+                    // output(s) and there weren't any issues while doing that. So the transaction is ready now
+                    // and we can break.
+                    if (!pick_new_inputs) {
+                        break;
+                    }
                     pick_new_inputs = false;
+                }
+
+                // If nAmountLeft == nFeeRet it means we either added nChange to nFeeRet since nChange was considered to be dust
+                // or the input exactly matches output + fee.
+                // Either way, we used the total amount of the inputs we picked and the transaction is ready.
+                if (nAmountLeft == nFeeRet) {
+                    break;
                 }
             }
         }
