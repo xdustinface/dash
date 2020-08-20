@@ -3960,6 +3960,13 @@ bool CWallet::CreateTransaction(const std::vector<CRecipient>& vecSend, CWalletT
                     nChangePosInOut = -1;
                 }
 
+                if (nChange < 0 && !nSubtractFeeFromAmount) {
+                    // nValueIn is not enough to cover nValueToSelect + nFeeRet. Add the missing amount abs(nChange) to the fee
+                    // and try to select other inputs in the next loop to cover the full required amount.
+                    nFeeRet += abs(nChange);
+                    continue;
+                }
+
                 // If no specific change position was requested, apply BIP69
                 if (nChangePosRequest == -1) {
                     std::sort(txNew.vin.begin(), txNew.vin.end(), CompareInputBIP69());
