@@ -3734,7 +3734,6 @@ bool CWallet::CreateTransaction(const std::vector<CRecipient>& vecSend, CWalletT
     assert(txNew.nLockTime <= (unsigned int)chainActive.Height());
     assert(txNew.nLockTime < LOCKTIME_THRESHOLD);
     FeeCalculation feeCalc;
-    CAmount nFeeNeeded;
     unsigned int nBytes;
     {
         std::set<CInputCoin> setCoins;
@@ -3772,8 +3771,6 @@ bool CWallet::CreateTransaction(const std::vector<CRecipient>& vecSend, CWalletT
 
                 scriptChange = GetScriptForDestination(vchPubKey.GetID());
             }
-            CTxOut change_prototype_txout(0, scriptChange);
-            size_t change_prototype_size = GetSerializeSize(change_prototype_txout, SER_DISK, 0);
 
             CFeeRate discard_rate = GetDiscardRate(::feeEstimator);
             nFeeRet = 0;
@@ -3901,13 +3898,13 @@ bool CWallet::CreateTransaction(const std::vector<CRecipient>& vecSend, CWalletT
                     return true;
                 };
 
-                if (!calculateFee(nFeeNeeded)) {
+                if (!calculateFee(nFeeRet)) {
                     return false;
                 }
 
                 CTxOut newTxOut;
                 const CAmount nAmountLeft = nValueIn - nValueToSelect;
-                CAmount nChange = nAmountLeft - nFeeNeeded;
+                CAmount nChange = nAmountLeft - nFeeRet;
 
                 if (nChange > 0)
                 {
@@ -3955,8 +3952,8 @@ bool CWallet::CreateTransaction(const std::vector<CRecipient>& vecSend, CWalletT
 
                             std::vector<CTxOut>::iterator position = txNew.vout.begin()+nChangePosInOut;
                             txNew.vout.insert(position, newTxOut);
-                            nFeeNeeded = nFeeNeededWithChange;
-                            nChange = nAmountLeft - nFeeNeeded;
+                            nFeeRet = nFeeNeededWithChange;
+                            nChange = nAmountLeft - nFeeRet;
                         }
                     }
                 } else {
@@ -3983,56 +3980,9 @@ bool CWallet::CreateTransaction(const std::vector<CRecipient>& vecSend, CWalletT
                     }
                 }
 
-                if (nFeeRet >= nFeeNeeded) {
-                    // Reduce fee to only the needed amount if possible. This
-                    // prevents potential overpayment in fees if the coins
-                    // selected to meet nFeeNeeded result in a transaction that
-                    // requires less fee than the prior iteration.
-
-                    // If we have no change and a big enough excess fee, then
-                    // try to construct transaction again only without picking
-                    // new inputs. We now know we only need the smaller fee
-                    // (because of reduced tx size) and so we should add a
-                    // change output. Only try this once.
-                    if (nChangePosInOut == -1 && nSubtractFeeFromAmount == 0 && pick_new_inputs) {
-                        unsigned int tx_size_with_change = nBytes + change_prototype_size + 2; // Add 2 as a buffer in case increasing # of outputs changes compact size
-                        CAmount fee_needed_with_change = GetMinimumFee(tx_size_with_change, coin_control, ::mempool, ::feeEstimator, nullptr);
-                        CAmount minimum_value_for_change = GetDustThreshold(change_prototype_txout, discard_rate);
-                        if (nFeeRet >= fee_needed_with_change + minimum_value_for_change) {
-                            pick_new_inputs = false;
-                            nFeeRet = fee_needed_with_change;
-                            continue;
-                        }
-                    }
-
-                    // If we have change output already, just increase it
-                    if (nFeeRet > nFeeNeeded && nChangePosInOut != -1 && nSubtractFeeFromAmount == 0) {
-                        CAmount extraFeePaid = nFeeRet - nFeeNeeded;
-                        std::vector<CTxOut>::iterator change_position = txNew.vout.begin()+nChangePosInOut;
-                        change_position->nValue += extraFeePaid;
-                        nFeeRet -= extraFeePaid;
-                    }
-                    break; // Done, enough fee included.
-                }
-                else if (!pick_new_inputs) {
-                    // This shouldn't happen, we should have had enough excess
-                    // fee to pay for the new output and still meet nFeeNeeded
-                    // Or we should have just subtracted fee from recipients and
-                    // nFeeNeeded should not have changed
-                    strFailReason = _("Transaction fee and change calculation failed");
-                    return false;
-                }
-
-                // Try to reduce change to include necessary fee
+                // We have a change output, means we can just break as the transaction is done.
                 if (nChangePosInOut != -1 && nSubtractFeeFromAmount == 0) {
-                    CAmount additionalFeeNeeded = nFeeNeeded - nFeeRet;
-                    std::vector<CTxOut>::iterator change_position = txNew.vout.begin()+nChangePosInOut;
-                    // Only reduce change if remaining amount is still a large enough output.
-                    if (change_position->nValue >= MIN_FINAL_CHANGE + additionalFeeNeeded) {
-                        change_position->nValue -= additionalFeeNeeded;
-                        nFeeRet += additionalFeeNeeded;
-                        break; // Done, able to increase fee from change
-                    }
+                    break;
                 }
 
                 // If subtracting fee from recipients, we now know what fee we
@@ -4040,10 +3990,6 @@ bool CWallet::CreateTransaction(const std::vector<CRecipient>& vecSend, CWalletT
                 if (nSubtractFeeFromAmount > 0) {
                     pick_new_inputs = false;
                 }
-
-                // Include more fee and try again.
-                nFeeRet = nFeeNeeded;
-                continue;
             }
         }
 
@@ -4090,8 +4036,8 @@ bool CWallet::CreateTransaction(const std::vector<CRecipient>& vecSend, CWalletT
         }
     }
 
-    LogPrintf("Fee Calculation: Fee:%d Bytes:%u Needed:%d Tgt:%d (requested %d) Reason:\"%s\" Decay %.5f: Estimation: (%g - %g) %.2f%% %.1f/(%.1f %d mem %.1f out) Fail: (%g - %g) %.2f%% %.1f/(%.1f %d mem %.1f out)\n",
-              nFeeRet, nBytes, nFeeNeeded, feeCalc.returnedTarget, feeCalc.desiredTarget, StringForFeeReason(feeCalc.reason), feeCalc.est.decay,
+    LogPrintf("Fee Calculation: Fee:%d Bytes:%u Tgt:%d (requested %d) Reason:\"%s\" Decay %.5f: Estimation: (%g - %g) %.2f%% %.1f/(%.1f %d mem %.1f out) Fail: (%g - %g) %.2f%% %.1f/(%.1f %d mem %.1f out)\n",
+              nFeeRet, nBytes, feeCalc.returnedTarget, feeCalc.desiredTarget, StringForFeeReason(feeCalc.reason), feeCalc.est.decay,
               feeCalc.est.pass.start, feeCalc.est.pass.end,
               100 * feeCalc.est.pass.withinTarget / (feeCalc.est.pass.totalConfirmed + feeCalc.est.pass.inMempool + feeCalc.est.pass.leftMempool),
               feeCalc.est.pass.withinTarget, feeCalc.est.pass.totalConfirmed, feeCalc.est.pass.inMempool, feeCalc.est.pass.leftMempool,
