@@ -1583,9 +1583,11 @@ int CWallet::GetRealOutpointPrivateSendRounds(const COutPoint& outpoint, int nRo
 {
     LOCK(cs_wallet);
 
-    if (nRounds >= MAX_PRIVATESEND_ROUNDS) {
-        // there can only be MAX_PRIVATESEND_ROUNDS rounds max
-        return MAX_PRIVATESEND_ROUNDS - 1;
+    const int nRoundsMax = MAX_PRIVATESEND_ROUNDS + CPrivateSendClientOptions::GetRandomRounds();
+
+    if (nRounds >= nRoundsMax) {
+        // there can only be nRoundsMax rounds max
+        return nRoundsMax - 1;
     }
 
     auto pair = mapOutpointRoundsCache.emplace(outpoint, -10);
@@ -1651,7 +1653,7 @@ int CWallet::GetRealOutpointPrivateSendRounds(const COutPoint& outpoint, int nRo
         }
     }
     *nRoundsRef = fDenomFound
-            ? (nShortest >= MAX_PRIVATESEND_ROUNDS - 1 ? MAX_PRIVATESEND_ROUNDS : nShortest + 1) // good, we a +1 to the shortest one but only MAX_PRIVATESEND_ROUNDS rounds max allowed
+            ? (nShortest >= nRoundsMax - 1 ? nRoundsMax : nShortest + 1) // good, we a +1 to the shortest one but only nRoundsMax rounds max allowed
             : 0;            // too bad, we are the fist one in that chain
     LogPrint(BCLog::PRIVATESEND, "%s UPDATED   %-70s %3d\n", __func__, outpoint.ToStringShort(), *nRoundsRef);
     return *nRoundsRef;
