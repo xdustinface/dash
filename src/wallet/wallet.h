@@ -802,9 +802,10 @@ private:
      */
     const CBlockIndex* m_last_block_processed = nullptr;
 
-    // Pulled from wallet DB ("ps_salt") and used when mixing a random number of rounds.
-    // This salt is needed to prevent an attacker from learning how many extra times
-    // the input was mixed based only on information in the blockchain.
+    /** Pulled from wallet DB ("ps_salt") and used when mixing a random number of rounds.
+     *  This salt is needed to prevent an attacker from learning how many extra times
+     *  the input was mixed based only on information in the blockchain.
+     */
     uint256 nPrivateSendSalt;
 
     /**
