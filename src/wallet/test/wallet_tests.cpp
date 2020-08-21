@@ -4,6 +4,7 @@
 
 #include <wallet/wallet.h>
 
+#include <iostream>
 #include <memory>
 #include <set>
 #include <stdint.h>
@@ -23,6 +24,7 @@
 extern UniValue importmulti(const JSONRPCRequest& request);
 extern UniValue dumpwallet(const JSONRPCRequest& request);
 extern UniValue importwallet(const JSONRPCRequest& request);
+extern UniValue getnewaddress(const JSONRPCRequest& request);
 
 // how many times to run all the tests to have a chance to catch errors that only show up with particular random shuffles
 #define RUN_TESTS 100
@@ -695,6 +697,348 @@ BOOST_FIXTURE_TEST_CASE(ListCoins, ListCoinsTestingSetup)
     BOOST_CHECK_EQUAL(list.size(), 1);
     BOOST_CHECK_EQUAL(boost::get<CKeyID>(list.begin()->first).ToString(), coinbaseAddress);
     BOOST_CHECK_EQUAL(list.begin()->second.size(), 2);
+}
+
+class CreateTransactionTestSetup : public TestChain100Setup
+{
+public:
+    enum ChangeTest {
+        Skip,
+        NoChangeExpected,
+        ChangeExpected,
+    };
+
+    CreateTransactionTestSetup()
+    {
+        CreateAndProcessBlock({}, GetScriptForRawPubKey(coinbaseKey.GetPubKey()));
+        wallet = MakeUnique<CWallet>("mock", WalletDatabase::CreateMock());
+        bool firstRun;
+        wallet->LoadWallet(firstRun);
+        AddWallet(wallet.get());
+        AddKey(*wallet, coinbaseKey);
+        WalletRescanReserver reserver(wallet.get());
+        reserver.reserve();
+        wallet->ScanForWalletTransactions(chainActive.Genesis(), nullptr, reserver);
+    }
+
+    ~CreateTransactionTestSetup()
+    {
+        RemoveWallet(wallet.get());
+    }
+
+    std::unique_ptr<CWallet> wallet;
+    CCoinControl coinControl;
+
+    bool CreateTransaction(const std::vector<std::pair<CAmount, bool>>& vecEntries, bool fCreateShouldSucceed = true, ChangeTest changeTest = ChangeTest::Skip)
+    {
+        return CreateTransaction(vecEntries, -1, fCreateShouldSucceed, changeTest);
+    }
+
+    bool CreateTransaction(const std::vector<std::pair<CAmount, bool>>& vecEntries, int nChangePosRequest = -1, bool fCreateShouldSucceed = true, ChangeTest changeTest = ChangeTest::Skip)
+    {
+        CWalletTx wtx;
+        CReserveKey reservekey(wallet.get());
+        CAmount nFeeRet;
+        int nChangePos = nChangePosRequest;
+        std::string strError;
+
+        auto checkEqual = [&](bool l, bool r) -> bool {
+            BOOST_CHECK_EQUAL(l, r);
+            return l == r;
+        };
+
+        // Verify the creation succeeds if expected and fails if not.
+        if (!checkEqual(fCreateShouldSucceed, wallet->CreateTransaction(GetRecipients(vecEntries), wtx, reservekey, nFeeRet, nChangePos, strError, coinControl))) {
+            return false;
+        }
+        if (!fCreateShouldSucceed) {
+            // No need to evaluate the following if the creation should have failed.
+            return true;
+        }
+        // Verify there is no change output if there wasn't any expected
+        bool fChangeTestPassed = changeTest == ChangeTest::Skip ||
+                                 (changeTest == ChangeTest::ChangeExpected && nChangePos != -1) ||
+                                 (changeTest == ChangeTest::NoChangeExpected && nChangePos == -1);
+        BOOST_CHECK(fChangeTestPassed);
+        if (!fChangeTestPassed) {
+            return false;
+        }
+        // Verify the change is at the requested position if there was a request
+        if (nChangePosRequest != -1 && !checkEqual(nChangePosRequest, nChangePos)) {
+            return false;
+        }
+        // Verify the number of requested outputs does match the resulting outputs
+        checkEqual(wtx.tx->vout.size() - (nChangePos != -1 ? 1 : 0), vecEntries.size());
+        return true;
+    }
+
+    std::vector<CRecipient> GetRecipients(const std::vector<std::pair<CAmount, bool>>& vecEntries)
+    {
+        std::vector<CRecipient> vecRecipients;
+        for (auto entry : vecEntries) {
+            vecRecipients.push_back({GetScriptForDestination(DecodeDestination(getnewaddress(JSONRPCRequest()).get_str())), entry.first, entry.second});
+        }
+        return vecRecipients;
+    }
+
+    std::vector<COutPoint> GetCoins(const std::vector<std::pair<CAmount, bool>>& vecEntries)
+    {
+        CWalletTx wtx;
+        CReserveKey reserveKey(wallet.get());
+        CAmount nFeeRet;
+        int nChangePosRet = -1;
+        std::string strError;
+        CCoinControl coinControl;
+        BOOST_CHECK(wallet->CreateTransaction(GetRecipients(vecEntries), wtx, reserveKey, nFeeRet, nChangePosRet, strError, coinControl));
+        CValidationState state;
+        BOOST_CHECK(wallet->CommitTransaction(wtx, reserveKey, nullptr, state));
+        CMutableTransaction blocktx;
+        {
+            LOCK(wallet->cs_wallet);
+            blocktx = CMutableTransaction(*wallet->mapWallet.at(wtx.tx->GetHash()).tx);
+        }
+        CreateAndProcessBlock({CMutableTransaction(blocktx)}, GetScriptForRawPubKey(coinbaseKey.GetPubKey()));
+        LOCK(cs_main);
+        LOCK(wallet->cs_wallet);
+        auto it = wallet->mapWallet.find(wtx.GetHash());
+        BOOST_CHECK(it != wallet->mapWallet.end());
+        it->second.SetMerkleBranch(chainActive.Tip(), 1);
+        wtx = it->second;
+
+        std::vector<COutPoint> vecOutpoints;
+        size_t n;
+        for (n = 0; n < wtx.tx->vout.size(); ++n) {
+            if (nChangePosRet != -1 && n == nChangePosRet) {
+                // Skip the change output to only return the requested coins
+                continue;
+            }
+            vecOutpoints.push_back(COutPoint(wtx.GetHash(), n));
+        }
+        assert(vecOutpoints.size() == vecEntries.size());
+        return vecOutpoints;
+    }
+};
+
+BOOST_FIXTURE_TEST_CASE(CreateTransactionTest, CreateTransactionTestSetup)
+{
+    // Try to send dust
+    BOOST_CHECK(CreateTransaction({{10, false}}, false));
+    BOOST_CHECK(CreateTransaction({{10, true}}, false));
+    BOOST_CHECK(CreateTransaction({{100, false}}, false));
+    BOOST_CHECK(CreateTransaction({{100, true}}, false));
+    BOOST_CHECK(CreateTransaction({{10000, true}, {100, true}}, false));
+    BOOST_CHECK(CreateTransaction({{10000, false}, {100, false}}, false));
+
+    auto runTest = [&](const int nTestId, const CAmount nFeeRate, const std::map<int, std::pair<bool, ChangeTest>>& mapExpected) {
+        coinControl.m_feerate = CFeeRate(nFeeRate);
+        const std::map<int, std::vector<std::pair<CAmount, bool>>> mapTestCases{
+            {0, {{1000, false}}},
+            {1, {{1000, true}}},
+            {2, {{10000, false}}},
+            {3, {{10000, true}}},
+            {4, {{34000, false}, {40000, false}}},
+            {5, {{37000, false}, {40000, false}}},
+            {6, {{50000, false}, {50000, false}}},
+            {7, {{50000, true}, {50000, false}}},
+            {8, {{50000, false}, {50001, false}}},
+            {9, {{50000, true}, {50001, true}}},
+            {10, {{100000, false}}},
+            {11, {{100000, true}}},
+            {12, {{100001, false}}},
+            {13, {{100001, true}}}
+        };
+        assert(mapTestCases.size() == mapExpected.size());
+        for (int i = 0; i < mapTestCases.size(); ++i) {
+            if (!CreateTransaction(mapTestCases.at(i), mapExpected.at(i).first, mapExpected.at(i).second)) {
+                std::cout << strprintf("CreateTransactionTest failed at: %d - %d\n", nTestId, i) << std::endl;
+            }
+        }
+    };
+
+    // First run the tests with only one input containing 100k duffs
+    {
+        coinControl.SetNull();
+        coinControl.Select(GetCoins({{100000, false}})[0]);
+
+        // Start with fallback feerate
+        runTest(1, DEFAULT_FALLBACK_FEE, {
+            {0, {true, ChangeTest::ChangeExpected}},
+            {1, {true, ChangeTest::ChangeExpected}},
+            {2, {true, ChangeTest::ChangeExpected}},
+            {3, {true, ChangeTest::ChangeExpected}},
+            {4, {true, ChangeTest::ChangeExpected}},
+            {5, {true, ChangeTest::ChangeExpected}},
+            {6, {false, ChangeTest::Skip}},
+            {7, {true, ChangeTest::NoChangeExpected}},
+            {8, {false, ChangeTest::Skip}},
+            {9, {true, ChangeTest::NoChangeExpected}},
+            {10, {false, ChangeTest::Skip}},
+            {11, {true, ChangeTest::NoChangeExpected}},
+            {12, {false, ChangeTest::Skip}},
+            {13, {true, ChangeTest::NoChangeExpected}}
+        });
+        // Now with 100x fallback feerate
+        runTest(2, DEFAULT_FALLBACK_FEE * 100, {
+            {0, {true, ChangeTest::ChangeExpected}},
+            {1, {false, ChangeTest::Skip}},
+            {2, {true, ChangeTest::ChangeExpected}},
+            {3, {false, ChangeTest::Skip}},
+            {4, {true, ChangeTest::NoChangeExpected}},
+            {5, {false, ChangeTest::Skip}},
+            {6, {false, ChangeTest::Skip}},
+            {7, {true, ChangeTest::NoChangeExpected}},
+            {8, {false, ChangeTest::Skip}},
+            {9, {true, ChangeTest::NoChangeExpected}},
+            {10, {false, ChangeTest::Skip}},
+            {11, {true, ChangeTest::NoChangeExpected}},
+            {12, {false, ChangeTest::Skip}},
+            {13, {true, ChangeTest::NoChangeExpected}}
+        });
+    }
+    // Now use 4 different inputs with a total of 100k duff
+    {
+        coinControl.SetNull();
+        auto setCoins = GetCoins({{1000, false}, {5000, false}, {10000, false}, {84000, false}});
+        for (auto coin : setCoins) {
+            coinControl.Select(coin);
+        }
+
+        // Start with fallback feerate
+        runTest(3, DEFAULT_FALLBACK_FEE, {
+            {0, {true, ChangeTest::ChangeExpected}},
+            {1, {false, ChangeTest::Skip}},
+            {2, {true, ChangeTest::ChangeExpected}},
+            {3, {true, ChangeTest::ChangeExpected}},
+            {4, {true, ChangeTest::ChangeExpected}},
+            {5, {true, ChangeTest::ChangeExpected}},
+            {6, {false, ChangeTest::Skip}},
+            {7, {true, ChangeTest::NoChangeExpected}},
+            {8, {false, ChangeTest::Skip}},
+            {9, {true, ChangeTest::NoChangeExpected}},
+            {10, {false, ChangeTest::Skip}},
+            {11, {true, ChangeTest::NoChangeExpected}},
+            {12, {false, ChangeTest::Skip}},
+            {13, {true, ChangeTest::NoChangeExpected}}
+        });
+        // Now with 100x fallback feerate
+        runTest(4, DEFAULT_FALLBACK_FEE * 100, {
+            {0, {true, ChangeTest::ChangeExpected}},
+            {1, {false, ChangeTest::Skip}},
+            {2, {true, ChangeTest::ChangeExpected}},
+            {3, {false, ChangeTest::Skip}},
+            {4, {false, ChangeTest::Skip}},
+            {5, {false, ChangeTest::Skip}},
+            {6, {false, ChangeTest::Skip}},
+            {7, {false, ChangeTest::Skip}},
+            {8, {false, ChangeTest::Skip}},
+            {9, {true, ChangeTest::NoChangeExpected}},
+            {10, {false, ChangeTest::Skip}},
+            {11, {true, ChangeTest::NoChangeExpected}},
+            {12, {false, ChangeTest::Skip}},
+            {13, {true, ChangeTest::NoChangeExpected}}
+        });
+    }
+
+    // Last use 10 equal inputs with a total of 100k duff
+    {
+        coinControl.SetNull();
+        auto setCoins = GetCoins({{10000, false}, {10000, false}, {10000, false}, {10000, false}, {10000, false},
+                                  {10000, false}, {10000, false}, {10000, false}, {10000, false}, {10000, false}});
+
+        for (auto coin : setCoins) {
+            coinControl.Select(coin);
+        }
+
+        // Start with fallback feerate
+        runTest(5, DEFAULT_FALLBACK_FEE, {
+            {0, {true, ChangeTest::ChangeExpected}},
+            {1, {false, ChangeTest::Skip}},
+            {2, {true, ChangeTest::ChangeExpected}},
+            {3, {true, ChangeTest::ChangeExpected}},
+            {4, {true, ChangeTest::ChangeExpected}},
+            {5, {true, ChangeTest::ChangeExpected}},
+            {6, {false, ChangeTest::Skip}},
+            {7, {true, ChangeTest::NoChangeExpected}},
+            {8, {false, ChangeTest::Skip}},
+            {9, {true, ChangeTest::NoChangeExpected}},
+            {10, {false, ChangeTest::Skip}},
+            {11, {true, ChangeTest::NoChangeExpected}},
+            {12, {false, ChangeTest::Skip}},
+            {13, {true, ChangeTest::NoChangeExpected}}
+        });
+        // Now with 100x fallback feerate
+        runTest(6, DEFAULT_FALLBACK_FEE * 100, {
+            {0, {false, ChangeTest::Skip}},
+            {1, {false, ChangeTest::Skip}},
+            {2, {false, ChangeTest::Skip}},
+            {3, {false, ChangeTest::Skip}},
+            {4, {false, ChangeTest::Skip}},
+            {5, {false, ChangeTest::Skip}},
+            {6, {false, ChangeTest::Skip}},
+            {7, {false, ChangeTest::Skip}},
+            {8, {false, ChangeTest::Skip}},
+            {9, {false, ChangeTest::Skip}},
+            {10, {false, ChangeTest::Skip}},
+            {11, {false, ChangeTest::Skip}},
+            {12, {false, ChangeTest::Skip}},
+            {13, {false, ChangeTest::Skip}}
+        });
+    }
+    // Some tests without selected coins in coinControl, let the wallet decide
+    // which inputs to use
+    {
+        coinControl.SetNull();
+        auto setCoins = GetCoins({{1000, false}, {1000, false}, {1000, false}, {1000, false}, {1000, false},
+                                  {1100, false}, {1200, false}, {1300, false}, {1400, false}, {1500, false},
+                                  {3000, false}, {3000, false}, {2000, false}, {2000, false}, {1000, false}});
+        // Lock all other coins which were already in the wallet
+        std::vector<COutput> vecAvailable;
+        wallet->AvailableCoins(vecAvailable);
+        for (auto coin : vecAvailable) {
+            auto out = COutPoint(coin.tx->GetHash(), coin.i);
+            if (std::find(setCoins.begin(), setCoins.end(), out) == setCoins.end()) {
+                wallet->LockCoin(out);
+            }
+        }
+
+        BOOST_CHECK(CreateTransaction({{100, false}}, false));
+        BOOST_CHECK(CreateTransaction({{1000, true}}, true));
+        BOOST_CHECK(CreateTransaction({{1100, false}}, true));
+        BOOST_CHECK(CreateTransaction({{1100, true}}, true));
+        BOOST_CHECK(CreateTransaction({{2200, false}}, true));
+        BOOST_CHECK(CreateTransaction({{3300, false}}, true));
+        BOOST_CHECK(CreateTransaction({{4400, false}}, true));
+        BOOST_CHECK(CreateTransaction({{5500, false}}, true));
+        BOOST_CHECK(CreateTransaction({{5500, true}}, true));
+        BOOST_CHECK(CreateTransaction({{6600, false}}, true));
+        BOOST_CHECK(CreateTransaction({{7700, false}}, true));
+        BOOST_CHECK(CreateTransaction({{8800, false}}, true));
+        BOOST_CHECK(CreateTransaction({{9900, false}}, true));
+        BOOST_CHECK(CreateTransaction({{9900, true}}, true));
+        BOOST_CHECK(CreateTransaction({{10000, false}}, true));
+        BOOST_CHECK(CreateTransaction({{10000, false}, {10000, false}}, false));
+        BOOST_CHECK(CreateTransaction({{10000, false}, {12500, true}}, true));
+        BOOST_CHECK(CreateTransaction({{10000, true}, {10000, true}}, true));
+        BOOST_CHECK(CreateTransaction({{1000, false}, {2000, false}, {3000, false}, {4000, false}}, true));
+        BOOST_CHECK(CreateTransaction({{1234, false}}, true));
+        BOOST_CHECK(CreateTransaction({{1234, false}, {4321, false}}, true));
+        BOOST_CHECK(CreateTransaction({{1234, false}, {4321, false}, {5678, false}}, true));
+        BOOST_CHECK(CreateTransaction({{1234, false}, {4321, false}, {5678, false}, {8765, false}}, false));
+        BOOST_CHECK(CreateTransaction({{1234, false}, {4321, false}, {5678, false}, {8765, true}}, true));
+        BOOST_CHECK(CreateTransaction({{1000000, false}}, false));
+
+        wallet->UnlockAllCoins();
+    }
+    // Test if the change output ends up at the requested position
+    {
+        coinControl.SetNull();
+        coinControl.Select(GetCoins({{100000, false}})[0]);
+
+        BOOST_CHECK(CreateTransaction({{25000, false}, {25000, false}, {25000, false}}, 0, true, ChangeTest::ChangeExpected));
+        BOOST_CHECK(CreateTransaction({{25000, false}, {25000, false}, {25000, false}}, 1, true, ChangeTest::ChangeExpected));
+        BOOST_CHECK(CreateTransaction({{25000, false}, {25000, false}, {25000, false}}, 2, true, ChangeTest::ChangeExpected));
+        BOOST_CHECK(CreateTransaction({{25000, false}, {25000, false}, {25000, false}}, 3, true, ChangeTest::ChangeExpected));
+    }
 }
 
 BOOST_AUTO_TEST_SUITE_END()
