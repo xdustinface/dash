@@ -2970,7 +2970,7 @@ const CTxOut& CWallet::FindNonChangeParentOutput(const CTransaction& tx, int out
     return ptx->vout[n];
 }
 
-void CWallet::GetPrivateSendSalt()
+void CWallet::InitPrivateSendSalt()
 {
     // Avoid fetching it multiple times
     assert(nPrivateSendSalt.IsNull());
@@ -4227,7 +4227,7 @@ DBErrors CWallet::LoadWallet(bool& fFirstRunRet)
         }
     }
 
-    GetPrivateSendSalt();
+    InitPrivateSendSalt();
 
     if (nLoadWalletRet != DBErrors::LOAD_OK)
         return nLoadWalletRet;

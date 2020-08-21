@@ -811,7 +811,7 @@ private:
     /**
      * Fetches PrivateSend salt from database or generates and saves a new one if no salt was found in the db
      */
-    void GetPrivateSendSalt();
+    void InitPrivateSendSalt();
 
 public:
     /*
