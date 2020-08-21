@@ -1685,8 +1685,8 @@ bool CWallet::IsDenominated(const COutPoint& outpoint) const
 
 bool CWallet::IsFullyMixed(const COutPoint& outpoint) const
 {
-    // Mix again if we don't have N rounds yet
     int nRounds = GetRealOutpointPrivateSendRounds(outpoint);
+    // Mix again if we don't have N rounds yet
     if (nRounds < CPrivateSendClientOptions::GetRounds()) return false;
 
     // Try to mix a "random" number of rounds more than minimum.
