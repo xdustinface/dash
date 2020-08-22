@@ -995,11 +995,14 @@ BOOST_FIXTURE_TEST_CASE(CreateTransactionTest, CreateTransactionTestSetup)
                                   {3000, false}, {3000, false}, {2000, false}, {2000, false}, {1000, false}});
         // Lock all other coins which were already in the wallet
         std::vector<COutput> vecAvailable;
-        wallet->AvailableCoins(vecAvailable);
-        for (auto coin : vecAvailable) {
-            auto out = COutPoint(coin.tx->GetHash(), coin.i);
-            if (std::find(setCoins.begin(), setCoins.end(), out) == setCoins.end()) {
-                wallet->LockCoin(out);
+        {
+            LOCK2(cs_main, wallet->cs_wallet);
+            wallet->AvailableCoins(vecAvailable);
+            for (auto coin : vecAvailable) {
+                auto out = COutPoint(coin.tx->GetHash(), coin.i);
+                if (std::find(setCoins.begin(), setCoins.end(), out) == setCoins.end()) {
+                    wallet->LockCoin(out);
+                }
             }
         }
 
@@ -1029,6 +1032,7 @@ BOOST_FIXTURE_TEST_CASE(CreateTransactionTest, CreateTransactionTestSetup)
         BOOST_CHECK(CreateTransaction({{1234, false}, {4321, false}, {5678, false}, {8765, true}}, true));
         BOOST_CHECK(CreateTransaction({{1000000, false}}, false));
 
+        LOCK(wallet->cs_wallet);
         wallet->UnlockAllCoins();
     }
     // Test if the change output ends up at the requested position
