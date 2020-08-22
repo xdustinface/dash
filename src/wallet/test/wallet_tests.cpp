@@ -720,6 +720,7 @@ public:
         WalletRescanReserver reserver(wallet.get());
         reserver.reserve();
         wallet->ScanForWalletTransactions(chainActive.Genesis(), nullptr, reserver);
+        minRelayTxFee = CFeeRate(DEFAULT_MIN_RELAY_TX_FEE);
     }
 
     ~CreateTransactionTestSetup()
