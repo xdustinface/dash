@@ -822,6 +822,7 @@ public:
 
 BOOST_FIXTURE_TEST_CASE(CreateTransactionTest, CreateTransactionTestSetup)
 {
+    minRelayTxFee = CFeeRate(DEFAULT_MIN_RELAY_TX_FEE);
     // Try to send dust
     BOOST_CHECK(CreateTransaction({{10, false}}, false));
     BOOST_CHECK(CreateTransaction({{10, true}}, false));
