@@ -3812,6 +3812,7 @@ bool CWallet::CreateTransaction(const std::vector<CRecipient>& vecSend, CWalletT
             nFeeRet = 0;
             bool pick_new_inputs = true;
             CAmount nValueIn = 0;
+            CAmount nAmountToSelectAdditional{0};
             // Start with no fee and loop until there is enough fee
             while (true)
             {
@@ -3822,8 +3823,9 @@ bool CWallet::CreateTransaction(const std::vector<CRecipient>& vecSend, CWalletT
                 bool fFirst = true;
 
                 CAmount nValueToSelect = nValue;
-                if (nSubtractFeeFromAmount == 0)
-                    nValueToSelect += nFeeRet;
+                if (nSubtractFeeFromAmount == 0) {
+                    nValueToSelect += nAmountToSelectAdditional;
+                }
                 // vouts to the payees
                 for (const auto& recipient : vecSend)
                 {
@@ -3939,7 +3941,7 @@ bool CWallet::CreateTransaction(const std::vector<CRecipient>& vecSend, CWalletT
                 }
 
                 CTxOut newTxOut;
-                const CAmount nAmountLeft = nValueIn - nValueToSelect;
+                const CAmount nAmountLeft = nValueIn - nValue;
                 CAmount nChange = nAmountLeft - nFeeRet;
 
                 if (nChange > 0)
@@ -3997,9 +3999,9 @@ bool CWallet::CreateTransaction(const std::vector<CRecipient>& vecSend, CWalletT
                 }
 
                 if (nChange < 0 && !nSubtractFeeFromAmount) {
-                    // nValueIn is not enough to cover nValueToSelect + nFeeRet. Add the missing amount abs(nChange) to the fee
+                    // nValueIn is not enough to cover nValue + nFeeRet. Add the missing amount abs(nChange) to the fee
                     // and try to select other inputs in the next loop to cover the full required amount.
-                    nFeeRet += abs(nChange);
+                    nAmountToSelectAdditional += abs(nChange);
                     continue;
                 }
 
