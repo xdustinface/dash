@@ -3777,8 +3777,15 @@ bool CWallet::CreateTransaction(const std::vector<CRecipient>& vecSend, CWalletT
         LOCK2(cs_main, mempool.cs);
         LOCK(cs_wallet);
         {
+            CAmount nAmountAvailable{0};
             std::vector<COutput> vAvailableCoins;
             AvailableCoins(vAvailableCoins, true, &coin_control);
+
+            for (auto out : vAvailableCoins) {
+                if (out.fSpendable) {
+                    nAmountAvailable += out.tx->tx->vout[out.i].nValue;
+                }
+            }
 
             // Create change script that will be used if we need change
             // TODO: pass in scriptChange instead of reservekey so
@@ -3825,6 +3832,12 @@ bool CWallet::CreateTransaction(const std::vector<CRecipient>& vecSend, CWalletT
                 CAmount nValueToSelect = nValue;
                 if (nSubtractFeeFromAmount == 0) {
                     nValueToSelect += nAmountToSelectAdditional;
+                }
+                // If the resulting amount to select exceeds the
+                // balance from the available coins just try it one
+                // last time with whole available amount.
+                if (nValueToSelect > nAmountAvailable) {
+                    nValueToSelect = nAmountAvailable;
                 }
                 // vouts to the payees
                 for (const auto& recipient : vecSend)
@@ -3998,11 +4011,16 @@ bool CWallet::CreateTransaction(const std::vector<CRecipient>& vecSend, CWalletT
                     nChangePosInOut = -1;
                 }
 
-                if (nChange < 0 && !nSubtractFeeFromAmount) {
-                    // nValueIn is not enough to cover nValue + nFeeRet. Add the missing amount abs(nChange) to the fee
-                    // and try to select other inputs in the next loop to cover the full required amount.
-                    nAmountToSelectAdditional += abs(nChange);
-                    continue;
+                if (nChange < 0) {
+                    if (!nSubtractFeeFromAmount) {
+                        // nValueIn is not enough to cover nValue + nFeeRet. Add the missing amount abs(nChange) to the fee
+                        // and try to select other inputs in the next loop to cover the full required amount.
+                        nAmountToSelectAdditional += abs(nChange);
+                        continue;
+                    } else if (nAmountToSelectAdditional && nValueToSelect == nAmountAvailable) {
+                        strFailReason = _("Insufficient funds.");
+                        return false;
+                    }
                 }
 
                 // If no specific change position was requested, apply BIP69
