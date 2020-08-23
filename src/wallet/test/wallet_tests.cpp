@@ -709,6 +709,19 @@ public:
         ChangeExpected,
     };
 
+    // Result strings to test
+    const std::string strInsufficientFunds = "Insufficient funds.";
+    const std::string strAmountNotNegative = "Transaction amounts must not be negative";
+    const std::string strAtLeastOneRecipient = "Transaction must have at least one recipient";
+    const std::string strTooSmallToPayFee = "The transaction amount is too small to pay the fee";
+    const std::string strTooSmallAfterFee = "The transaction amount is too small to send after the fee has been deducted";
+    const std::string strTooSmall = "Transaction amount too small";
+    const std::string strUnableToLocatePrivateSend1 = "Unable to locate enough PrivateSend non-denominated funds for this transaction.";
+    const std::string strUnableToLocatePrivateSend2 = "Unable to locate enough PrivateSend denominated funds for this transaction. PrivateSend uses exact denominated amounts to send funds, you might simply need to mix some more coins.";
+    const std::string strTransactionTooLarge = "Transaction too large";
+    const std::string strTransactionTooLargeForFeePolicy = "Transaction too large for fee policy";
+    const std::string strChangeIndexOutOfRange = "Change index out of range";
+
     CreateTransactionTestSetup()
     {
         CreateAndProcessBlock({}, GetScriptForRawPubKey(coinbaseKey.GetPubKey()));
@@ -730,12 +743,23 @@ public:
     std::unique_ptr<CWallet> wallet;
     CCoinControl coinControl;
 
-    bool CreateTransaction(const std::vector<std::pair<CAmount, bool>>& vecEntries, bool fCreateShouldSucceed = true, ChangeTest changeTest = ChangeTest::Skip)
+    template <typename T>
+    bool CheckEqual(const T expected, const T actual)
     {
-        return CreateTransaction(vecEntries, -1, fCreateShouldSucceed, changeTest);
+        BOOST_CHECK_EQUAL(expected, actual);
+        return expected == actual;
     }
 
-    bool CreateTransaction(const std::vector<std::pair<CAmount, bool>>& vecEntries, int nChangePosRequest = -1, bool fCreateShouldSucceed = true, ChangeTest changeTest = ChangeTest::Skip)
+    bool CreateTransaction(const std::vector<std::pair<CAmount, bool>>& vecEntries, bool fCreateShouldSucceed = true, ChangeTest changeTest = ChangeTest::Skip)
+    {
+        return CreateTransaction(vecEntries, {}, -1, fCreateShouldSucceed, changeTest);
+    }
+    bool CreateTransaction(const std::vector<std::pair<CAmount, bool>>& vecEntries, std::string strErrorExpected, bool fCreateShouldSucceed = true, ChangeTest changeTest = ChangeTest::Skip)
+    {
+        return CreateTransaction(vecEntries, strErrorExpected, -1, fCreateShouldSucceed, changeTest);
+    }
+
+    bool CreateTransaction(const std::vector<std::pair<CAmount, bool>>& vecEntries, std::string strErrorExpected, int nChangePosRequest = -1, bool fCreateShouldSucceed = true, ChangeTest changeTest = ChangeTest::Skip)
     {
         CWalletTx wtx;
         CReserveKey reservekey(wallet.get());
@@ -743,13 +767,12 @@ public:
         int nChangePos = nChangePosRequest;
         std::string strError;
 
-        auto checkEqual = [&](bool l, bool r) -> bool {
-            BOOST_CHECK_EQUAL(l, r);
-            return l == r;
-        };
-
         // Verify the creation succeeds if expected and fails if not.
-        if (!checkEqual(fCreateShouldSucceed, wallet->CreateTransaction(GetRecipients(vecEntries), wtx, reservekey, nFeeRet, nChangePos, strError, coinControl))) {
+        if (!CheckEqual(fCreateShouldSucceed, wallet->CreateTransaction(GetRecipients(vecEntries), wtx, reservekey, nFeeRet, nChangePos, strError, coinControl))) {
+            return false;
+        }
+        //  Verify the expected error string if there is one provided
+        if (strErrorExpected.size() && !CheckEqual(strErrorExpected, strError)) {
             return false;
         }
         if (!fCreateShouldSucceed) {
@@ -765,11 +788,11 @@ public:
             return false;
         }
         // Verify the change is at the requested position if there was a request
-        if (nChangePosRequest != -1 && !checkEqual(nChangePosRequest, nChangePos)) {
+        if (nChangePosRequest != -1 && !CheckEqual(nChangePosRequest, nChangePos)) {
             return false;
         }
         // Verify the number of requested outputs does match the resulting outputs
-        checkEqual(wtx.tx->vout.size() - (nChangePos != -1 ? 1 : 0), vecEntries.size());
+        CheckEqual(vecEntries.size(), wtx.tx->vout.size() - (nChangePos != -1 ? 1 : 0));
         return true;
     }
 
@@ -1040,10 +1063,77 @@ BOOST_FIXTURE_TEST_CASE(CreateTransactionTest, CreateTransactionTestSetup)
         coinControl.SetNull();
         coinControl.Select(GetCoins({{100000, false}})[0]);
 
-        BOOST_CHECK(CreateTransaction({{25000, false}, {25000, false}, {25000, false}}, 0, true, ChangeTest::ChangeExpected));
-        BOOST_CHECK(CreateTransaction({{25000, false}, {25000, false}, {25000, false}}, 1, true, ChangeTest::ChangeExpected));
-        BOOST_CHECK(CreateTransaction({{25000, false}, {25000, false}, {25000, false}}, 2, true, ChangeTest::ChangeExpected));
-        BOOST_CHECK(CreateTransaction({{25000, false}, {25000, false}, {25000, false}}, 3, true, ChangeTest::ChangeExpected));
+        BOOST_CHECK(CreateTransaction({{25000, false}, {25000, false}, {25000, false}}, {}, 0, true, ChangeTest::ChangeExpected));
+        BOOST_CHECK(CreateTransaction({{25000, false}, {25000, false}, {25000, false}}, {}, 1, true, ChangeTest::ChangeExpected));
+        BOOST_CHECK(CreateTransaction({{25000, false}, {25000, false}, {25000, false}}, {}, 2, true, ChangeTest::ChangeExpected));
+        BOOST_CHECK(CreateTransaction({{25000, false}, {25000, false}, {25000, false}}, {}, 3, true, ChangeTest::ChangeExpected));
+    }
+    // Test error cases
+    {
+        coinControl.SetNull();
+        // First try to send something without any coins available
+        {
+            // Lock all other coins
+            std::vector<COutput> vecAvailable;
+            {
+                LOCK2(cs_main, wallet->cs_wallet);
+                wallet->AvailableCoins(vecAvailable);
+                for (auto coin : vecAvailable) {
+                    wallet->LockCoin(COutPoint(coin.tx->GetHash(), coin.i));
+                }
+            }
+
+            BOOST_CHECK(CreateTransaction({{1000, false}}, strInsufficientFunds, false));
+            BOOST_CHECK(CreateTransaction({{1000, true}}, strInsufficientFunds, false));
+            coinControl.nCoinType = CoinType::ONLY_NONDENOMINATED;
+            BOOST_CHECK(CreateTransaction({{1000, true}}, strUnableToLocatePrivateSend1, false));
+            coinControl.nCoinType = CoinType::ONLY_FULLY_MIXED;
+            BOOST_CHECK(CreateTransaction({{1000, true}}, strUnableToLocatePrivateSend2, false));
+
+            LOCK(wallet->cs_wallet);
+            wallet->UnlockAllCoins();
+        }
+
+        // Just to create nCount output recipes to use in tests below
+        std::vector<std::pair<CAmount, bool>> vecOutputEntries{{5000, false}};
+        auto createOutputEntries = [&](int nCount) {
+            while (vecOutputEntries.size() <= nCount) {
+                vecOutputEntries.push_back(vecOutputEntries.back());
+            }
+            if (vecOutputEntries.size() > nCount) {
+                int nDiff = vecOutputEntries.size() - nCount;
+                vecOutputEntries.erase(vecOutputEntries.begin(), vecOutputEntries.begin() + nDiff);
+            }
+        };
+
+        coinControl.SetNull();
+        coinControl.Select(GetCoins({{100 * COIN, false}})[0]);
+
+        BOOST_CHECK(CreateTransaction({{-5000, false}}, strAmountNotNegative, false));
+        BOOST_CHECK(CreateTransaction({}, strAtLeastOneRecipient, false));
+        BOOST_CHECK(CreateTransaction({{545, false}}, strTooSmall, false));
+        BOOST_CHECK(CreateTransaction({{545, true}}, strTooSmall, false));
+        BOOST_CHECK(CreateTransaction({{546, true}}, strTooSmallAfterFee, false));
+
+        createOutputEntries(100);
+        vecOutputEntries.push_back({600, true});
+        BOOST_CHECK(CreateTransaction(vecOutputEntries, strTooSmallToPayFee, false));
+        vecOutputEntries.pop_back();
+
+        createOutputEntries(2934);
+        BOOST_CHECK(CreateTransaction(vecOutputEntries, {}, true));
+        createOutputEntries(2935);
+        BOOST_CHECK(CreateTransaction(vecOutputEntries, strTransactionTooLarge, false));
+
+        auto prevRate = minRelayTxFee;
+        coinControl.m_feerate = prevRate;
+        coinControl.fOverrideFeeRate = true;
+        minRelayTxFee = CFeeRate(prevRate.GetFeePerK() * 10);
+        BOOST_CHECK(CreateTransaction({{5000, false}}, strTransactionTooLargeForFeePolicy, false));
+        coinControl.m_feerate.reset();
+        minRelayTxFee = prevRate;
+
+        BOOST_CHECK(CreateTransaction({{5000, false}, {5000, false}, {5000, false}}, strChangeIndexOutOfRange, 4, false));
     }
 }
 
