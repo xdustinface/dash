@@ -3920,22 +3920,30 @@ bool CWallet::CreateTransaction(const std::vector<CRecipient>& vecSend, CWalletT
 
                 CTxOut newTxOut;
                 const CAmount nAmountLeft = nValueIn - nValue;
-                CAmount nChange = nAmountLeft - nFeeRet;
+                auto getChange = [&]() {
+                    if (nSubtractFeeFromAmount) {
+                        return nAmountLeft;
+                    } else {
+                        return nAmountLeft - nFeeRet;
+                    }
+                };
 
-                if (nChange > 0)
+                if (getChange() > 0)
                 {
                     //over pay for denominated transactions
                     if (coin_control.nCoinType == CoinType::ONLY_FULLY_MIXED) {
                         nChangePosInOut = -1;
-                        nFeeRet += nChange;
+                        nFeeRet += getChange();
                     } else {
                         // Fill a vout to ourself with zero amount until we know the correct change
                         newTxOut = CTxOut(0, scriptChange);
                         txNew.vout.push_back(newTxOut);
 
-                        // Calculate the fee with the change output added
-                        CAmount nFeeNeededWithChange{0};
-                        if (!calculateFee(nFeeNeededWithChange)) {
+                        // Calculate the fee with the change output added, store the
+                        // current fee to reset it in case the remainder is dust and we
+                        // don't need to fee with change output added.
+                        CAmount nFeePrev = nFeeRet;
+                        if (!calculateFee(nFeeRet)) {
                             return false;
                         }
 
@@ -3943,15 +3951,15 @@ bool CWallet::CreateTransaction(const std::vector<CRecipient>& vecSend, CWalletT
                         txNew.vout.pop_back();
 
                         // Set the change amount properly
-                        newTxOut.nValue = nAmountLeft - nFeeNeededWithChange;
+                        newTxOut.nValue = getChange();
 
                         // Never create dust outputs; if we would, just
                         // add the dust to the fee.
                         if (IsDust(newTxOut, discard_rate))
                         {
+                            nFeeRet = nFeePrev;
                             nChangePosInOut = -1;
-                            nFeeRet += nChange;
-
+                            nFeeRet += getChange();
                         }
                         else
                         {
@@ -3968,19 +3976,17 @@ bool CWallet::CreateTransaction(const std::vector<CRecipient>& vecSend, CWalletT
 
                             std::vector<CTxOut>::iterator position = txNew.vout.begin()+nChangePosInOut;
                             txNew.vout.insert(position, newTxOut);
-                            nFeeRet = nFeeNeededWithChange;
-                            nChange = nAmountLeft - nFeeRet;
                         }
                     }
                 } else {
                     nChangePosInOut = -1;
                 }
 
-                if (nChange < 0) {
+                if (getChange() < 0) {
                     if (!nSubtractFeeFromAmount) {
                         // nValueIn is not enough to cover nValue + nFeeRet. Add the missing amount abs(nChange) to the fee
                         // and try to select other inputs in the next loop to cover the full required amount.
-                        nAmountToSelectAdditional += abs(nChange);
+                        nAmountToSelectAdditional += abs(getChange());
                         continue;
                     } else if (nAmountToSelectAdditional && nValueToSelect == nAmountAvailable) {
                         strFailReason = _("Insufficient funds.");
