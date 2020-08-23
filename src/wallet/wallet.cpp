@@ -3784,7 +3784,7 @@ bool CWallet::CreateTransaction(const std::vector<CRecipient>& vecSend, CWalletT
             bool pick_new_inputs = true;
             CAmount nValueIn = 0;
             CAmount nAmountToSelectAdditional{0};
-            // Start with no fee and loop until there is enough fee, try it 500 times.
+            // Start with no nAmountToSelectAdditional and loop until there is enough to cover the request, try it 500 times.
             int nMaxTries = 500;
             while (--nMaxTries)
             {
@@ -4043,11 +4043,18 @@ bool CWallet::CreateTransaction(const std::vector<CRecipient>& vecSend, CWalletT
 
         if (sign)
         {
+            auto getScriptPubKey = [&](const CTxIn& txin) -> const CScript& {
+                for (const auto& coin : setCoins) {
+                    if (txin.prevout == coin.outpoint) {
+                        return coin.txout.scriptPubKey;
+                    }
+                }
+                assert(false);
+            };
             CTransaction txNewConst(txNew);
-            int nIn = 0;
-            for(const auto& coin : setCoins)
+            for (int nIn = 0; nIn < txNew.vin.size(); ++nIn)
             {
-                const CScript& scriptPubKey = coin.txout.scriptPubKey;
+                const CScript& scriptPubKey = getScriptPubKey(txNew.vin[nIn]);
                 SignatureData sigdata;
 
                 if (!ProduceSignature(TransactionSignatureCreator(this, &txNewConst, nIn, SIGHASH_ALL), scriptPubKey, sigdata))
@@ -4057,8 +4064,6 @@ bool CWallet::CreateTransaction(const std::vector<CRecipient>& vecSend, CWalletT
                 } else {
                     UpdateTransaction(txNew, nIn, sigdata);
                 }
-
-                nIn++;
             }
         }
 
