@@ -3982,6 +3982,11 @@ bool CWallet::CreateTransaction(const std::vector<CRecipient>& vecSend, CWalletT
                     nChangePosInOut = -1;
                 }
 
+                if (nAmountAvailable == 0 || (!nSubtractFeeFromAmount && nValueIn < nValue)) {
+                    strFailReason = _("Insufficient funds.");
+                    return false;
+                }
+
                 if (getChange() < 0) {
                     if (!nSubtractFeeFromAmount) {
                         // nValueIn is not enough to cover nValue + nFeeRet. Add the missing amount abs(nChange) to the fee
