@@ -4012,7 +4012,14 @@ bool CWallet::CreateTransaction(const std::vector<CRecipient>& vecSend, CWalletT
                     }
                 }
 
-                // We have a change output, means we can just break as the transaction is done.
+                if (nAmountLeft == nFeeRet) {
+                    // We either added the change amount to nFeeRet because the change amount was considered
+                    // to be dust or the input exactly matches output + fee.
+                    // Either way, we used the total amount of the inputs we picked and the transaction is ready.
+                    break;
+                }
+
+                // We have a change output and we don't need to subtruct fees, which means the transaction is ready.
                 if (nChangePosInOut != -1 && nSubtractFeeFromAmount == 0) {
                     break;
                 }
@@ -4027,13 +4034,6 @@ bool CWallet::CreateTransaction(const std::vector<CRecipient>& vecSend, CWalletT
                         break;
                     }
                     pick_new_inputs = false;
-                }
-
-                // If nAmountLeft == nFeeRet it means we either added nChange to nFeeRet since nChange was considered to be dust
-                // or the input exactly matches output + fee.
-                // Either way, we used the total amount of the inputs we picked and the transaction is ready.
-                if (nAmountLeft == nFeeRet) {
-                    break;
                 }
             }
 
