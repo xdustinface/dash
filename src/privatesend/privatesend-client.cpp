@@ -1443,11 +1443,6 @@ bool CPrivateSendClientSession::MakeCollateralAmounts(const CompactTallyItem& ta
         return false;
     }
 
-    auto getAdjustedAmount = [&](CAmount nAmount) -> CAmount {
-        // If amount is denominated remove one duff, this will go into fees!
-        return CPrivateSend::IsDenominatedAmount(nAmount) ? nAmount - 1 : nAmount;
-    };
-
     int nCase{0}; // Just for debug logs
     if (txBuilder.CouldAddOutputs({CPrivateSend::GetMaxCollateralAmount(), CPrivateSend::GetCollateralAmount()})) {
         nCase = 1;
@@ -1458,7 +1453,9 @@ bool CPrivateSendClientSession::MakeCollateralAmounts(const CompactTallyItem& ta
         txBuilder.AddOutput(CPrivateSend::GetMaxCollateralAmount());
         // Note, here we first add a zero amount output to get the remainder after all fees and then assign it
         CTransactionBuilderOutput* out = txBuilder.AddOutput();
-        out->UpdateAmount(getAdjustedAmount(txBuilder.GetAmountLeft()));
+        CAmount nAmountLeft = txBuilder.GetAmountLeft();
+        // If remainder is denominated add one duff to the fee
+        out->UpdateAmount(CPrivateSend::IsDenominatedAmount(nAmountLeft) ? nAmountLeft - 1 : nAmountLeft);
 
     } else if (txBuilder.CouldAddOutputs({CPrivateSend::GetCollateralAmount(), CPrivateSend::GetCollateralAmount()})) {
         nCase = 2;
@@ -1471,7 +1468,7 @@ bool CPrivateSendClientSession::MakeCollateralAmounts(const CompactTallyItem& ta
         CTransactionBuilderOutput* out2 = txBuilder.AddOutput();
 
         // Create two equal outputs from the available value. This adds one duff to the fee if txBuilder.GetAmountLeft() is odd.
-        CAmount nAmountOutputs = getAdjustedAmount(txBuilder.GetAmountLeft() / 2);
+        CAmount nAmountOutputs = txBuilder.GetAmountLeft() / 2;
 
         assert(CPrivateSend::IsCollateralAmount(nAmountOutputs));
 
@@ -1484,7 +1481,7 @@ bool CPrivateSendClientSession::MakeCollateralAmounts(const CompactTallyItem& ta
         // Out1 CPrivateSend::IsCollateralAmount()
         // Out2 Skipped
         CTransactionBuilderOutput* out = txBuilder.AddOutput();
-        out->UpdateAmount(getAdjustedAmount(txBuilder.GetAmountLeft()));
+        out->UpdateAmount(txBuilder.GetAmountLeft());
 
         assert(CPrivateSend::IsCollateralAmount(out->GetAmount()));
     }
