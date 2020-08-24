@@ -3820,7 +3820,7 @@ bool CWallet::CreateTransaction(const std::vector<CRecipient>& vecSend, CWalletT
             bool pick_new_inputs = true;
             CAmount nValueIn = 0;
             CAmount nAmountToSelectAdditional{0};
-            // Start with no fee and loop until there is enough fee, try it 500 times.
+            // Start with nAmountToSelectAdditional=0 and loop until there is enough to cover the request + fees, try it 500 times.
             int nMaxTries = 500;
             while (--nMaxTries)
             {
