@@ -3786,7 +3786,7 @@ bool CWallet::CreateTransaction(const std::vector<CRecipient>& vecSend, CWalletT
             CAmount nAmountToSelectAdditional{0};
             // Start with no fee and loop until there is enough fee, try it 500 times.
             int nMaxTries = 500;
-            while (--nMaxTries)
+            while (--nMaxTries > 0)
             {
                 nChangePosInOut = nChangePosRequest;
                 txNew.vin.clear();
@@ -3917,7 +3917,7 @@ bool CWallet::CreateTransaction(const std::vector<CRecipient>& vecSend, CWalletT
                 CTxOut newTxOut;
                 const CAmount nAmountLeft = nValueIn - nValue;
                 auto getChange = [&]() {
-                    if (nSubtractFeeFromAmount) {
+                    if (nSubtractFeeFromAmount > 0) {
                         return nAmountLeft;
                     } else {
                         return nAmountLeft - nFeeRet;
@@ -4037,7 +4037,7 @@ bool CWallet::CreateTransaction(const std::vector<CRecipient>& vecSend, CWalletT
                 }
             }
 
-            if (!nMaxTries) {
+            if (nMaxTries == 0) {
                 strFailReason = _("Exceeded max tries.");
                 return false;
             }
