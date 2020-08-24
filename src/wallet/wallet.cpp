@@ -4034,19 +4034,19 @@ bool CWallet::CreateTransaction(const std::vector<CRecipient>& vecSend, CWalletT
                     std::sort(vecCoins.begin(), vecCoins.end(), CompareInputCoinBIP69());
                     std::sort(txNew.vin.begin(), txNew.vin.end(), CompareInputBIP69());
                     std::sort(txNew.vout.begin(), txNew.vout.end(), CompareOutputBIP69());
-                }
 
-                // If there was change output added before, we must update its position now
-                if (nChangePosInOut != -1) {
-                    int i = 0;
-                    for (const CTxOut& txOut : txNew.vout)
-                    {
-                        if (txOut == newTxOut)
+                    // If there was a change output added before, we must update its position now
+                    if (nChangePosInOut != -1) {
+                        int i = 0;
+                        for (const CTxOut& txOut : txNew.vout)
                         {
-                            nChangePosInOut = i;
-                            break;
+                            if (txOut == newTxOut)
+                            {
+                                nChangePosInOut = i;
+                                break;
+                            }
+                            i++;
                         }
-                        i++;
                     }
                 }
 
