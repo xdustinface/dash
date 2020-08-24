@@ -3796,13 +3796,8 @@ bool CWallet::CreateTransaction(const std::vector<CRecipient>& vecSend, CWalletT
 
                 CAmount nValueToSelect = nValue;
                 if (nSubtractFeeFromAmount == 0) {
+                    assert(nAmountToSelectAdditional >= 0);
                     nValueToSelect += nAmountToSelectAdditional;
-                }
-                // If the resulting amount to select exceeds the
-                // balance from the available coins just try it one
-                // last time with whole available amount.
-                if (nValueToSelect > nAmountAvailable) {
-                    nValueToSelect = nAmountAvailable;
                 }
                 // vouts to the payees
                 for (const auto& recipient : vecSend)
@@ -3983,23 +3978,17 @@ bool CWallet::CreateTransaction(const std::vector<CRecipient>& vecSend, CWalletT
                     nChangePosInOut = -1;
                 }
 
-                if (nAmountAvailable == 0 || getChange() < 0) {
-                    if (!nSubtractFeeFromAmount && nValueToSelect < nAmountAvailable) {
+                if (getChange() < 0) {
+                    if (nSubtractFeeFromAmount == 0) {
                         // nValueIn is not enough to cover nValue + nFeeRet. Add the missing amount abs(nChange) to the fee
-                        // and try to select other inputs in the next loop to cover the full required amount.
+                        // and try to select other inputs in the next loop step to cover the full required amount.
                         nAmountToSelectAdditional += abs(getChange());
-                        continue;
-                    } else {
-                        if (coin_control.nCoinType == CoinType::ONLY_NONDENOMINATED) {
-                            strFailReason = _("Unable to locate enough PrivateSend non-denominated funds for this transaction.");
-                        } else if (coin_control.nCoinType == CoinType::ONLY_FULLY_MIXED) {
-                            strFailReason = _("Unable to locate enough PrivateSend denominated funds for this transaction.");
-                            strFailReason += " " + _("PrivateSend uses exact denominated amounts to send funds, you might simply need to mix some more coins.");
-                        } else {
-                            strFailReason = _("Insufficient funds.");
-                        }
-                        return false;
+                    } else if (nAmountToSelectAdditional > 0 && nValueToSelect == nAmountAvailable) {
+                        // We tried selecting more and failed. We have no extra funds left,
+                        // so just add 1 duff to fail in the next loop step with a correct reason
+                        nAmountToSelectAdditional += 1;
                     }
+                    continue;
                 }
 
                 // If no specific change position was requested, apply BIP69
