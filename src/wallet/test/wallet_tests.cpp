@@ -721,6 +721,7 @@ public:
     const std::string strTransactionTooLarge = "Transaction too large";
     const std::string strTransactionTooLargeForFeePolicy = "Transaction too large for fee policy";
     const std::string strChangeIndexOutOfRange = "Change index out of range";
+    const std::string strExceededMaxTries = "Exceeded max tries.";
 
     CreateTransactionTestSetup()
     {
@@ -768,8 +769,15 @@ public:
         int nChangePos = nChangePosRequest;
         std::string strError;
 
+        bool fCreationSucceeded = wallet->CreateTransaction(GetRecipients(vecEntries), wtx, reservekey, nFeeRet, nChangePos, strError, coinControl);
+        bool fHitMaxTries = strError == strExceededMaxTries;
+        // This should never happen.
+        if (fHitMaxTries) {
+            BOOST_CHECK(!fHitMaxTries);
+            return false;
+        }
         // Verify the creation succeeds if expected and fails if not.
-        if (!CheckEqual(fCreateShouldSucceed, wallet->CreateTransaction(GetRecipients(vecEntries), wtx, reservekey, nFeeRet, nChangePos, strError, coinControl))) {
+        if (!CheckEqual(fCreateShouldSucceed, fCreationSucceeded)) {
             return false;
         }
         //  Verify the expected error string if there is one provided
