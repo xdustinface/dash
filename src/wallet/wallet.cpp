@@ -3982,26 +3982,21 @@ bool CWallet::CreateTransaction(const std::vector<CRecipient>& vecSend, CWalletT
                     nChangePosInOut = -1;
                 }
 
-                if (nAmountAvailable == 0 || (!nSubtractFeeFromAmount && nValueIn < nValue)) {
-                    if (coin_control.nCoinType == CoinType::ONLY_NONDENOMINATED) {
-                        strFailReason = _("Unable to locate enough PrivateSend non-denominated funds for this transaction.");
-                    } else if (coin_control.nCoinType == CoinType::ONLY_FULLY_MIXED) {
-                        strFailReason = _("Unable to locate enough PrivateSend denominated funds for this transaction.");
-                        strFailReason += " " + _("PrivateSend uses exact denominated amounts to send funds, you might simply need to mix some more coins.");
-                    } else {
-                        strFailReason = _("Insufficient funds.");
-                    }
-                    return false;
-                }
-
-                if (getChange() < 0) {
-                    if (!nSubtractFeeFromAmount) {
+                if (nAmountAvailable == 0 || getChange() < 0) {
+                    if (!nSubtractFeeFromAmount && nValueToSelect < nAmountAvailable) {
                         // nValueIn is not enough to cover nValue + nFeeRet. Add the missing amount abs(nChange) to the fee
                         // and try to select other inputs in the next loop to cover the full required amount.
                         nAmountToSelectAdditional += abs(getChange());
                         continue;
-                    } else if (nAmountToSelectAdditional && nValueToSelect == nAmountAvailable) {
-                        strFailReason = _("Insufficient funds.");
+                    } else {
+                        if (coin_control.nCoinType == CoinType::ONLY_NONDENOMINATED) {
+                            strFailReason = _("Unable to locate enough PrivateSend non-denominated funds for this transaction.");
+                        } else if (coin_control.nCoinType == CoinType::ONLY_FULLY_MIXED) {
+                            strFailReason = _("Unable to locate enough PrivateSend denominated funds for this transaction.");
+                            strFailReason += " " + _("PrivateSend uses exact denominated amounts to send funds, you might simply need to mix some more coins.");
+                        } else {
+                            strFailReason = _("Insufficient funds.");
+                        }
                         return false;
                     }
                 }
