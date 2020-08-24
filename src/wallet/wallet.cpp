@@ -3788,7 +3788,7 @@ bool CWallet::CreateTransaction(const std::vector<CRecipient>& vecSend, CWalletT
             int nMaxTries = 500;
             while (--nMaxTries > 0)
             {
-                nChangePosInOut = nChangePosRequest;
+                nChangePosInOut = std::numeric_limits<int>::max();
                 txNew.vin.clear();
                 txNew.vout.clear();
                 wtxNew.fFromMe = true;
@@ -3959,15 +3959,17 @@ bool CWallet::CreateTransaction(const std::vector<CRecipient>& vecSend, CWalletT
                         }
                         else
                         {
-                            if (nChangePosInOut == -1)
+                            if (nChangePosRequest == -1)
                             {
                                 // Insert change txn at random position:
                                 nChangePosInOut = GetRandInt(txNew.vout.size()+1);
                             }
-                            else if ((unsigned int)nChangePosInOut > txNew.vout.size())
+                            else if ((unsigned int)nChangePosRequest > txNew.vout.size())
                             {
                                 strFailReason = _("Change index out of range");
                                 return false;
+                            } else {
+                                nChangePosInOut = nChangePosRequest;
                             }
 
                             std::vector<CTxOut>::iterator position = txNew.vout.begin()+nChangePosInOut;
@@ -4042,6 +4044,9 @@ bool CWallet::CreateTransaction(const std::vector<CRecipient>& vecSend, CWalletT
                 return false;
             }
         }
+
+        // Make sure change position was updated one way or another
+        assert(nChangePosInOut != std::numeric_limits<int>::max());
 
         if (nChangePosInOut == -1) reservekey.ReturnKey(); // Return any reserved key if we don't have change
 
