@@ -3736,7 +3736,7 @@ bool CWallet::CreateTransaction(const std::vector<CRecipient>& vecSend, CWalletT
     FeeCalculation feeCalc;
     unsigned int nBytes;
     {
-        std::set<CInputCoin> setCoins;
+        std::vector<CInputCoin> vecCoins;
         LOCK2(cs_main, mempool.cs);
         LOCK(cs_wallet);
         {
@@ -3840,8 +3840,8 @@ bool CWallet::CreateTransaction(const std::vector<CRecipient>& vecSend, CWalletT
                 // Choose coins to use
                 if (pick_new_inputs) {
                     nValueIn = 0;
-                    setCoins.clear();
-                    if (!SelectCoins(vAvailableCoins, nValueToSelect, setCoins, nValueIn, &coin_control)) {
+                    std::set<CInputCoin> setCoinsTmp;
+                    if (!SelectCoins(vAvailableCoins, nValueToSelect, setCoinsTmp, nValueIn, &coin_control)) {
                         if (coin_control.nCoinType == CoinType::ONLY_NONDENOMINATED) {
                             strFailReason = _("Unable to locate enough PrivateSend non-denominated funds for this transaction.");
                         } else if (coin_control.nCoinType == CoinType::ONLY_FULLY_MIXED) {
@@ -3852,6 +3852,7 @@ bool CWallet::CreateTransaction(const std::vector<CRecipient>& vecSend, CWalletT
                         }
                         return false;
                     }
+                    vecCoins.assign(setCoinsTmp.begin(), setCoinsTmp.end());
                 }
 
                 // Fill vin
@@ -3859,7 +3860,7 @@ bool CWallet::CreateTransaction(const std::vector<CRecipient>& vecSend, CWalletT
                 // Note how the sequence number is set to max()-1 so that the
                 // nLockTime set above actually works.
                 txNew.vin.clear();
-                for (const auto& coin : setCoins) {
+                for (const auto& coin : vecCoins) {
                     CTxIn txin = CTxIn(coin.outpoint,CScript(),
                                               CTxIn::SEQUENCE_FINAL - 1);
                     txNew.vin.push_back(txin);
@@ -3868,7 +3869,7 @@ bool CWallet::CreateTransaction(const std::vector<CRecipient>& vecSend, CWalletT
                 auto calculateFee = [&](CAmount& nFee) -> bool {
                     // Fill in dummy signatures for fee calculation.
                     int nIn = 0;
-                    for (const auto& coin : setCoins)
+                    for (const auto& coin : vecCoins)
                     {
                         const CScript& scriptPubKey = coin.txout.scriptPubKey;
                         SignatureData sigdata;
@@ -4003,6 +4004,7 @@ bool CWallet::CreateTransaction(const std::vector<CRecipient>& vecSend, CWalletT
 
                 // If no specific change position was requested, apply BIP69
                 if (nChangePosRequest == -1) {
+                    std::sort(vecCoins.begin(), vecCoins.end(), CompareInputCoinBIP69());
                     std::sort(txNew.vin.begin(), txNew.vin.end(), CompareInputBIP69());
                     std::sort(txNew.vout.begin(), txNew.vout.end(), CompareOutputBIP69());
                 }
@@ -4058,7 +4060,7 @@ bool CWallet::CreateTransaction(const std::vector<CRecipient>& vecSend, CWalletT
         {
             CTransaction txNewConst(txNew);
             int nIn = 0;
-            for(const auto& coin : setCoins)
+            for(const auto& coin : vecCoins)
             {
                 const CScript& scriptPubKey = coin.txout.scriptPubKey;
                 SignatureData sigdata;
