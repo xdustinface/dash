@@ -896,11 +896,11 @@ BOOST_FIXTURE_TEST_CASE(CreateTransactionTest, CreateTransactionTestSetup)
             {6, {false, ChangeTest::Skip}},
             {7, {true, ChangeTest::NoChangeExpected}},
             {8, {false, ChangeTest::Skip}},
-            {9, {true, ChangeTest::NoChangeExpected}},
+            {9, {false, ChangeTest::Skip}},
             {10, {false, ChangeTest::Skip}},
             {11, {true, ChangeTest::NoChangeExpected}},
             {12, {false, ChangeTest::Skip}},
-            {13, {true, ChangeTest::NoChangeExpected}}
+            {13, {false, ChangeTest::Skip}}
         });
         // Now with 100x fallback feerate
         runTest(2, DEFAULT_FALLBACK_FEE * 100, {
@@ -913,11 +913,11 @@ BOOST_FIXTURE_TEST_CASE(CreateTransactionTest, CreateTransactionTestSetup)
             {6, {false, ChangeTest::Skip}},
             {7, {true, ChangeTest::NoChangeExpected}},
             {8, {false, ChangeTest::Skip}},
-            {9, {true, ChangeTest::NoChangeExpected}},
+            {9, {false, ChangeTest::Skip}},
             {10, {false, ChangeTest::Skip}},
             {11, {true, ChangeTest::NoChangeExpected}},
             {12, {false, ChangeTest::Skip}},
-            {13, {true, ChangeTest::NoChangeExpected}}
+            {13, {false, ChangeTest::Skip}}
         });
     }
     // Now use 4 different inputs with a total of 100k duff
@@ -939,11 +939,11 @@ BOOST_FIXTURE_TEST_CASE(CreateTransactionTest, CreateTransactionTestSetup)
             {6, {false, ChangeTest::Skip}},
             {7, {true, ChangeTest::NoChangeExpected}},
             {8, {false, ChangeTest::Skip}},
-            {9, {true, ChangeTest::NoChangeExpected}},
+            {9, {false, ChangeTest::Skip}},
             {10, {false, ChangeTest::Skip}},
             {11, {true, ChangeTest::NoChangeExpected}},
             {12, {false, ChangeTest::Skip}},
-            {13, {true, ChangeTest::NoChangeExpected}}
+            {13, {false, ChangeTest::Skip}}
         });
         // Now with 100x fallback feerate
         runTest(4, DEFAULT_FALLBACK_FEE * 100, {
@@ -956,11 +956,11 @@ BOOST_FIXTURE_TEST_CASE(CreateTransactionTest, CreateTransactionTestSetup)
             {6, {false, ChangeTest::Skip}},
             {7, {false, ChangeTest::Skip}},
             {8, {false, ChangeTest::Skip}},
-            {9, {true, ChangeTest::NoChangeExpected}},
+            {9, {false, ChangeTest::Skip}},
             {10, {false, ChangeTest::Skip}},
             {11, {true, ChangeTest::NoChangeExpected}},
             {12, {false, ChangeTest::Skip}},
-            {13, {true, ChangeTest::NoChangeExpected}}
+            {13, {false, ChangeTest::Skip}}
         });
     }
 
@@ -985,11 +985,11 @@ BOOST_FIXTURE_TEST_CASE(CreateTransactionTest, CreateTransactionTestSetup)
             {6, {false, ChangeTest::Skip}},
             {7, {true, ChangeTest::NoChangeExpected}},
             {8, {false, ChangeTest::Skip}},
-            {9, {true, ChangeTest::NoChangeExpected}},
+            {9, {false, ChangeTest::Skip}},
             {10, {false, ChangeTest::Skip}},
             {11, {true, ChangeTest::NoChangeExpected}},
             {12, {false, ChangeTest::Skip}},
-            {13, {true, ChangeTest::NoChangeExpected}}
+            {13, {false, ChangeTest::Skip}}
         });
         // Now with 100x fallback feerate
         runTest(6, DEFAULT_FALLBACK_FEE * 100, {
