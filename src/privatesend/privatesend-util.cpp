@@ -174,6 +174,9 @@ void CTransactionBuilder::Clear()
 
 bool CTransactionBuilder::CouldAddOutput(CAmount nAmountOutput) const
 {
+    if (nAmountOutput < 0) {
+        return false;
+    }
     // Adding another output can change the serialized size of the vout size hence + GetSizeOfCompactSizeDiff()
     unsigned int nBytes = GetBytesTotal() + nBytesOutput + GetSizeOfCompactSizeDiff(1);
     return GetAmountLeft(GetAmountInitial(), GetAmountUsed() + nAmountOutput, GetFee(nBytes)) >= 0;
@@ -184,6 +187,9 @@ bool CTransactionBuilder::CouldAddOutputs(const std::vector<CAmount>& vecOutputA
     CAmount nAmountAdditional{0};
     int nBytesAdditional = nBytesOutput * vecOutputAmounts.size();
     for (const auto nAmountOutput : vecOutputAmounts) {
+        if (nAmountOutput < 0) {
+            return false;
+        }
         nAmountAdditional += nAmountOutput;
     }
     // Adding other outputs can change the serialized size of the vout size hence + GetSizeOfCompactSizeDiff()
