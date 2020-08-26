@@ -888,12 +888,12 @@ bool CPrivateSendClientSession::DoAutomaticDenominating(CConnman& connman, bool 
         // there are funds to denominate and denominated balance does not exceed
         // max amount to mix yet.
         if (nBalanceAnonimizableNonDenom >= nValueMin + CPrivateSend::GetCollateralAmount() && nBalanceToDenominate > 0) {
-            CreateDenominated(nBalanceToDenominate, connman);
+            CreateDenominated(nBalanceToDenominate);
         }
 
         //check if we have the collateral sized inputs
         if (!mixingWallet->HasCollateralInputs()) {
-            return !mixingWallet->HasCollateralInputs(false) && MakeCollateralAmounts(connman);
+            return !mixingWallet->HasCollateralInputs(false) && MakeCollateralAmounts();
         }
 
         if (nSessionID) {
@@ -1376,7 +1376,7 @@ bool CPrivateSendClientSession::PrepareDenominate(int nMinRounds, int nMaxRounds
 }
 
 // Create collaterals by looping through inputs grouped by addresses
-bool CPrivateSendClientSession::MakeCollateralAmounts(CConnman& connman)
+bool CPrivateSendClientSession::MakeCollateralAmounts()
 {
     if (!CPrivateSendClientOptions::IsEnabled() || !mixingWallet) return false;
 
@@ -1400,13 +1400,13 @@ bool CPrivateSendClientSession::MakeCollateralAmounts(CConnman& connman)
 
     // First try to use only non-denominated funds
     for (const auto& item : vecTally) {
-        if (!MakeCollateralAmounts(item, false, connman)) continue;
+        if (!MakeCollateralAmounts(item, false)) continue;
         return true;
     }
 
     // There should be at least some denominated funds we should be able to break in pieces to continue mixing
     for (const auto& item : vecTally) {
-        if (!MakeCollateralAmounts(item, true, connman)) continue;
+        if (!MakeCollateralAmounts(item, true)) continue;
         return true;
     }
 
@@ -1416,7 +1416,7 @@ bool CPrivateSendClientSession::MakeCollateralAmounts(CConnman& connman)
 }
 
 // Split up large inputs or create fee sized inputs
-bool CPrivateSendClientSession::MakeCollateralAmounts(const CompactTallyItem& tallyItem, bool fTryDenominated, CConnman& connman)
+bool CPrivateSendClientSession::MakeCollateralAmounts(const CompactTallyItem& tallyItem, bool fTryDenominated)
 {
     AssertLockHeld(cs_main);
     AssertLockHeld(mempool.cs);
@@ -1504,7 +1504,7 @@ bool CPrivateSendClientSession::MakeCollateralAmounts(const CompactTallyItem& ta
 }
 
 // Create denominations by looping through inputs grouped by addresses
-bool CPrivateSendClientSession::CreateDenominated(CAmount nBalanceToDenominate, CConnman& connman)
+bool CPrivateSendClientSession::CreateDenominated(CAmount nBalanceToDenominate)
 {
     if (!CPrivateSendClientOptions::IsEnabled() || !mixingWallet) return false;
 
@@ -1529,7 +1529,7 @@ bool CPrivateSendClientSession::CreateDenominated(CAmount nBalanceToDenominate, 
     bool fCreateMixingCollaterals = !mixingWallet->HasCollateralInputs();
 
     for (const auto& item : vecTally) {
-        if (!CreateDenominated(nBalanceToDenominate, item, fCreateMixingCollaterals, connman)) continue;
+        if (!CreateDenominated(nBalanceToDenominate, item, fCreateMixingCollaterals)) continue;
         return true;
     }
 
@@ -1538,7 +1538,7 @@ bool CPrivateSendClientSession::CreateDenominated(CAmount nBalanceToDenominate, 
 }
 
 // Create denominations
-bool CPrivateSendClientSession::CreateDenominated(CAmount nBalanceToDenominate, const CompactTallyItem& tallyItem, bool fCreateMixingCollaterals, CConnman& connman)
+bool CPrivateSendClientSession::CreateDenominated(CAmount nBalanceToDenominate, const CompactTallyItem& tallyItem, bool fCreateMixingCollaterals)
 {
     AssertLockHeld(cs_main);
     AssertLockHeld(mempool.cs);
