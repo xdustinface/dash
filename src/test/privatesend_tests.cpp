@@ -108,6 +108,12 @@ public:
 
 BOOST_FIXTURE_TEST_CASE(CTransactionBuilderTest, CTransactionBuilderTestSetup)
 {
+    // NOTE: Mock wallet version is FEATURE_BASE which means that it uses uncompressed pubkeys
+    // (65 bytes instead of 33 bytes), so CTxIn size is 180 bytes, not 148 bytes as one might expect.
+    // Each output is 34 bytes, vin and vout compact sizes are 1 byte each.
+    // Therefore base size (i.e. for a tx with 1 input, 0 outputs) is expected to be
+    // 4(n32bitVersion) + 1(vin size) + 180(vin[0]) + 1(vout size) + 4(nLockTime) = 190 bytes.
+
     minRelayTxFee = CFeeRate(DEFAULT_MIN_RELAY_TX_FEE);
     // Tests with single outpoint tallyItem
     {
@@ -116,15 +122,15 @@ BOOST_FIXTURE_TEST_CASE(CTransactionBuilderTest, CTransactionBuilderTestSetup)
 
         BOOST_CHECK_EQUAL(txBuilder.CountOutputs(), 0);
         BOOST_CHECK_EQUAL(tallyItem.nAmount, txBuilder.GetAmountInitial());
-        BOOST_CHECK_EQUAL(txBuilder.GetAmountLeft(), 4810);
+        BOOST_CHECK_EQUAL(txBuilder.GetAmountLeft(), 4810);         // 5000 - 190
 
-        BOOST_CHECK(txBuilder.CouldAddOutput(4776));
+        BOOST_CHECK(txBuilder.CouldAddOutput(4776));                // 4810 - 34
         BOOST_CHECK(!txBuilder.CouldAddOutput(4777));
 
         BOOST_CHECK(txBuilder.CouldAddOutput(0));
         BOOST_CHECK(!txBuilder.CouldAddOutput(-1));
 
-        BOOST_CHECK(txBuilder.CouldAddOutputs({1000, 1000, 2708}));
+        BOOST_CHECK(txBuilder.CouldAddOutputs({1000, 1000, 2708})); // (4810 - 34 * 3) split in 3 outputs
         BOOST_CHECK(!txBuilder.CouldAddOutputs({1000, 1000, 2709}));
 
         BOOST_CHECK_EQUAL(txBuilder.AddOutput(5000), nullptr);
