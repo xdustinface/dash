@@ -132,6 +132,8 @@ BOOST_FIXTURE_TEST_CASE(CTransactionBuilderTest, CTransactionBuilderTestSetup)
 
         CTransactionBuilderOutput* output = txBuilder.AddOutput();
         BOOST_CHECK(output->UpdateAmount(txBuilder.GetAmountLeft()));
+        BOOST_CHECK(output->UpdateAmount(1));
+        BOOST_CHECK(output->UpdateAmount(output->GetAmount() + txBuilder.GetAmountLeft()));
         BOOST_CHECK(!output->UpdateAmount(output->GetAmount() + 1));
         BOOST_CHECK(!output->UpdateAmount(0));
         BOOST_CHECK(!output->UpdateAmount(-1));
