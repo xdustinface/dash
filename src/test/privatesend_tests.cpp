@@ -142,6 +142,7 @@ BOOST_FIXTURE_TEST_CASE(CTransactionBuilderTest, CTransactionBuilderTestSetup)
         std::string strResult;
         BOOST_CHECK(txBuilder.Commit(strResult));
         CWalletTx& wtx = AddTxToChain(uint256S(strResult));
+        BOOST_CHECK_EQUAL(wtx.tx->vout.size(), txBuilder.CountOutputs()); // should have no change output
         BOOST_CHECK_EQUAL(wtx.tx->vout[0].nValue, output->GetAmount());
         BOOST_CHECK(wtx.tx->vout[0].scriptPubKey == output->GetScript());
     }
@@ -162,12 +163,16 @@ BOOST_FIXTURE_TEST_CASE(CTransactionBuilderTest, CTransactionBuilderTestSetup)
         BOOST_CHECK_EQUAL(vecOutputs.size(), 100);
         BOOST_CHECK(txBuilder.Commit(strResult));
         CWalletTx& wtx = AddTxToChain(uint256S(strResult));
+        BOOST_CHECK_EQUAL(wtx.tx->vout.size(), txBuilder.CountOutputs() + 1); // should have change output
         for (const auto& out : wtx.tx->vout) {
             auto it = std::find_if(vecOutputs.begin(), vecOutputs.end(), [&](CTransactionBuilderOutput* output) -> bool {
                 return output->GetAmount() == out.nValue && output->GetScript() == out.scriptPubKey;
             });
             if (it != vecOutputs.end()) {
                 vecOutputs.erase(it);
+            } else {
+                // change output
+                BOOST_CHECK_EQUAL(txBuilder.GetAmountLeft() - 34, out.nValue);
             }
         }
         BOOST_CHECK(vecOutputs.size() == 0);
