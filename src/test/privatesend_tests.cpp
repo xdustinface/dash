@@ -153,14 +153,23 @@ BOOST_FIXTURE_TEST_CASE(CTransactionBuilderTest, CTransactionBuilderTestSetup)
         std::vector<CTransactionBuilderOutput*> vecOutputs;
         std::string strResult;
 
-        vecOutputs.push_back(txBuilder.AddOutput(100));
+        auto output = txBuilder.AddOutput(100);
+        BOOST_CHECK(output != nullptr);
         BOOST_CHECK(!txBuilder.Commit(strResult));
 
-        vecOutputs.back()->UpdateAmount(1000);
+        if (output != nullptr) {
+            output->UpdateAmount(1000);
+            vecOutputs.push_back(output);
+        }
         while (vecOutputs.size() < 100) {
-            vecOutputs.push_back(txBuilder.AddOutput(1000 + vecOutputs.size()));
+            output = txBuilder.AddOutput(1000 + vecOutputs.size());
+            if (output == nullptr) {
+                break;
+            }
+            vecOutputs.push_back(output);
         }
         BOOST_CHECK_EQUAL(vecOutputs.size(), 100);
+        BOOST_CHECK_EQUAL(txBuilder.CountOutputs(), vecOutputs.size());
         BOOST_CHECK(txBuilder.Commit(strResult));
         CWalletTx& wtx = AddTxToChain(uint256S(strResult));
         BOOST_CHECK_EQUAL(wtx.tx->vout.size(), txBuilder.CountOutputs() + 1); // should have change output
