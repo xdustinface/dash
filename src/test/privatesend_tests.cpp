@@ -121,7 +121,7 @@ BOOST_FIXTURE_TEST_CASE(CTransactionBuilderTest, CTransactionBuilderTestSetup)
         CTransactionBuilder txBuilder(wallet.get(), tallyItem);
 
         BOOST_CHECK_EQUAL(txBuilder.CountOutputs(), 0);
-        BOOST_CHECK_EQUAL(tallyItem.nAmount, txBuilder.GetAmountInitial());
+        BOOST_CHECK_EQUAL(txBuilder.GetAmountInitial(), tallyItem.nAmount);
         BOOST_CHECK_EQUAL(txBuilder.GetAmountLeft(), 4810);         // 5000 - 190
 
         BOOST_CHECK(txBuilder.CouldAddOutput(4776));                // 4810 - 34
