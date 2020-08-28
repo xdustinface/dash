@@ -11,6 +11,7 @@
 #include <net.h>
 #include <policy/policy.h>
 #include <primitives/transaction.h>
+#include <privatesend/privatesend-client.h>
 #include <script/ismine.h>
 #include <script/standard.h>
 #include <support/allocators/secure.h>
@@ -57,6 +58,7 @@ WalletTx MakeWalletTx(CWallet& wallet, const CWalletTx& wtx)
 {
     WalletTx result;
     bool fIsDenomInFromMe{false}, fIsDenomOutFromMe{false}, fAllDenomOut{true};
+    result.m_wallet = MakeWallet(wallet);
     result.tx = wtx.tx;
     result.txin_is_mine.reserve(wtx.tx->vin.size());
     for (const auto& txin : wtx.tx->vin) {
@@ -123,10 +125,55 @@ WalletTxOut MakeWalletTxOut(CWallet& wallet, const CWalletTx& wtx, int n, int de
     return result;
 }
 
+class PrivateSendImpl : public PrivateSend::Client
+{
+    std::shared_ptr<CPrivateSendClientManager> m_manager;
+public:
+    PrivateSendImpl(CWallet& wallet) : m_manager(privateSendClientManagers.at(wallet.GetName())) {}
+    void resetCachedBlocks() override
+    {
+        m_manager->nCachedNumBlocks = std::numeric_limits<int>::max();
+    }
+    void resetPool() override
+    {
+        m_manager->ResetPool();
+    }
+    void disableAutobackups() override
+    {
+        m_manager->fCreateAutoBackups = false;
+    }
+    int getCachedBlocks() override
+    {
+        return m_manager->nCachedNumBlocks;
+    }
+    std::string getSessionDenoms() override
+    {
+        return m_manager->GetSessionDenoms();
+    }
+    void setCachedBlocks(int nCachedBlocks) override
+    {
+       m_manager->nCachedNumBlocks = nCachedBlocks;
+    }
+    bool isMixing() override
+    {
+        return m_manager->IsMixing();
+    }
+    bool startMixing() override
+    {
+        return m_manager->StartMixing();
+    }
+    void stopMixing() override
+    {
+        m_manager->StopMixing();
+    }
+};
+
 class WalletImpl : public Wallet
 {
 public:
-    WalletImpl(CWallet& wallet) : m_wallet(wallet) {}
+    PrivateSendImpl m_privatesend;
+
+    WalletImpl(CWallet& wallet) : m_wallet(wallet), m_privatesend(wallet) {}
 
     void markDirty() override
     {
@@ -429,6 +476,7 @@ public:
         return result;
     }
     bool hdEnabled() override { return m_wallet.IsHDEnabled(); }
+    PrivateSend::Client& privateSend() override { return m_privatesend; }
     std::unique_ptr<Handler> handleShowProgress(ShowProgressFn fn) override
     {
         return MakeHandler(m_wallet.ShowProgress.connect(fn));

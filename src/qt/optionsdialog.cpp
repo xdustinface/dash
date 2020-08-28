@@ -20,10 +20,6 @@
 #include <netbase.h>
 #include <txdb.h> // for -dbcache defaults
 
-#ifdef ENABLE_WALLET
-#include <privatesend/privatesend-client.h>
-#endif // ENABLE_WALLET
-
 #include <QDataWidgetMapper>
 #include <QDir>
 #include <QIntValidator>
@@ -301,7 +297,7 @@ void OptionsDialog::on_okButton_clicked()
     appearance->accept();
 #ifdef ENABLE_WALLET
     for (auto& wallet : model->node().getWallets()) {
-        privateSendClientManagers.at(wallet->getWalletName())->nCachedNumBlocks = std::numeric_limits<int>::max();
+        wallet->privateSend().resetCachedBlocks();
         wallet->markDirty();
     }
 #endif // ENABLE_WALLET

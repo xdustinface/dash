@@ -19,7 +19,6 @@
 #include <qt/utilitydialog.h>
 
 #ifdef ENABLE_WALLET
-#include <privatesend/privatesend-client.h>
 #include <qt/walletframe.h>
 #include <qt/walletmodel.h>
 #include <qt/walletview.h>
@@ -782,8 +781,8 @@ void BitcoinGUI::setWalletActionsEnabled(bool enabled)
     sendCoinsAction->setEnabled(enabled);
     sendCoinsMenuAction->setEnabled(enabled);
 #ifdef ENABLE_WALLET
-    privateSendCoinsAction->setEnabled(enabled && CPrivateSendClientOptions::IsEnabled());
-    privateSendCoinsMenuAction->setEnabled(enabled && CPrivateSendClientOptions::IsEnabled());
+    privateSendCoinsAction->setEnabled(enabled && clientModel->privateSendOptions().isEnabled());
+    privateSendCoinsMenuAction->setEnabled(enabled && clientModel->privateSendOptions().isEnabled());
 #else
     privateSendCoinsAction->setEnabled(enabled);
     privateSendCoinsMenuAction->setEnabled(enabled);
@@ -1050,8 +1049,8 @@ void BitcoinGUI::setNumBlocks(int count, const QDateTime& blockDate, double nVer
     // Disabling macOS App Nap on initial sync, disk, reindex operations and mixing.
     bool disableAppNap = !m_node.masternode().isSynced();
 #ifdef ENABLE_WALLET
-    for (const auto& pair : privateSendClientManagers) {
-        disableAppNap |= pair.second->IsMixing();
+    for (const auto& wallet : m_node.getWallets()) {
+        disableAppNap |= wallet->privateSend().isMixing();
     }
 #endif // ENABLE_WALLET
     if (disableAppNap) {

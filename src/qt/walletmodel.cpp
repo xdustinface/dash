@@ -22,7 +22,6 @@
 #include <wallet/wallet.h>
 
 #include <spork.h>
-#include <privatesend/privatesend-client.h>
 
 #include <stdint.h>
 
@@ -81,13 +80,13 @@ void WalletModel::pollBalanceChanged()
         return;
     }
 
-    if(fForceCheckBalanceChanged || m_node.getNumBlocks() != cachedNumBlocks || CPrivateSendClientOptions::GetRounds() != cachedPrivateSendRounds)
+    if(fForceCheckBalanceChanged || m_node.getNumBlocks() != cachedNumBlocks || node().privateSendOptions().getRounds() != cachedPrivateSendRounds)
     {
         fForceCheckBalanceChanged = false;
 
         // Balance and number of transactions might have changed
         cachedNumBlocks = m_node.getNumBlocks();
-        cachedPrivateSendRounds = CPrivateSendClientOptions::GetRounds();
+        cachedPrivateSendRounds = node().privateSendOptions().getRounds();
 
         checkBalanceChanged(new_balances);
         if(transactionTableModel)

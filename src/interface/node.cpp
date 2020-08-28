@@ -35,6 +35,7 @@
 #include <config/dash-config.h>
 #endif
 #ifdef ENABLE_WALLET
+#include <privatesend/privatesend-client.h>
 #include <wallet/fees.h>
 #include <wallet/wallet.h>
 #define CHECK_WALLET(x) x
@@ -87,11 +88,73 @@ public:
     }
 };
 
+#ifdef ENABLE_WALLET
+class PrivateSendOptionsImpl : public PrivateSend::Options
+{
+public:
+    int getRounds() override
+    {
+        return CPrivateSendClientOptions::GetRounds();
+    }
+    int getAmount() override
+    {
+        return CPrivateSendClientOptions::GetAmount();
+    }
+    void setMultiSessionEnabled(bool fEnabled) override
+    {
+        CPrivateSendClientOptions::SetMultiSessionEnabled(fEnabled);
+    }
+    void setRounds(int nRounds) override
+    {
+        CPrivateSendClientOptions::SetRounds(nRounds);
+    }
+    void setAmount(CAmount amount) override
+    {
+        CPrivateSendClientOptions::SetAmount(amount);
+    }
+    bool isEnabled() override
+    {
+        return CPrivateSendClientOptions::IsEnabled();
+    }
+    bool isMultiSessionEnabled() override
+    {
+        return CPrivateSendClientOptions::IsMultiSessionEnabled();
+    }
+    bool isCollateralAmount(CAmount nAmount) override
+    {
+        return CPrivateSend::IsCollateralAmount(nAmount);
+    }
+    CAmount getMinCollateralAmount() override
+    {
+        return CPrivateSend::GetMinCollateralAmount();
+    }
+    CAmount getMaxCollateralAmount() override
+    {
+        return CPrivateSend::GetMaxCollateralAmount();
+    }
+    CAmount getSmallestDenomination() override
+    {
+        return CPrivateSend::GetSmallestDenomination();
+    }
+    bool isDenominated(CAmount nAmount) override
+    {
+        return CPrivateSend::IsDenominatedAmount(nAmount);
+    }
+    std::vector<CAmount> getStandardDenominations() override
+    {
+        return CPrivateSend::GetStandardDenominations();
+    }
+};
+#endif
+
 class NodeImpl : public Node
 {
     EVOImpl m_evo;
     LLMQImpl m_llmq;
     MasternodeImpl m_masternode;
+#ifdef ENABLE_WALLET
+    PrivateSendOptionsImpl m_privatesend;
+#endif
 
     void parseParameters(int argc, const char* const argv[]) override
     {
@@ -303,6 +366,9 @@ class NodeImpl : public Node
     EVO& evo() override { return m_evo; }
     LLMQ& llmq() override { return m_llmq; }
     Masternode& masternode() override { return m_masternode; }
+#ifdef ENABLE_WALLET
+    PrivateSend::Options& privateSendOptions() override { return m_privatesend; }
+#endif
 
     std::unique_ptr<Handler> handleInitMessage(InitMessageFn fn) override
     {

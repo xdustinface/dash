@@ -371,7 +371,7 @@ bool CPrivateSend::IsCollateralValid(const CTransaction& txCollateral)
     }
 
     //collateral transactions are required to pay out a small fee to the miners
-    if (nValueIn - nValueOut < GetCollateralAmount()) {
+    if (nValueIn - nValueOut < GetMinCollateralAmount()) {
         LogPrint(BCLog::PRIVATESEND, "CPrivateSend::IsCollateralValid -- did not include enough fees in transaction: fees: %d, txCollateral=%s", nValueOut - nValueIn, txCollateral.ToString()); /* Continued */
         return false;
     }
@@ -393,7 +393,7 @@ bool CPrivateSend::IsCollateralValid(const CTransaction& txCollateral)
 bool CPrivateSend::IsCollateralAmount(CAmount nInputAmount)
 {
     // collateral input can be anything between 1x and "max" (including both)
-    return (nInputAmount >= GetCollateralAmount() && nInputAmount <= GetMaxCollateralAmount());
+    return (nInputAmount >= GetMinCollateralAmount() && nInputAmount <= GetMaxCollateralAmount());
 }
 
 /*
