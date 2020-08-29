@@ -97,16 +97,11 @@ CTransactionBuilderOutput::CTransactionBuilderOutput(CTransactionBuilder* pTxBui
 bool CTransactionBuilderOutput::UpdateAmount(const CAmount nNewAmount)
 {
     LOCK(pTxBuilder->cs_outputs);
-
-    const CAmount nAmountDiff = nNewAmount - nAmount;
-
-    if (nNewAmount > 0 && nAmountDiff <= pTxBuilder->GetAmountLeft()) {
-        if (nAmountDiff != 0) {
-            nAmount = nNewAmount;
-        }
-        return true;
+    if (nNewAmount <= 0 || nNewAmount - nAmount > pTxBuilder->GetAmountLeft()) {
+        return false;
     }
-    return false;
+    nAmount = nNewAmount;
+    return true;
 }
 
 CTransactionBuilder::CTransactionBuilder(CWallet* pwalletIn, const CompactTallyItem& tallyItemIn) :
