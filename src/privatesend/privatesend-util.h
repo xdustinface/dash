@@ -57,7 +57,7 @@ public:
     // Get the amount of this output
     CAmount GetAmount() const { return nAmount; }
     // Try update the amount of this output. Returns true if it was successful and false if not (e.g. insufficient amount left).
-    bool UpdateAmount(const CAmount nAmount);
+    bool UpdateAmount(CAmount nAmount);
     // Tell the wallet to remove the key used by this output from the keypool
     void KeepKey() { key.KeepKey(); }
     // Tell the wallet to return the key used by this output to the keypool
@@ -117,7 +117,7 @@ private:
     // Get the total number of bytes used already by this transaction
     unsigned int GetBytesTotal() const;
     // Helper to calculate static amount left by simply subtracting an used amount and a fee from a provided initial amount.
-    static CAmount GetAmountLeft(const CAmount nAmountInitial, const CAmount nAmountUsed, const CAmount nFee);
+    static CAmount GetAmountLeft(CAmount nAmountInitial, CAmount nAmountUsed, CAmount nFee);
     // Get the amount currently used by added outputs. Does not include fees.
     CAmount GetAmountUsed() const;
     // Get fees based on the number of bytes and the feerate set in CoinControl.
