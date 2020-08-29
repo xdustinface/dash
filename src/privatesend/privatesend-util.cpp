@@ -180,7 +180,8 @@ bool CTransactionBuilder::CouldAddOutput(CAmount nAmountOutput) const
 bool CTransactionBuilder::CouldAddOutputs(const std::vector<CAmount>& vecOutputAmounts) const
 {
     CAmount nAmountAdditional{0};
-    int nBytesAdditional = nBytesOutput * vecOutputAmounts.size();
+    assert(vecOutputAmounts.size() < INT_MAX);
+    int nBytesAdditional = nBytesOutput * (int)vecOutputAmounts.size();
     for (const auto nAmountOutput : vecOutputAmounts) {
         if (nAmountOutput < 0) {
             return false;
@@ -238,7 +239,9 @@ CAmount CTransactionBuilder::GetFee(unsigned int nBytes) const
 int CTransactionBuilder::GetSizeOfCompactSizeDiff(size_t nAdd) const
 {
     size_t nSize = vecOutputs.size();
-    return ::GetSizeOfCompactSizeDiff(nSize, nSize + nAdd);
+    unsigned int ret = ::GetSizeOfCompactSizeDiff(nSize, nSize + nAdd);
+    assert(ret <= INT_MAX);
+    return (int)ret;
 }
 
 bool CTransactionBuilder::IsDust(CAmount nAmount) const
