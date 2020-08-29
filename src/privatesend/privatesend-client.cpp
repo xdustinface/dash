@@ -1647,7 +1647,7 @@ bool CPrivateSendClientSession::CreateDenominated(CAmount nBalanceToDenominate, 
 
         auto countPossibleOutputs = [&](CAmount nAmount) -> int {
             std::vector<CAmount> vecOutputs;
-            while(true) {
+            while (true) {
                 // Create an potential output
                 vecOutputs.push_back(nAmount);
                 if (!txBuilder.CouldAddOutputs(vecOutputs) || txBuilder.CountOutputs() + vecOutputs.size() > PRIVATESEND_DENOM_OUTPUTS_THRESHOLD) {

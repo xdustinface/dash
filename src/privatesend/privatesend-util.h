@@ -80,7 +80,7 @@ class CTransactionBuilder
     int nBytesBase{0};
     // Contains the number of bytes required to add one output
     int nBytesOutput{0};
-    // Call KeepKey for all keys in desctructor if fKeepKeys is true, call ReturnKey for all key if its false.
+    // Call KeepKey for all keys in destructor if fKeepKeys is true, call ReturnKey for all key if its false.
     bool fKeepKeys{false};
     // Protect vecOutputs
     mutable CCriticalSection cs_outputs;
@@ -96,7 +96,7 @@ public:
     bool CouldAddOutput(CAmount nAmountOutput) const;
     // Check if its possible to add multiple outputs as vector of amounts. Returns true if its possible to add all of them and false if not.
     bool CouldAddOutputs(const std::vector<CAmount>& vecOutputAmounts) const;
-    // Add an output with the amount nAmount. Returns a pointer to the output if it could be added and nullptr if not due to insufficient amomunt left.
+    // Add an output with the amount nAmount. Returns a pointer to the output if it could be added and nullptr if not due to insufficient amount left.
     CTransactionBuilderOutput* AddOutput(CAmount nAmountOutput = 0);
     // Get amount we had available when we started
     CAmount GetAmountInitial() const { return tallyItem.nAmount; }

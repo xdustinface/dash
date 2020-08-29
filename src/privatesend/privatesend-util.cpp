@@ -257,7 +257,7 @@ bool CTransactionBuilder::Commit(std::string& strResult)
     CAmount nFeeRet = 0;
     int nChangePosRet = -1;
 
-    // Transfor the outputs to the format CWallet::CreateTransaction requires
+    // Transform the outputs to the format CWallet::CreateTransaction requires
     std::vector<CRecipient> vecSend;
     {
         LOCK(cs_outputs);
