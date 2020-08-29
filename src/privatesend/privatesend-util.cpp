@@ -112,7 +112,7 @@ CTransactionBuilder::CTransactionBuilder(CWallet* pwalletIn, const CompactTallyI
     // Generate a feerate which will be used to consider if the remainder is dust and will go into fees or not
     coinControl.m_discard_feerate = ::GetDiscardRate(::feeEstimator);
     // Generate a feerate which will be used by calculations of this class and also by CWallet::CreateTransaction
-    coinControl.m_feerate = std::max(::feeEstimator.estimateSmartFee(::nTxConfirmTarget, nullptr, true), payTxFee);
+    coinControl.m_feerate = std::max(::feeEstimator.estimateSmartFee((int)::nTxConfirmTarget, nullptr, true), payTxFee);
     // Change always goes back to origin
     coinControl.destChange = tallyItemIn.txdest;
     // Only allow tallyItems inputs for tx creation
