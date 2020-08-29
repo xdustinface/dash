@@ -136,7 +136,7 @@ CTransactionBuilder::CTransactionBuilder(CWallet* pwalletIn, const CompactTallyI
     SignatureData dummySignature;
     ProduceSignature(DummySignatureCreator(pwallet), dummyScript, dummySignature);
     for (auto out : tallyItem.vecOutPoints) {
-        dummyTx.vin.push_back(CTxIn(out, dummySignature.scriptSig));
+        dummyTx.vin.emplace_back(out, dummySignature.scriptSig);
     }
     // Calculate required bytes for the dummy tx with tallyItem's inputs only
     nBytesBase = ::GetSerializeSize(dummyTx, SER_NETWORK, PROTOCOL_VERSION);
