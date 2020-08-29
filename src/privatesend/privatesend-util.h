@@ -55,7 +55,7 @@ public:
     // Get the scriptPubKey of this output
     CScript GetScript() { return script; }
     // Get the amount of this output
-    CAmount GetAmount() { return nAmount; }
+    CAmount GetAmount() const { return nAmount; }
     // Try update the amount of this output. Returns true if it was successful and false if not (e.g. insufficient amount left).
     bool UpdateAmount(const CAmount nAmount);
     // Tell the wallet to remove the key used by this output from the keypool
