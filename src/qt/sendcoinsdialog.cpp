@@ -257,7 +257,7 @@ void SendCoinsDialog::on_sendButton_clicked()
         SendCoinsEntry *entry = qobject_cast<SendCoinsEntry*>(ui->entries->itemAt(i)->widget());
         if(entry)
         {
-            if(entry->validate(model->node()))
+            if(entry->validate())
             {
                 recipients.append(entry->getValue());
             }

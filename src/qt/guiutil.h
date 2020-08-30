@@ -22,11 +22,6 @@ class QValidatedLineEdit;
 class OptionsModel;
 class SendCoinsRecipient;
 
-namespace interface
-{
-class Node;
-}
-
 QT_BEGIN_NAMESPACE
 class QAbstractItemView;
 class QDateTime;
@@ -110,9 +105,6 @@ namespace GUIUtil
     bool parseBitcoinURI(QString uri, SendCoinsRecipient *out);
     bool validateBitcoinURI(const QString& uri);
     QString formatBitcoinURI(const SendCoinsRecipient &info);
-
-    // Returns true if given address+amount meets "dust" definition
-    bool isDust(interface::Node& node, const QString& address, const CAmount& amount);
 
     // HTML escaping for rich text controls
     QString HtmlEscape(const QString& str, bool fMultiLine=false);

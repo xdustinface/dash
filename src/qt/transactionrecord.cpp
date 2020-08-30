@@ -35,8 +35,7 @@ QList<TransactionRecord> TransactionRecord::decomposeTransaction(const interface
     CAmount nNet = nCredit - nDebit;
     uint256 hash = wtx.tx->GetHash();
     std::map<std::string, std::string> mapValue = wtx.value_map;
-    auto node = interface::MakeNode();
-    auto& privateSendOptions = node->privateSendOptions();
+    auto& privateSendOptions = interface::GetNode().privateSendOptions();
 
     if (nNet > 0 || wtx.is_coinbase)
     {

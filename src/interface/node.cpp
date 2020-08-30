@@ -441,5 +441,9 @@ class NodeImpl : public Node
 } // namespace
 
 std::unique_ptr<Node> MakeNode() { return MakeUnique<NodeImpl>(); }
+Node& GetNode() {
+    static auto node = MakeNode();
+    return *node;
+}
 
 } // namespace interface

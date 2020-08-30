@@ -6,6 +6,9 @@
 #include <qt/sendcoinsentry.h>
 #include <qt/forms/ui_sendcoinsentry.h>
 
+#include <interface/node.h>
+#include <policy/policy.h>
+
 #include <qt/addressbookpage.h>
 #include <qt/addresstablemodel.h>
 #include <qt/guiutil.h>
@@ -138,7 +141,7 @@ void SendCoinsEntry::useAvailableBalanceClicked()
     Q_EMIT useAvailableBalance(this);
 }
 
-bool SendCoinsEntry::validate(interface::Node& node)
+bool SendCoinsEntry::validate()
 {
     if (!model)
         return false;
@@ -169,7 +172,10 @@ bool SendCoinsEntry::validate(interface::Node& node)
     }
 
     // Reject dust outputs:
-    if (retval && GUIUtil::isDust(node, ui->payTo->text(), ui->payAmount->value())) {
+    CTxDestination dest = DecodeDestination(ui->payTo->text().toStdString());
+    CScript script = GetScriptForDestination(dest);
+    CTxOut txOut(ui->payAmount->value(), script);
+    if (retval && IsDust(txOut, interface::GetNode().getDustRelayFee())) {
         ui->payAmount->setValid(false);
         retval = false;
     }

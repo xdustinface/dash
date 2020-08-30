@@ -331,6 +331,8 @@ public:
 
 //! Return implementation of Node interface.
 std::unique_ptr<Node> MakeNode();
+//! Return a reference to an instance of Node interface
+Node& GetNode();
 
 } // namespace interface
 
