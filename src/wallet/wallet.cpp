@@ -3900,12 +3900,10 @@ bool CWallet::CreateTransaction(const std::vector<CRecipient>& vecSend, CWalletT
                 auto calculateFee = [&](CAmount& nFee) -> bool {
                     // Fill in dummy signatures for fee calculation.
                     int nIn = 0;
-                    for (const auto& coin : vecCoins)
-                    {
+                    for (const auto& coin : vecCoins) {
                         const CScript& scriptPubKey = coin.txout.scriptPubKey;
                         SignatureData sigdata;
-                        if (!ProduceSignature(DummySignatureCreator(this), scriptPubKey, sigdata))
-                        {
+                        if (!ProduceSignature(DummySignatureCreator(this), scriptPubKey, sigdata)) {
                             strFailReason = _("Signing transaction failed");
                             return false;
                         } else {
@@ -3937,8 +3935,7 @@ bool CWallet::CreateTransaction(const std::vector<CRecipient>& vecSend, CWalletT
 
                     // If we made it here and we aren't even able to meet the relay fee on the next pass, give up
                     // because we must be at the maximum allowed fee.
-                    if (nFee < ::minRelayTxFee.GetFee(nBytes))
-                    {
+                    if (nFee < ::minRelayTxFee.GetFee(nBytes)) {
                         strFailReason = _("Transaction too large for fee policy");
                         return false;
                     }
