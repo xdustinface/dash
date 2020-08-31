@@ -39,92 +39,92 @@ public:
 
 class CTransactionBuilderOutput
 {
-    // Used for amount updates
+    /// Used for amount updates
     CTransactionBuilder* pTxBuilder{nullptr};
-    // Reserve key where the amount of this output will end up
+    /// Reserve key where the amount of this output will end up
     CReserveKey key;
-    // Amount this output will receive
+    /// Amount this output will receive
     CAmount nAmount{0};
-    // ScriptPubKey of this output
+    /// ScriptPubKey of this output
     CScript script;
 
 public:
     CTransactionBuilderOutput(CTransactionBuilder* pTxBuilderIn, CWallet* pwalletIn, CAmount nAmountIn);
     CTransactionBuilderOutput(CTransactionBuilderOutput&&) = delete;
     CTransactionBuilderOutput& operator=(CTransactionBuilderOutput&&) = delete;
-    // Get the scriptPubKey of this output
+    /// Get the scriptPubKey of this output
     CScript GetScript() const { return script; }
-    // Get the amount of this output
+    /// Get the amount of this output
     CAmount GetAmount() const { return nAmount; }
-    // Try update the amount of this output. Returns true if it was successful and false if not (e.g. insufficient amount left).
+    /// Try update the amount of this output. Returns true if it was successful and false if not (e.g. insufficient amount left).
     bool UpdateAmount(CAmount nAmount);
-    // Tell the wallet to remove the key used by this output from the keypool
+    /// Tell the wallet to remove the key used by this output from the keypool
     void KeepKey() { key.KeepKey(); }
-    // Tell the wallet to return the key used by this output to the keypool
+    /// Tell the wallet to return the key used by this output to the keypool
     void ReturnKey() { key.ReturnKey(); }
 };
 
 class CTransactionBuilder
 {
-    // Wallet the transaction will be build for
+    /// Wallet the transaction will be build for
     CWallet* pwallet{nullptr};
-    // See CTransactionBuilder() for initialization
+    /// See CTransactionBuilder() for initialization
     CCoinControl coinControl;
-    // Dummy since we anyway use tallyItem's destination as change destination in coincontrol.
-    // Its a member just to make sure ReturnKey can be called in destructor just in case it gets generated/kept
-    // somewhere in CWallet code.
+    /// Dummy since we anyway use tallyItem's destination as change destination in coincontrol.
+    /// Its a member just to make sure ReturnKey can be called in destructor just in case it gets generated/kept
+    /// somewhere in CWallet code.
     CReserveKey dummyReserveKey;
-    // Contains all utxos available to generate this transactions. They are all from the same address.
+    /// Contains all utxos available to generate this transactions. They are all from the same address.
     CompactTallyItem tallyItem;
-    // Contains the number of bytes required for a transaction with only the inputs of tallyItems, no outputs
+    /// Contains the number of bytes required for a transaction with only the inputs of tallyItems, no outputs
     int nBytesBase{0};
-    // Contains the number of bytes required to add one output
+    /// Contains the number of bytes required to add one output
     int nBytesOutput{0};
-    // Call KeepKey for all keys in destructor if fKeepKeys is true, call ReturnKey for all key if its false.
+    /// Call KeepKey for all keys in destructor if fKeepKeys is true, call ReturnKey for all key if its false.
     bool fKeepKeys{false};
-    // Protect vecOutputs
+    /// Protect vecOutputs
     mutable CCriticalSection cs_outputs;
-    // Contains all outputs already added to the transaction
+    /// Contains all outputs already added to the transaction
     std::vector<std::unique_ptr<CTransactionBuilderOutput>> vecOutputs;
-    // Needed by CTransactionBuilderOutput::UpdateAmount to lock cs_outputs
+    /// Needed by CTransactionBuilderOutput::UpdateAmount to lock cs_outputs
     friend class CTransactionBuilderOutput;
 
 public:
     CTransactionBuilder(CWallet* pwalletIn, const CompactTallyItem& tallyItemIn);
     ~CTransactionBuilder();
-    // Check it would be possible to add a single output with the amount nAmount. Returns true if its possible and false if not.
+    /// Check it would be possible to add a single output with the amount nAmount. Returns true if its possible and false if not.
     bool CouldAddOutput(CAmount nAmountOutput) const;
-    // Check if its possible to add multiple outputs as vector of amounts. Returns true if its possible to add all of them and false if not.
+    /// Check if its possible to add multiple outputs as vector of amounts. Returns true if its possible to add all of them and false if not.
     bool CouldAddOutputs(const std::vector<CAmount>& vecOutputAmounts) const;
-    // Add an output with the amount nAmount. Returns a pointer to the output if it could be added and nullptr if not due to insufficient amount left.
+    /// Add an output with the amount nAmount. Returns a pointer to the output if it could be added and nullptr if not due to insufficient amount left.
     CTransactionBuilderOutput* AddOutput(CAmount nAmountOutput = 0);
-    // Get amount we had available when we started
+    /// Get amount we had available when we started
     CAmount GetAmountInitial() const { return tallyItem.nAmount; }
-    // Get the amount currently left to add more outputs. Does respect fees.
+    /// Get the amount currently left to add more outputs. Does respect fees.
     CAmount GetAmountLeft() const { return GetAmountInitial() - GetAmountUsed() - GetFee(GetBytesTotal()); }
-    // Check if an amounts should be considered as dust
+    /// Check if an amounts should be considered as dust
     bool IsDust(CAmount nAmount) const;
-    // Get the total number of added outputs
+    /// Get the total number of added outputs
     int CountOutputs() const { return vecOutputs.size(); }
-    // Create and Commit the transaction to the wallet
+    /// Create and Commit the transaction to the wallet
     bool Commit(std::string& strResult);
-    // Convert to a string
+    /// Convert to a string
     std::string ToString() const;
 
 private:
-    // Clear the output vector and keep/return the included keys depending on the value of fKeepKeys
+    /// Clear the output vector and keep/return the included keys depending on the value of fKeepKeys
     void Clear();
-    // Get the total number of bytes used already by this transaction
+    /// Get the total number of bytes used already by this transaction
     unsigned int GetBytesTotal() const;
-    // Helper to calculate static amount left by simply subtracting an used amount and a fee from a provided initial amount.
+    /// Helper to calculate static amount left by simply subtracting an used amount and a fee from a provided initial amount.
     static CAmount GetAmountLeft(CAmount nAmountInitial, CAmount nAmountUsed, CAmount nFee);
-    // Get the amount currently used by added outputs. Does not include fees.
+    /// Get the amount currently used by added outputs. Does not include fees.
     CAmount GetAmountUsed() const;
-    // Get fees based on the number of bytes and the feerate set in CoinControl.
-    // NOTE: To get the total transaction fee this should only be called once with the total number of bytes for the transaction to avoid
-    // calling CFeeRate::GetFee multiple times with subtotals as this may add rounding errors with each further call.
+    /// Get fees based on the number of bytes and the feerate set in CoinControl.
+    /// NOTE: To get the total transaction fee this should only be called once with the total number of bytes for the transaction to avoid
+    /// calling CFeeRate::GetFee multiple times with subtotals as this may add rounding errors with each further call.
     CAmount GetFee(unsigned int nBytes) const;
-    // Helper to get GetSizeOfCompactSizeDiff(vecOutputs.size(), vecOutputs.size() + nAdd)
+    /// Helper to get GetSizeOfCompactSizeDiff(vecOutputs.size(), vecOutputs.size() + nAdd)
     int GetSizeOfCompactSizeDiff(size_t nAdd) const;
 };
 
