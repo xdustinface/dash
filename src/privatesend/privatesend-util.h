@@ -37,6 +37,10 @@ public:
     void ReturnAll();
 };
 
+/**
+ * @brief Used by CTransactionBuilder to represent its transaction outputs.
+ * It creates a CReserveKey for the given CWallet as destination.
+ */
 class CTransactionBuilderOutput
 {
     /// Used for amount updates
@@ -64,6 +68,11 @@ public:
     void ReturnKey() { key.ReturnKey(); }
 };
 
+/**
+ * @brief Enables simple transaction generation for a given CWallet object. The resulting
+ * transaction's inputs are defined by the given CompactTallyItem. The outputs are
+ * defined by CTransactionBuilderOutput.
+ */
 class CTransactionBuilder
 {
     /// Wallet the transaction will be build for
