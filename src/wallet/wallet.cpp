@@ -3892,9 +3892,7 @@ bool CWallet::CreateTransaction(const std::vector<CRecipient>& vecSend, CWalletT
                 // nLockTime set above actually works.
                 txNew.vin.clear();
                 for (const auto& coin : vecCoins) {
-                    CTxIn txin = CTxIn(coin.outpoint,CScript(),
-                                              CTxIn::SEQUENCE_FINAL - 1);
-                    txNew.vin.push_back(txin);
+                    txNew.vin.emplace_back(coin.outpoint, CScript(), CTxIn::SEQUENCE_FINAL - 1);
                 }
 
                 auto calculateFee = [&](CAmount& nFee) -> bool {
