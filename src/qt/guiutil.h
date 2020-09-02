@@ -43,6 +43,8 @@ namespace GUIUtil
         UNCONFIRMED,
         /* Theme related blue color */
         BLUE,
+        /* Eye-friendly orange color */
+        ORANGE,
         /* Eye-friendly red color, e.g. Transaction list -- negative amount */
         RED,
         /* Eye-friendly green color */
@@ -63,6 +65,8 @@ namespace GUIUtil
         BORDER_WIDGET,
         /* Pixel color of generated QR codes. */
         QR_PIXEL,
+        /* Alternative color for black/white icons. White part will be filled with this color by default. */
+        ICON_ALTERNATIVE_COLOR,
     };
 
     /* Enumeration of possible "styles" */

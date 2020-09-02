@@ -149,6 +149,7 @@ static const std::map<ThemedColor, QColor> themedColors = {
     { ThemedColor::DEFAULT, QColor(85, 85, 85) },
     { ThemedColor::UNCONFIRMED, QColor(128, 128, 128) },
     { ThemedColor::BLUE, QColor(0, 141, 228) },
+    { ThemedColor::ORANGE, QColor(199, 147, 4) },
     { ThemedColor::RED, QColor(168, 72, 50) },
     { ThemedColor::GREEN, QColor(8, 110, 3) },
     { ThemedColor::BAREADDRESS, QColor(140, 140, 140) },
@@ -159,12 +160,14 @@ static const std::map<ThemedColor, QColor> themedColors = {
     { ThemedColor::BACKGROUND_WIDGET, QColor(234, 234, 236) },
     { ThemedColor::BORDER_WIDGET, QColor(220, 220, 220) },
     { ThemedColor::QR_PIXEL, QColor(85, 85, 85) },
+    { ThemedColor::ICON_ALTERNATIVE_COLOR, QColor(167, 167, 167) },
 };
 
 static const std::map<ThemedColor, QColor> themedDarkColors = {
     { ThemedColor::DEFAULT, QColor(199, 199, 199) },
     { ThemedColor::UNCONFIRMED, QColor(170, 170, 170) },
     { ThemedColor::BLUE, QColor(0, 89, 154) },
+    { ThemedColor::ORANGE, QColor(199, 147, 4) },
     { ThemedColor::RED, QColor(168, 72, 50) },
     { ThemedColor::GREEN, QColor(8, 110, 3) },
     { ThemedColor::BAREADDRESS, QColor(140, 140, 140) },
@@ -175,6 +178,7 @@ static const std::map<ThemedColor, QColor> themedDarkColors = {
     { ThemedColor::BACKGROUND_WIDGET, QColor(45, 45, 46) },
     { ThemedColor::BORDER_WIDGET, QColor(74, 74, 75) },
     { ThemedColor::QR_PIXEL, QColor(199, 199, 199) },
+    { ThemedColor::ICON_ALTERNATIVE_COLOR, QColor(74, 74, 75) },
 };
 
 static const std::map<ThemedStyle, QString> themedStyles = {
