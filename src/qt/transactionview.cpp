@@ -708,6 +708,7 @@ void TransactionView::resizeEvent(QResizeEvent* event)
 
 void TransactionView::changeEvent(QEvent* e)
 {
+    QWidget::changeEvent(e);
     if (e->type() == QEvent::StyleChange) {
         updateCalendarWidgets();
     }
