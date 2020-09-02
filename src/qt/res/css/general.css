@@ -1616,12 +1616,11 @@ QWidget#RPCConsole QLineEdit#lineEdit { /* Console Input */
     margin-top: 10px;
 }
 
-QWidget#RPCConsole QPushButton#clearButton,
-QWidget#RPCConsole QPushButton#fontSmallerButton,
-QWidget#RPCConsole QPushButton#fontBiggerButton { /* Console Font and Clear Buttons */
+QWidget#RPCConsole .QToolButton { /* Console buttons fontbigger/fontsmaller/clear */
     background-color: #00000000;
-    padding-left: 10px;
-    padding-right: 10px;
+    margin-left: 3px;
+    margin-bottom:5px;
+    border: 0;
 }
 
 QWidget#RPCConsole QPushButton#promptIcon { /* Prompt Icon */
@@ -1795,18 +1794,11 @@ QDialog#SignVerifyMessageDialog QPushButton#addressBookButton_VM { /* Verify Mes
     border: 0px solid red;
 }
 
-QDialog#SignVerifyMessageDialog QPushButton#addressBookButton_VM,
-QDialog#SignVerifyMessageDialog QPushButton#addressBookButton_SM,
-QDialog#SignVerifyMessageDialog QPushButton#copySignatureButton_SM,
-QDialog#SignVerifyMessageDialog QPushButton#pasteButton_SM {
-    padding-left: -1px;
-    padding-right: -1px;
-}
-
-QDialog#SignVerifyMessageDialog QPushButton#addressBookButton_VM,
-QDialog#SignVerifyMessageDialog QPushButton#addressBookButton_SM,
-QDialog#SignVerifyMessageDialog QPushButton#copySignatureButton_SM {
-    margin-left: 8px;
+QDialog#SignVerifyMessageDialog .QToolButton { /* General Settings for Pay To Icons */
+    background-color: #00000000;
+    margin-left: 5px;
+    margin-right: 5px;
+    border: 0;
 }
 
 /******************************************************
