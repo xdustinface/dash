@@ -42,6 +42,7 @@
 
 #include <boost/scoped_array.hpp>
 
+#include <QAbstractButton>
 #include <QAbstractItemView>
 #include <QApplication>
 #include <QClipboard>
@@ -209,6 +210,48 @@ QString getThemedStyleQString(ThemedStyle style)
 {
     QString theme = QSettings().value("theme", "").toString();
     return theme.startsWith(darkThemePrefix) ? themedDarkStyles.at(style) : themedStyles.at(style);
+}
+
+QIcon getIcon(const QString& strIcon, const ThemedColor color, const ThemedColor colorAlternative, const QString& strIconPath)
+{
+    QColor qcolor = getThemedQColor(color);
+    QColor qcolorAlternative = getThemedQColor(colorAlternative);
+    QIcon icon(strIconPath + strIcon);
+    QIcon themedIcon;
+    for (const QSize& size : icon.availableSizes()) {
+        QImage image(icon.pixmap(size).toImage());
+        image = image.convertToFormat(QImage::Format_ARGB32);
+        for (int x = 0; x < image.width(); ++x) {
+            for (int y = 0; y < image.height(); ++y) {
+                const QRgb rgb = image.pixel(x, y);
+                QColor* pColor;
+                if ((rgb & RGB_MASK) < RGB_HALF) {
+                    pColor = &qcolor;
+                } else {
+                    pColor = &qcolorAlternative;
+                }
+                image.setPixel(x, y, qRgba(pColor->red(), pColor->green(), pColor->blue(), qAlpha(rgb)));
+            }
+        }
+        themedIcon.addPixmap(QPixmap::fromImage(image));
+    }
+    return themedIcon;
+}
+
+QIcon getIcon(const QString& strIcon, const ThemedColor color, const QString& strIconPath)
+{
+    return getIcon(strIcon, color, ThemedColor::ICON_ALTERNATIVE_COLOR, strIconPath);
+}
+
+void setIcon(QAbstractButton* button, const QString& strIcon, const ThemedColor color, const ThemedColor colorAlternative, const QSize& size)
+{
+    button->setIcon(getIcon(strIcon, color, colorAlternative));
+    button->setIconSize(size);
+}
+
+void setIcon(QAbstractButton* button, const QString& strIcon, const ThemedColor color, const QSize& size)
+{
+    setIcon(button, strIcon, color, ThemedColor::ICON_ALTERNATIVE_COLOR, size);
 }
 
 QString dateTimeStr(const QDateTime &date)
