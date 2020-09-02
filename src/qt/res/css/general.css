@@ -1744,7 +1744,6 @@ QStackedWidget#SendCoinsEntry .QToolButton#addressBookButton,
 QStackedWidget#SendCoinsEntry .QToolButton#pasteButton,
 QStackedWidget#SendCoinsEntry .QToolButton#deleteButton,
 QStackedWidget#SendCoinsEntry .QToolButton#deleteButton_is {
-    qproperty-iconSize: 28px 28px;
 }
 
 QStackedWidget#SendCoinsEntry .QLineEdit#addAsLabel { /* Pay To Input Field */
@@ -1800,7 +1799,6 @@ QDialog#SignVerifyMessageDialog QPushButton#addressBookButton_VM,
 QDialog#SignVerifyMessageDialog QPushButton#addressBookButton_SM,
 QDialog#SignVerifyMessageDialog QPushButton#copySignatureButton_SM,
 QDialog#SignVerifyMessageDialog QPushButton#pasteButton_SM {
-    qproperty-iconSize: 28px 28px;
     padding-left: -1px;
     padding-right: -1px;
 }
