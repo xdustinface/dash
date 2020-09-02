@@ -27,11 +27,11 @@ SendCoinsEntry::SendCoinsEntry(QWidget* parent) :
 
     ui->addAsLabel->setPlaceholderText(tr("Enter a label for this address to add it to your address book"));
 
-    ui->addressBookButton->setIcon(QIcon(":/icons/address-book"));
-    ui->pasteButton->setIcon(QIcon(":/icons/editpaste"));
-    ui->deleteButton->setIcon(QIcon(":/icons/remove"));
-    ui->deleteButton_is->setIcon(QIcon(":/icons/remove"));
-    ui->deleteButton_s->setIcon(QIcon(":/icons/remove"));
+    GUIUtil::setIcon(ui->addressBookButton, "address-book");
+    GUIUtil::setIcon(ui->pasteButton, "editpaste");
+    GUIUtil::setIcon(ui->deleteButton, "remove", GUIUtil::ThemedColor::RED);
+    GUIUtil::setIcon(ui->deleteButton_is, "remove", GUIUtil::ThemedColor::RED);
+    GUIUtil::setIcon(ui->deleteButton_s, "remove", GUIUtil::ThemedColor::RED);
 
     // normal dash address field
     GUIUtil::setupAddressWidget(ui->payTo, this, true);
