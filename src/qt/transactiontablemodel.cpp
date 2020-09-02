@@ -424,21 +424,10 @@ QString TransactionTableModel::formatTxType(const TransactionRecord *wtx) const
 
 QVariant TransactionTableModel::txAddressDecoration(const TransactionRecord *wtx) const
 {
-    switch(wtx->type)
-    {
-    case TransactionRecord::Generated:
-        return GUIUtil::getIcon("tx_mined");
-    case TransactionRecord::RecvWithPrivateSend:
-    case TransactionRecord::RecvWithAddress:
-    case TransactionRecord::RecvFromOther:
-        return GUIUtil::getIcon("tx_input");
-    case TransactionRecord::PrivateSend:
-    case TransactionRecord::SendToAddress:
-    case TransactionRecord::SendToOther:
-        return GUIUtil::getIcon("tx_output");
-    default:
-        return GUIUtil::getIcon("tx_inout");
+    if (wtx->status.depth < 6 && wtx->status.lockedByInstantSend && !wtx->status.lockedByChainLocks) {
+        return GUIUtil::getIcon("verify", GUIUtil::ThemedColor::BLUE);
     }
+    return QVariant();
 }
 
 QString TransactionTableModel::formatTxToAddress(const TransactionRecord *wtx, bool tooltip) const
@@ -517,27 +506,27 @@ QVariant TransactionTableModel::txStatusDecoration(const TransactionRecord *wtx)
     case TransactionStatus::Unconfirmed:
         return GUIUtil::getIcon("transaction_0");
     case TransactionStatus::Abandoned:
-        return GUIUtil::getIcon("transaction_abandoned");
+        return GUIUtil::getIcon("transaction_abandoned", GUIUtil::ThemedColor::RED);
     case TransactionStatus::Confirming:
         switch(wtx->status.depth)
         {
-        case 1: return GUIUtil::getIcon("transaction_1");
-        case 2: return GUIUtil::getIcon("transaction_2");
-        case 3: return GUIUtil::getIcon("transaction_3");
-        case 4: return GUIUtil::getIcon("transaction_4");
-        default: return GUIUtil::getIcon("transaction_5");
+        case 1: return GUIUtil::getIcon("transaction_1", GUIUtil::ThemedColor::ORANGE);
+        case 2: return GUIUtil::getIcon("transaction_2", GUIUtil::ThemedColor::ORANGE);
+        case 3: return GUIUtil::getIcon("transaction_3", GUIUtil::ThemedColor::ORANGE);
+        case 4: return GUIUtil::getIcon("transaction_4", GUIUtil::ThemedColor::ORANGE);
+        default: return GUIUtil::getIcon("transaction_5", GUIUtil::ThemedColor::ORANGE);
         };
     case TransactionStatus::Confirmed:
-        return GUIUtil::getIcon("transaction_confirmed");
+        return GUIUtil::getIcon("synced", GUIUtil::ThemedColor::GREEN);
     case TransactionStatus::Conflicted:
-        return GUIUtil::getIcon("transaction_conflicted");
+        return GUIUtil::getIcon("transaction_0", GUIUtil::ThemedColor::RED, GUIUtil::ThemedColor::RED);
     case TransactionStatus::Immature: {
         int total = wtx->status.depth + wtx->status.matures_in;
         int part = (wtx->status.depth * 5 / total) + 1;
-        return GUIUtil::getIcon(QString("transaction_%1").arg(part));
+        return GUIUtil::getIcon(QString("transaction_%1").arg(part), GUIUtil::ThemedColor::ORANGE);
         }
     case TransactionStatus::NotAccepted:
-        return GUIUtil::getIcon("transaction_0");
+        return GUIUtil::getIcon("transaction_0", GUIUtil::ThemedColor::RED);
     default:
         return GUIUtil::getThemedQColor(GUIUtil::ThemedColor::DEFAULT);
     }
@@ -638,18 +627,26 @@ QVariant TransactionTableModel::data(const QModelIndex &index, int role) const
         {
             return GUIUtil::getThemedQColor(GUIUtil::ThemedColor::TX_STATUS_DANGER);
         }
-        if(rec->status.lockedByInstantSend)
-        {
-            return GUIUtil::getThemedQColor(GUIUtil::ThemedColor::TX_STATUS_LOCKED);
-        }
         // Non-confirmed (but not immature) as transactions are grey
         if(!rec->status.countsForBalance && rec->status.status != TransactionStatus::Immature)
         {
             return GUIUtil::getThemedQColor(GUIUtil::ThemedColor::UNCONFIRMED);
         }
-        if(index.column() == Amount && (rec->credit+rec->debit) < 0)
-        {
-            return GUIUtil::getThemedQColor(GUIUtil::ThemedColor::RED);
+        if (index.column() == Amount) {
+            switch (rec->type) {
+            case TransactionRecord::Generated:
+                return GUIUtil::getThemedQColor(GUIUtil::ThemedColor::BLUE);
+            case TransactionRecord::RecvWithPrivateSend:
+            case TransactionRecord::RecvWithAddress:
+            case TransactionRecord::RecvFromOther:
+                return GUIUtil::getThemedQColor(GUIUtil::ThemedColor::GREEN);
+            case TransactionRecord::PrivateSend:
+            case TransactionRecord::SendToAddress:
+            case TransactionRecord::SendToOther:
+                return GUIUtil::getThemedQColor(GUIUtil::ThemedColor::RED);
+            default:
+                return GUIUtil::getThemedQColor(GUIUtil::ThemedColor::ORANGE);
+            }
         }
         if(index.column() == ToAddress)
         {
