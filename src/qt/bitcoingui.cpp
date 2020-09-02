@@ -1301,6 +1301,19 @@ void BitcoinGUI::changeEvent(QEvent *e)
         }
     }
 #endif
+    if (e->type() == QEvent::StyleChange) {
+        updateNetworkState();
+#ifdef ENABLE_WALLET
+        updateWalletStatus();
+#endif
+        if (masternodeSync.IsSynced()) {
+            labelBlocksIcon->setPixmap(GUIUtil::getIcon("synced").pixmap(STATUSBAR_ICONSIZE, STATUSBAR_ICONSIZE));
+        } else {
+            labelBlocksIcon->setPixmap(GUIUtil::getIcon(QString(
+                "spinner-%1").arg(spinnerFrame, 3, 10, QChar('0')), GUIUtil::ThemedColor::BLUE, MOVIES_PATH)
+                .pixmap(STATUSBAR_ICONSIZE, STATUSBAR_ICONSIZE));
+        }
+    }
 }
 
 void BitcoinGUI::closeEvent(QCloseEvent *event)
