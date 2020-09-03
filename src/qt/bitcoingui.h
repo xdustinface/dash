@@ -146,9 +146,12 @@ private:
     CAppNapInhibitor* m_app_nap_inhibitor = nullptr;
 #endif
 
-    /** Keep track of previous number of blocks, to detect progress */
-    int prevBlocks;
-    int spinnerFrame;
+    /** Timer to update the spinner animation in the status bar periodically */
+    QTimer* timerSpinner;
+    /** Start the spinner animation in the status bar */
+    void startSpinner();
+    /** Stop the spinner animation in the status bar */
+    void stopSpinner();
 
     struct IncomingTransactionMessage {
         QString date;

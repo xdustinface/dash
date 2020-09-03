@@ -120,8 +120,7 @@ BitcoinGUI::BitcoinGUI(const NetworkStyle* networkStyle, QWidget* parent) :
     helpMessageDialog(0),
     modalOverlay(0),
     tabGroup(0),
-    prevBlocks(0),
-    spinnerFrame(0)
+    timerSpinner(0)
 {
     QSettings settings;
     if (!restoreGeometry(settings.value("MainWindowGeometry").toByteArray())) {
@@ -232,6 +231,9 @@ BitcoinGUI::BitcoinGUI(const NetworkStyle* networkStyle, QWidget* parent) :
     statusBar()->addWidget(progressBar);
     statusBar()->addPermanentWidget(frameBlocks);
 
+    // Start spinner animation in the status bar
+    startSpinner();
+
     // Install event filter to be able to catch status tip events (QEvent::StatusTip)
     this->installEventFilter(this);
 
@@ -279,6 +281,45 @@ BitcoinGUI::~BitcoinGUI()
 
     delete rpcConsole;
     delete tabGroup;
+}
+
+void BitcoinGUI::startSpinner()
+{
+    if (labelBlocksIcon == nullptr || timerSpinner != nullptr) {
+        return;
+    }
+    auto getNextFrame = []() {
+        static std::vector<std::unique_ptr<QPixmap>> vecFrames;
+        static std::vector<std::unique_ptr<QPixmap>>::iterator itFrame;
+        while (vecFrames.size() < SPINNER_FRAMES) {
+            QString&& strFrame = QString("spinner-%1").arg(vecFrames.size(), 3, 10, QChar('0'));
+            QPixmap&& frame = getIcon(strFrame, GUIUtil::ThemedColor::ORANGE, MOVIES_PATH).pixmap(STATUSBAR_ICONSIZE, STATUSBAR_ICONSIZE);
+            itFrame = vecFrames.insert(vecFrames.end(), std::make_unique<QPixmap>(frame));
+        }
+        assert(vecFrames.size() == SPINNER_FRAMES);
+        if (itFrame == vecFrames.end()) {
+            itFrame = vecFrames.begin();
+        }
+        return *itFrame++->get();
+    };
+
+    timerSpinner = new QTimer(this);
+    QObject::connect(timerSpinner, &QTimer::timeout, [=]() {
+        if (timerSpinner == nullptr) {
+            return;
+        }
+        labelBlocksIcon->setPixmap(getNextFrame());
+    });
+    timerSpinner->start(40);
+}
+
+void BitcoinGUI::stopSpinner()
+{
+    if (timerSpinner == nullptr) {
+        return;
+    }
+    timerSpinner->deleteLater();
+    timerSpinner = nullptr;
 }
 
 void BitcoinGUI::createActions()
@@ -1138,14 +1179,8 @@ void BitcoinGUI::setNumBlocks(int count, const QDateTime& blockDate, const QStri
         progressBar->setVisible(true);
 
         tooltip = tr("Catching up...") + QString("<br>") + tooltip;
-        if(count != prevBlocks)
-        {
-            labelBlocksIcon->setPixmap(GUIUtil::getIcon(QString(
-                "spinner-%1").arg(spinnerFrame, 3, 10, QChar('0')), GUIUtil::ThemedColor::ORANGE, MOVIES_PATH)
-                .pixmap(STATUSBAR_ICONSIZE, STATUSBAR_ICONSIZE));
-            spinnerFrame = (spinnerFrame + 1) % SPINNER_FRAMES;
-        }
-        prevBlocks = count;
+
+        startSpinner();
 
 #ifdef ENABLE_WALLET
         if(walletFrame)
@@ -1194,16 +1229,12 @@ void BitcoinGUI::setAdditionalDataSyncProgress(double nSyncProgress)
 #endif // ENABLE_WALLET
 
     if(masternodeSync.IsSynced()) {
+        stopSpinner();
         progressBarLabel->setVisible(false);
         progressBar->setVisible(false);
         labelBlocksIcon->setPixmap(GUIUtil::getIcon("synced", GUIUtil::ThemedColor::GREEN).pixmap(STATUSBAR_ICONSIZE, STATUSBAR_ICONSIZE));
     } else {
-
-        labelBlocksIcon->setPixmap(GUIUtil::getIcon(QString(
-            "spinner-%1").arg(spinnerFrame, 3, 10, QChar('0')), GUIUtil::ThemedColor::ORANGE, MOVIES_PATH)
-            .pixmap(STATUSBAR_ICONSIZE, STATUSBAR_ICONSIZE));
-        spinnerFrame = (spinnerFrame + 1) % SPINNER_FRAMES;
-
+        startSpinner();
         progressBar->setFormat(tr("Synchronizing additional data: %p%"));
         progressBar->setMaximum(1000000000);
         progressBar->setValue(nSyncProgress * 1000000000.0 + 0.5);
@@ -1310,10 +1341,6 @@ void BitcoinGUI::changeEvent(QEvent *e)
 #endif
         if (masternodeSync.IsSynced()) {
             labelBlocksIcon->setPixmap(GUIUtil::getIcon("synced", GUIUtil::ThemedColor::GREEN).pixmap(STATUSBAR_ICONSIZE, STATUSBAR_ICONSIZE));
-        } else {
-            labelBlocksIcon->setPixmap(GUIUtil::getIcon(QString(
-                "spinner-%1").arg(spinnerFrame, 3, 10, QChar('0')), GUIUtil::ThemedColor::ORANGE, MOVIES_PATH)
-                .pixmap(STATUSBAR_ICONSIZE, STATUSBAR_ICONSIZE));
         }
     }
 }
