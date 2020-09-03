@@ -402,19 +402,20 @@ WalletModel::SendCoinsReturn WalletModel::sendCoins(WalletModelTransaction &tran
                 vOrderForm.emplace_back("Message", rcp.message.toStdString());
         }
 
+        mapValue_t mapValue;
         if (fIsPrivateSend) {
-            vOrderForm.emplace_back("DS", "1");
+            mapValue["DS"] = "1";
         }
 
         CTransactionRef& newTx = transaction.getTransaction();
         CReserveKey *keyChange = transaction.getPossibleKeyChange();
         CValidationState state;
-        if (!wallet->CommitTransaction(newTx, {} /* mapValue */, std::move(vOrderForm), {} /* fromAccount */, *keyChange, g_connman.get(), state))
+        if (!wallet->CommitTransaction(newTx, std::move(mapValue), std::move(vOrderForm), {} /* fromAccount */, *keyChange, g_connman.get(), state))
             return SendCoinsReturn(TransactionCommitFailed, QString::fromStdString(state.GetRejectReason()));
 
         CDataStream ssTx(SER_NETWORK, PROTOCOL_VERSION);
         ssTx << newTx;
-        transaction_array.append(&(ssTx[0]), ssTx.size());
+        transaction_array.append(ssTx.data(), ssTx.size());
     }
 
     // Add addresses / update labels that we've sent to the address book,
