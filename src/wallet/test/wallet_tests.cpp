@@ -800,8 +800,7 @@ public:
             return false;
         }
         // Verify the number of requested outputs does match the resulting outputs
-        CheckEqual(vecEntries.size(), wtx.tx->vout.size() - (nChangePos != -1 ? 1 : 0));
-        return true;
+        return CheckEqual(vecEntries.size(), wtx.tx->vout.size() - (nChangePos != -1 ? 1 : 0));
     }
 
     std::vector<CRecipient> GetRecipients(const std::vector<std::pair<CAmount, bool>>& vecEntries)
