@@ -853,13 +853,6 @@ public:
 BOOST_FIXTURE_TEST_CASE(CreateTransactionTest, CreateTransactionTestSetup)
 {
     minRelayTxFee = CFeeRate(DEFAULT_MIN_RELAY_TX_FEE);
-    // Try to send dust
-    BOOST_CHECK(CreateTransaction({{10, false}}, false));
-    BOOST_CHECK(CreateTransaction({{10, true}}, false));
-    BOOST_CHECK(CreateTransaction({{100, false}}, false));
-    BOOST_CHECK(CreateTransaction({{100, true}}, false));
-    BOOST_CHECK(CreateTransaction({{10000, true}, {100, true}}, false));
-    BOOST_CHECK(CreateTransaction({{10000, false}, {100, false}}, false));
 
     auto runTest = [&](const int nTestId, const CAmount nFeeRate, const std::map<int, std::pair<bool, ChangeTest>>& mapExpected) {
         coinControl.m_feerate = CFeeRate(nFeeRate);
