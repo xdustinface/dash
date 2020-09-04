@@ -13,6 +13,7 @@
 #include <qt/optionsmodel.h>
 #include <qt/transactionfilterproxy.h>
 #include <qt/transactiontablemodel.h>
+#include <qt/transactionrecord.h>
 #include <qt/utilitydialog.h>
 #include <qt/walletmodel.h>
 
@@ -24,7 +25,6 @@
 #include <QSettings>
 #include <QTimer>
 
-#define ICON_OFFSET 16
 #define DECORATION_SIZE 54
 #define NUM_ITEMS 5
 #define NUM_ITEMS_ADV 7
@@ -44,29 +44,19 @@ public:
     {
         painter->save();
 
-        QIcon icon = qvariant_cast<QIcon>(index.data(TransactionTableModel::RawDecorationRole));
         QRect mainRect = option.rect;
-        mainRect.moveLeft(ICON_OFFSET);
-        QRect decorationRect(mainRect.topLeft(), QSize(DECORATION_SIZE, DECORATION_SIZE));
-        int xspace = DECORATION_SIZE + 8;
+        int xspace = 8;
         int ypad = 6;
         int halfheight = (mainRect.height() - 2*ypad)/2;
-        QRect amountRect(mainRect.left() + xspace, mainRect.top()+ypad, mainRect.width() - xspace - ICON_OFFSET, halfheight);
+        QRect amountRect(mainRect.left() + xspace, mainRect.top()+ypad, mainRect.width() - xspace, halfheight);
         QRect addressRect(mainRect.left() + xspace, mainRect.top()+ypad+halfheight, mainRect.width() - xspace, halfheight);
-        icon = QIcon(icon);
-        icon.paint(painter, decorationRect);
 
         QDateTime date = index.data(TransactionTableModel::DateRole).toDateTime();
         QString address = index.data(Qt::DisplayRole).toString();
         qint64 amount = index.data(TransactionTableModel::AmountRole).toLongLong();
         bool confirmed = index.data(TransactionTableModel::ConfirmedRole).toBool();
-        QVariant value = index.data(Qt::ForegroundRole);
-        QColor foreground = GUIUtil::getThemedQColor(GUIUtil::ThemedColor::DEFAULT);
-        if(value.canConvert<QBrush>())
-        {
-            QBrush brush = qvariant_cast<QBrush>(value);
-            foreground = brush.color();
-        }
+        TransactionRecord::Type type = static_cast<TransactionRecord::Type>(index.data(TransactionTableModel::TypeRole).toInt());
+        QColor foreground = qvariant_cast<QColor>(index.data(Qt::ForegroundRole));
 
         painter->setPen(foreground);
         QRect boundingRect;
@@ -79,27 +69,33 @@ public:
             iconWatchonly.paint(painter, watchonlyRect);
         }
 
-        if(amount < 0)
-        {
+        switch (type) {
+        case TransactionRecord::Generated:
+            foreground = GUIUtil::getThemedQColor(GUIUtil::ThemedColor::BLUE);
+            break;
+        case TransactionRecord::RecvWithPrivateSend:
+        case TransactionRecord::RecvWithAddress:
+        case TransactionRecord::RecvFromOther:
+            foreground = GUIUtil::getThemedQColor(GUIUtil::ThemedColor::GREEN);
+            break;
+        case TransactionRecord::PrivateSend:
+        case TransactionRecord::SendToAddress:
+        case TransactionRecord::SendToOther:
             foreground = GUIUtil::getThemedQColor(GUIUtil::ThemedColor::RED);
-        }
-        else if(!confirmed)
-        {
-            foreground = GUIUtil::getThemedQColor(GUIUtil::ThemedColor::UNCONFIRMED);
-        }
-        else
-        {
-            foreground = option.palette.color(QPalette::Text);
+            break;
+        default:
+            foreground = GUIUtil::getThemedQColor(GUIUtil::ThemedColor::ORANGE);
         }
         painter->setPen(foreground);
         QString amountText = BitcoinUnits::floorWithUnit(unit, amount, true, BitcoinUnits::separatorAlways);
         if(!confirmed)
         {
+            foreground = GUIUtil::getThemedQColor(GUIUtil::ThemedColor::UNCONFIRMED);
             amountText = QString("[") + amountText + QString("]");
         }
         painter->drawText(amountRect, Qt::AlignRight|Qt::AlignVCenter, amountText);
 
-        painter->setPen(option.palette.color(QPalette::Text));
+        painter->setPen(GUIUtil::getThemedQColor(GUIUtil::ThemedColor::DEFAULT));
         painter->drawText(amountRect, Qt::AlignLeft|Qt::AlignVCenter, GUIUtil::dateTimeStr(date));
 
         painter->restore();
@@ -151,7 +147,6 @@ OverviewPage::OverviewPage(QWidget* parent) :
 
     // Recent transactions
     ui->listTransactions->setItemDelegate(txdelegate);
-    ui->listTransactions->setIconSize(QSize(DECORATION_SIZE, DECORATION_SIZE));
     // Note: minimum height of listTransactions will be set later in updateAdvancedPSUI() to reflect actual settings
     ui->listTransactions->setAttribute(Qt::WA_MacShowFocusRect, false);
 
