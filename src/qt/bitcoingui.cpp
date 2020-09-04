@@ -1007,9 +1007,9 @@ void BitcoinGUI::updateNetworkState()
     switch(count)
     {
     case 0: icon = "connect_0"; break;
-    case 1: case 2: case 3: icon = "connect_1"; break;
-    case 4: case 5: case 6: icon = "connect_2"; break;
-    case 7: case 8: case 9: icon = "connect_3"; break;
+    case 1: case 2: icon = "connect_1"; break;
+    case 3: case 4: case 5: icon = "connect_2"; break;
+    case 6: case 7: icon = "connect_3"; break;
     default: icon = "connect_4"; break;
     }
 
