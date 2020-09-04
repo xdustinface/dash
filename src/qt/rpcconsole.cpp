@@ -59,17 +59,6 @@ const QString ZAPTXES2("-zapwallettxes=2 -persistmempool=0");
 const QString UPGRADEWALLET("-upgradewallet");
 const QString REINDEX("-reindex");
 
-const struct {
-    const char *url;
-    const char *source;
-} ICON_MAPPING[] = {
-    {"cmd-request", "tx_input"},
-    {"cmd-reply", "tx_output"},
-    {"cmd-error", "tx_output"},
-    {"misc", "tx_inout"},
-    {nullptr, nullptr}
-};
-
 namespace {
 
 // don't add private key handling cmd's to the history
@@ -863,25 +852,16 @@ void RPCConsole::clear(bool clearHistory)
     ui->lineEdit->clear();
     ui->lineEdit->setFocus();
 
-    // Add smoothly scaled icon images.
-    for(int i=0; ICON_MAPPING[i].url; ++i)
-    {
-        ui->messagesWidget->document()->addResource(
-                    QTextDocument::ImageResource,
-                    QUrl(ICON_MAPPING[i].url),
-                    GUIUtil::getIcon(ICON_MAPPING[i].source).pixmap(QSize(consoleFontSize, consoleFontSize)));
-    }
-
     // Set default style sheet
     QFontInfo fixedFontInfo(GUIUtil::fixedPitchFont());
     ui->messagesWidget->document()->setDefaultStyleSheet(
         QString(
                 "table { }"
-                "td.time { " + GUIUtil::getThemedStyleQString(GUIUtil::ThemedStyle::TS_SECONDARY) + " font-size: %2; padding-top: 3px; } "
+                "td.time { " + GUIUtil::getThemedStyleQString(GUIUtil::ThemedStyle::TS_SECONDARY) + " font-size: %2; } "
                 "td.message { " + GUIUtil::getThemedStyleQString(GUIUtil::ThemedStyle::TS_PRIMARY) + " font-family: %1; font-size: %2; white-space:pre-wrap; } "
                 "td.cmd-request, b { " + GUIUtil::getThemedStyleQString(GUIUtil::ThemedStyle::TS_COMMAND) + " } "
                 "td.cmd-error, .secwarning { " + GUIUtil::getThemedStyleQString(GUIUtil::ThemedStyle::TS_ERROR) + " }"
-            ).arg(fixedFontInfo.family(), QString("%1pt").arg(consoleFontSize))
+            ).arg(fixedFontInfo.family(), QString("%1pt").arg(consoleFontSize)).arg(consoleFontSize * 0.1)
         );
 
 #ifdef Q_OS_MAC
@@ -914,7 +894,6 @@ void RPCConsole::message(int category, const QString &message, bool html)
     QString timeString = time.toString();
     QString out;
     out += "<table><tr><td class=\"time\" width=\"65\">" + timeString + "</td>";
-    out += "<td class=\"icon\" width=\"32\"><img src=\"" + categoryClass(category) + "\"></td>";
     out += "<td class=\"message " + categoryClass(category) + "\" valign=\"middle\">";
     if(html)
         out += message;
