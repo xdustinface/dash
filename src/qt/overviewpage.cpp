@@ -46,10 +46,10 @@ public:
 
         QRect mainRect = option.rect;
         int xspace = 8;
-        int ypad = 6;
+        int ypad = 8;
         int halfheight = (mainRect.height() - 2*ypad)/2;
         QRect amountRect(mainRect.left() + xspace, mainRect.top()+ypad, mainRect.width() - xspace, halfheight);
-        QRect addressRect(mainRect.left() + xspace, mainRect.top()+ypad+halfheight, mainRect.width() - xspace, halfheight);
+        QRect addressRect(mainRect.left() + xspace, mainRect.top()+ypad+halfheight + 5, mainRect.width() - xspace, halfheight);
 
         QDateTime date = index.data(TransactionTableModel::DateRole).toDateTime();
         QString address = index.data(Qt::DisplayRole).toString();
@@ -93,6 +93,11 @@ public:
             foreground = GUIUtil::getThemedQColor(GUIUtil::ThemedColor::UNCONFIRMED);
             amountText = QString("[") + amountText + QString("]");
         }
+
+        QFont font = painter->font();
+        font.setPointSize(font.pointSize() * 1.17);
+        painter->setFont(font);
+
         painter->drawText(amountRect, Qt::AlignRight|Qt::AlignVCenter, amountText);
 
         painter->setPen(GUIUtil::getThemedQColor(GUIUtil::ThemedColor::DEFAULT));
