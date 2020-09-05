@@ -29,11 +29,10 @@ public:
     enum ColumnIndex {
         Status = 0,
         Watchonly = 1,
-        InstantSend = 2,
-        Date = 3,
-        Type = 4,
-        ToAddress = 5,
-        Amount = 6
+        Date = 2,
+        Type = 3,
+        ToAddress = 4,
+        Amount = 5
     };
 
     /** Roles to get specific information from a transaction row.
@@ -50,10 +49,6 @@ public:
         WatchonlyRole,
         /** Watch-only icon */
         WatchonlyDecorationRole,
-        /** InstantSend boolean */
-        InstantSendRole,
-        /** InstantSend icon */
-        InstantSendDecorationRole,
         /** Long description (HTML format) */
         LongDescriptionRole,
         /** Address of transaction */
@@ -108,7 +103,6 @@ private:
     QString formatTooltip(const TransactionRecord *rec) const;
     QVariant txStatusDecoration(const TransactionRecord *wtx) const;
     QVariant txWatchonlyDecoration(const TransactionRecord *wtx) const;
-    QVariant txInstantSendDecoration(const TransactionRecord *wtx) const;
     QVariant txAddressDecoration(const TransactionRecord *wtx) const;
 
 public Q_SLOTS:
