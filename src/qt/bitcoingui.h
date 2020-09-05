@@ -148,7 +148,7 @@ private:
 
     /** Timer to update the spinner animation in the status bar periodically */
     QTimer* timerSpinner;
-    /** Start the spinner animation in the status bar */
+    /** Start the spinner animation in the status bar if it's not running and if labelBlocksIcon is visible. */
     void startSpinner();
     /** Stop the spinner animation in the status bar */
     void stopSpinner();

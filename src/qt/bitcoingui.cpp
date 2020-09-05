@@ -210,6 +210,10 @@ BitcoinGUI::BitcoinGUI(const NetworkStyle* networkStyle, QWidget* parent) :
     frameBlocksLayout->addWidget(labelBlocksIcon);
     frameBlocksLayout->addStretch();
 
+    // Hide the spinner/synced icon by default to avoid
+    // that the spinner starts before we have any connections
+    labelBlocksIcon->hide();
+
     // Progress bar and label for blocks download
     progressBarLabel = new QLabel();
     progressBarLabel->setVisible(true);
@@ -230,9 +234,6 @@ BitcoinGUI::BitcoinGUI(const NetworkStyle* networkStyle, QWidget* parent) :
     statusBar()->addWidget(progressBarLabel);
     statusBar()->addWidget(progressBar);
     statusBar()->addPermanentWidget(frameBlocks);
-
-    // Start spinner animation in the status bar
-    startSpinner();
 
     // Install event filter to be able to catch status tip events (QEvent::StatusTip)
     this->installEventFilter(this);
@@ -285,7 +286,7 @@ BitcoinGUI::~BitcoinGUI()
 
 void BitcoinGUI::startSpinner()
 {
-    if (labelBlocksIcon == nullptr || timerSpinner != nullptr) {
+    if (labelBlocksIcon == nullptr || labelBlocksIcon->isHidden() || timerSpinner != nullptr) {
         return;
     }
     auto getNextFrame = []() {
@@ -1043,7 +1044,10 @@ void BitcoinGUI::gotoVerifyMessageTab(QString addr)
 
 void BitcoinGUI::updateNetworkState()
 {
+    static int nPreviousCount{0};
+    static bool fPreviousState{false};
     int count = clientModel->getNumConnections();
+    bool fNetworkState = clientModel->getNetworkActive();
     QString icon;
     GUIUtil::ThemedColor color = GUIUtil::ThemedColor::ORANGE;
     switch(count)
@@ -1055,7 +1059,37 @@ void BitcoinGUI::updateNetworkState()
     default: icon = "connect_4"; color = GUIUtil::ThemedColor::GREEN; break;
     }
 
-    if (clientModel->getNetworkActive()) {
+    labelBlocksIcon->setVisible(count > 0);
+    bool fShowStatusBar = fNetworkState && (!masternodeSync.IsSynced() || count == 0);
+    progressBarLabel->setVisible(fShowStatusBar);
+    progressBar->setVisible(fShowStatusBar);
+
+    bool fNetworkBecameActive = (!fPreviousState && fNetworkState) || (nPreviousCount == 0 && count > 0);
+    bool fNetworkBecameInactive = (fPreviousState && !fNetworkState) || (nPreviousCount > 0 && count == 0);
+
+    if (fNetworkBecameActive) {
+        // If the sync process still signals synced after five seconds represent it in the UI.
+        if (masternodeSync.IsSynced()) {
+            QTimer::singleShot(5000, this, [&]() {
+                if (clientModel->getNumConnections() > 0 && masternodeSync.IsSynced()) {
+                    setAdditionalDataSyncProgress(1);
+                }
+            });
+        }
+        startSpinner();
+    } else if (fNetworkBecameInactive) {
+        labelBlocksIcon->hide();
+        stopSpinner();
+    }
+
+    if (fNetworkBecameActive || fNetworkBecameInactive) {
+        setNumBlocks(clientModel->getNumBlocks(), clientModel->getLastBlockDate(), clientModel->getLastBlockHash(), clientModel->getVerificationProgress(nullptr), false);
+    }
+
+    nPreviousCount = count;
+    fPreviousState = fNetworkState;
+
+    if (fNetworkState) {
         labelConnectionsIcon->setToolTip(tr("%n active connection(s) to Dash network", "", count));
     } else {
         labelConnectionsIcon->setToolTip(tr("Network activity disabled"));
@@ -1111,6 +1145,10 @@ void BitcoinGUI::setNumBlocks(int count, const QDateTime& blockDate, const QStri
     }
     if (!clientModel)
         return;
+
+    bool fShowStatusBar = clientModel->getNetworkActive() && (!masternodeSync.IsSynced() || clientModel->getNumConnections() == 0);
+    progressBarLabel->setVisible(fShowStatusBar);
+    progressBar->setVisible(fShowStatusBar);
 
     // Prevent orphan statusbar messages (e.g. hover Quit in main menu, wait until chain-sync starts -> garbled text)
     statusBar()->clearMessage();
@@ -1172,15 +1210,11 @@ void BitcoinGUI::setNumBlocks(int count, const QDateTime& blockDate, const QStri
     {
         QString timeBehindText = GUIUtil::formatNiceTimeOffset(secs);
 
-        progressBarLabel->setVisible(true);
         progressBar->setFormat(tr("%1 behind").arg(timeBehindText));
         progressBar->setMaximum(1000000000);
         progressBar->setValue(nVerificationProgress * 1000000000.0 + 0.5);
-        progressBar->setVisible(true);
 
         tooltip = tr("Catching up...") + QString("<br>") + tooltip;
-
-        startSpinner();
 
 #ifdef ENABLE_WALLET
         if(walletFrame)
@@ -1238,13 +1272,14 @@ void BitcoinGUI::setAdditionalDataSyncProgress(double nSyncProgress)
         walletFrame->showOutOfSyncWarning(false);
 #endif // ENABLE_WALLET
 
+    bool fShowStatusBar = clientModel->getNetworkActive() && (!masternodeSync.IsSynced() || clientModel->getNumConnections() == 0);
+    progressBarLabel->setVisible(fShowStatusBar);
+    progressBar->setVisible(fShowStatusBar);
+
     if(masternodeSync.IsSynced()) {
         stopSpinner();
-        progressBarLabel->setVisible(false);
-        progressBar->setVisible(false);
         labelBlocksIcon->setPixmap(GUIUtil::getIcon("synced", GUIUtil::ThemedColor::GREEN).pixmap(STATUSBAR_ICONSIZE, STATUSBAR_ICONSIZE));
     } else {
-        startSpinner();
         progressBar->setFormat(tr("Synchronizing additional data: %p%"));
         progressBar->setMaximum(1000000000);
         progressBar->setValue(nSyncProgress * 1000000000.0 + 0.5);
