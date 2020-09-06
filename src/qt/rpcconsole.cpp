@@ -479,11 +479,7 @@ RPCConsole::RPCConsole(QWidget* parent) :
 
     ui->openDebugLogfileButton->setToolTip(ui->openDebugLogfileButton->toolTip().arg(tr(PACKAGE_NAME)));
 
-    // Needed on Mac also
-    const QSize consoleButtonsSize(BUTTON_ICONSIZE * 0.8, BUTTON_ICONSIZE * 0.8);
-    GUIUtil::setIcon(ui->clearButton, "remove", GUIUtil::ThemedColor::RED, consoleButtonsSize);
-    GUIUtil::setIcon(ui->fontBiggerButton, "fontbigger", GUIUtil::ThemedColor::BLUE, consoleButtonsSize);
-    GUIUtil::setIcon(ui->fontSmallerButton, "fontsmaller", GUIUtil::ThemedColor::BLUE, consoleButtonsSize);
+    setButtonIcons();
 
     // Install event filter for up and down arrow
     ui->lineEdit->installEventFilter(this);
@@ -1270,6 +1266,14 @@ void RPCConsole::updateNodeDetail(const CNodeCombinedStats *stats)
     ui->detailWidget->show();
 }
 
+void RPCConsole::setButtonIcons()
+{
+    const QSize consoleButtonsSize(BUTTON_ICONSIZE * 0.8, BUTTON_ICONSIZE * 0.8);
+    GUIUtil::setIcon(ui->clearButton, "remove", GUIUtil::ThemedColor::RED, consoleButtonsSize);
+    GUIUtil::setIcon(ui->fontBiggerButton, "fontbigger", GUIUtil::ThemedColor::BLUE, consoleButtonsSize);
+    GUIUtil::setIcon(ui->fontSmallerButton, "fontsmaller", GUIUtil::ThemedColor::BLUE, consoleButtonsSize);
+}
+
 void RPCConsole::resizeEvent(QResizeEvent *event)
 {
     QWidget::resizeEvent(event);
@@ -1302,6 +1306,8 @@ void RPCConsole::changeEvent(QEvent* e)
     if (e->type() == QEvent::StyleChange) {
         clear();
         ui->promptIcon->setHidden(GUIUtil::dashThemeActive());
+        // Adjust button icon colors on theme changes
+        setButtonIcons();
     }
 
     QWidget::changeEvent(e);
