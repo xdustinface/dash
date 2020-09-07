@@ -1164,7 +1164,7 @@ CAmount GetBlockSubsidy(int nPrevBits, int nPrevHeight, const Consensus::Params&
     return fSuperblockPartOnly ? nSuperblockPart : nSubsidy - nSuperblockPart;
 }
 
-CAmount GetMasternodePayment(int nHeight, CAmount blockValue)
+CAmount GetMasternodePayment(int nHeight, CAmount blockValue, int nReallocActivationHeight)
 {
     CAmount ret = blockValue/5; // start at 20%
 
@@ -1181,6 +1181,36 @@ CAmount GetMasternodePayment(int nHeight, CAmount blockValue)
     if(nHeight > nMNPIBlock+(nMNPIPeriod* 6)) ret += blockValue / 40; // 261680 - 45.0% - 2015-05-01
     if(nHeight > nMNPIBlock+(nMNPIPeriod* 7)) ret += blockValue / 40; // 278960 - 47.5% - 2015-06-01
     if(nHeight > nMNPIBlock+(nMNPIPeriod* 9)) ret += blockValue / 40; // 313520 - 50.0% - 2015-08-03
+
+    if (nHeight < nReallocActivationHeight) {
+        // Block Reward Realocation is not activated yet, nothing to do
+        return ret;
+    }
+
+    int nSuperblockCycle = Params().GetConsensus().nSuperblockCycle;
+    // Actual realocation starts in the cycle next to one activation happens in
+    int nReallocStart = nReallocActivationHeight - nReallocActivationHeight % nSuperblockCycle + nSuperblockCycle;
+
+    if (nHeight < nReallocStart) {
+        // Activated but we have to wait for the next cycle to start realocation, nothing to do
+        return ret;
+    }
+
+    int nReallocCycle = nSuperblockCycle * 3;
+    int nReallocPeriod = (nHeight - nReallocStart) / nReallocCycle;
+
+    // 2x13+2x7+2x6+6x5+5x3+1x2+1x1 = 100
+    int perc{0};
+    for (int i = 0; i <= nReallocPeriod; ++i) {
+        if      (i <  2) perc += 13;
+        else if (i <  4) perc += 7;
+        else if (i <  6) perc += 6;
+        else if (i < 12) perc += 5;
+        else if (i < 17) perc += 3;
+        else if (i < 18) perc += 2;
+        else if (i < 19) perc += 1;
+    }
+    ret = blockValue * (500 + perc) / 1000;
 
     return ret;
 }

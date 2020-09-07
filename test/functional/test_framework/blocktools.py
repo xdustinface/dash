@@ -87,7 +87,7 @@ def get_legacy_sigopcount_tx(tx, fAccurate=True):
     return count
 
 # Identical to GetMasternodePayment in C++ code
-def get_masternode_payment(nHeight, blockValue):
+def get_masternode_payment(nHeight, blockValue, nReallocActivationHeight):
     ret = int(blockValue / 5)
 
     nMNPIBlock = 350
@@ -111,5 +111,40 @@ def get_masternode_payment(nHeight, blockValue):
         ret += int(blockValue / 40)
     if nHeight > nMNPIBlock+(nMNPIPeriod* 9):
         ret += int(blockValue / 40)
+
+    if nHeight < nReallocActivationHeight:
+        # Block Reward Realocation is not activated yet, nothing to do
+        return ret
+
+    nSuperblockCycle = 10
+    # Actual realocation starts in the cycle next to one activation happens in
+    nReallocStart = nReallocActivationHeight - nReallocActivationHeight % nSuperblockCycle + nSuperblockCycle
+
+    if nHeight < nReallocStart:
+        # Activated but we have to wait for the next cycle to start realocation, nothing to do
+        return ret
+
+    nReallocCycle = nSuperblockCycle * 3
+    nReallocPeriod = int((nHeight - nReallocStart) / nReallocCycle)
+
+    # 2x13+2x7+2x6+6x5+5x3+1x2+1x1 = 100
+    perc = 0
+    for i in range(nReallocPeriod + 1):
+        if (i <  2):
+            perc += 13
+        elif (i <  4):
+            perc += 7
+        elif (i <  6):
+            perc += 6
+        elif (i < 12):
+            perc += 5
+        elif (i < 17):
+            perc += 3
+        elif (i < 18):
+            perc += 2
+        elif (i < 19):
+            perc += 1
+
+    ret = int(blockValue * (500 + perc) / 1000)
 
     return ret
