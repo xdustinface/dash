@@ -14,15 +14,19 @@
 class CMasternodeSync;
 CMasternodeSync masternodeSync;
 
-void CMasternodeSync::Reset(bool fNotifyReset)
+void CMasternodeSync::Reset(bool fForce, bool fNotifyReset)
 {
-    nCurrentAsset = MASTERNODE_SYNC_BLOCKCHAIN;
-    nTriedPeerCount = 0;
-    nTimeAssetSyncStarted = GetTime();
-    nTimeLastBumped = GetTime();
-    fReachedBestHeader = false;
-    if (fNotifyReset) {
-        uiInterface.NotifyAdditionalDataSyncProgressChanged(-1);
+    // Avoid resetting the sync process if we just "recently" received a new block
+    if (fForce || !nTimeLastUpdateBlockTip || ((GetTime() - nTimeLastUpdateBlockTip) > MASTERNODE_SYNC_RESET_SECONDS)) {
+        nCurrentAsset = MASTERNODE_SYNC_BLOCKCHAIN;
+        nTriedPeerCount = 0;
+        nTimeAssetSyncStarted = GetTime();
+        nTimeLastBumped = GetTime();
+        nTimeLastUpdateBlockTip = 0;
+        fReachedBestHeader = false;
+        if (fNotifyReset) {
+            uiInterface.NotifyAdditionalDataSyncProgressChanged(-1);
+        }
     }
 }
 
@@ -107,7 +111,7 @@ void CMasternodeSync::ProcessTick(CConnman& connman)
     static int64_t nTimeLastProcess = GetTime();
     if(GetTime() - nTimeLastProcess > 60*60 && !fMasternodeMode) {
         LogPrintf("CMasternodeSync::ProcessTick -- WARNING: no actions for too long, restarting sync...\n");
-        Reset();
+        Reset(true);
         nTimeLastProcess = GetTime();
         return;
     }
@@ -319,6 +323,8 @@ void CMasternodeSync::UpdatedBlockTip(const CBlockIndex *pindexNew, bool fInitia
 {
     LogPrint(BCLog::MNSYNC, "CMasternodeSync::UpdatedBlockTip -- pindexNew->nHeight: %d fInitialDownload=%d\n", pindexNew->nHeight, fInitialDownload);
 
+    nTimeLastUpdateBlockTip = GetAdjustedTime();
+
     if (IsSynced() || !pindexBestHeader)
         return;
 
@@ -330,7 +336,7 @@ void CMasternodeSync::UpdatedBlockTip(const CBlockIndex *pindexNew, bool fInitia
     if (fInitialDownload) {
         // switched too early
         if (IsBlockchainSynced()) {
-            Reset();
+            Reset(true);
         }
 
         // no need to check any further while still in IBD mode
@@ -344,7 +350,7 @@ void CMasternodeSync::UpdatedBlockTip(const CBlockIndex *pindexNew, bool fInitia
         // Switching from true to false means that we previously stuck syncing headers for some reason,
         // probably initial timeout was not enough,
         // because there is no way we can update tip not having best header
-        Reset();
+        Reset(true);
     }
 
     fReachedBestHeader = fReachedBestHeaderNew;
