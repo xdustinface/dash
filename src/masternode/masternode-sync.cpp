@@ -14,13 +14,16 @@
 class CMasternodeSync;
 CMasternodeSync masternodeSync;
 
-void CMasternodeSync::Reset()
+void CMasternodeSync::Reset(bool fNotifyReset)
 {
     nCurrentAsset = MASTERNODE_SYNC_BLOCKCHAIN;
     nTriedPeerCount = 0;
     nTimeAssetSyncStarted = GetTime();
     nTimeLastBumped = GetTime();
     fReachedBestHeader = false;
+    if (fNotifyReset) {
+        uiInterface.NotifyAdditionalDataSyncProgressChanged(-1);
+    }
 }
 
 void CMasternodeSync::BumpAssetLastTime(const std::string& strFuncName)

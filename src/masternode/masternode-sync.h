@@ -41,7 +41,7 @@ private:
     bool fReachedBestHeader{false};
 
 public:
-    CMasternodeSync() { Reset(); }
+    CMasternodeSync() { Reset(false); }
 
     static void SendGovernanceSyncRequest(CNode* pnode, CConnman& connman);
 
@@ -55,7 +55,7 @@ public:
     std::string GetAssetName() const;
     std::string GetSyncStatus() const;
 
-    void Reset();
+    void Reset(bool fNotifyReset = true);
     void SwitchToNextAsset(CConnman& connman);
 
     void ProcessMessage(CNode* pfrom, const std::string& strCommand, CDataStream& vRecv) const;
