@@ -199,6 +199,7 @@ void CMasternodeSync::ProcessTick(CConnman& connman)
                     //    the number of connected peers).
                     // We must be at the tip already, let's move to the next asset.
                     SwitchToNextAsset(connman);
+                    uiInterface.NotifyAdditionalDataSyncProgressChanged(nSyncProgress);
                 }
             }
 
