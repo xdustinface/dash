@@ -1485,8 +1485,11 @@ bool BitcoinGUI::handlePaymentRequest(const SendCoinsRecipient& recipient)
 
 void BitcoinGUI::setHDStatus(int hdEnabled)
 {
-    labelWalletHDStatusIcon->setPixmap(GUIUtil::getIcon("hd_enabled", hdEnabled ? GUIUtil::ThemedColor::GREEN : GUIUtil::ThemedColor::ICON_ALTERNATIVE_COLOR).pixmap(STATUSBAR_ICONSIZE, STATUSBAR_ICONSIZE));
-    labelWalletHDStatusIcon->setToolTip(hdEnabled ? tr("HD key generation is <b>enabled</b>") : tr("HD key generation is <b>disabled</b>"));
+    if (hdEnabled) {
+        labelWalletHDStatusIcon->setPixmap(GUIUtil::getIcon("hd_enabled", GUIUtil::ThemedColor::GREEN).pixmap(STATUSBAR_ICONSIZE, STATUSBAR_ICONSIZE));
+        labelWalletHDStatusIcon->setToolTip(tr("HD key generation is <b>enabled</b>"));
+    }
+    labelWalletHDStatusIcon->setVisible(hdEnabled);
 }
 
 void BitcoinGUI::setEncryptionStatus(int status)
