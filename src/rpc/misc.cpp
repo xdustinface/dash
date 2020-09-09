@@ -108,7 +108,7 @@ UniValue mnsync(const JSONRPCRequest& request)
 
     if(strMode == "reset")
     {
-        masternodeSync.Reset();
+        masternodeSync.Reset(true);
         return "success";
     }
     return "failure";
