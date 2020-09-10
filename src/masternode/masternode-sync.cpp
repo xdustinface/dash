@@ -17,7 +17,7 @@ CMasternodeSync masternodeSync;
 void CMasternodeSync::Reset(bool fForce, bool fNotifyReset)
 {
     // Avoid resetting the sync process if we just "recently" received a new block
-    if (fForce || !nTimeLastUpdateBlockTip || ((GetTime() - nTimeLastUpdateBlockTip) > MASTERNODE_SYNC_RESET_SECONDS)) {
+    if (fForce || (GetTime() - nTimeLastUpdateBlockTip > MASTERNODE_SYNC_RESET_SECONDS)) {
         nCurrentAsset = MASTERNODE_SYNC_BLOCKCHAIN;
         nTriedPeerCount = 0;
         nTimeAssetSyncStarted = GetTime();
@@ -195,7 +195,8 @@ void CMasternodeSync::ProcessTick(CConnman& connman)
                     LogPrintf("CMasternodeSync::ProcessTick -- nTick %d nCurrentAsset %d -- syncing mempool from peer=%d\n", nTick, nCurrentAsset, pnode->GetId());
                 }
 
-                if (fReachedBestHeader && GetTime() - nTimeLastBumped > (vNodesCopy.size() > 3 ? MASTERNODE_SYNC_TICK_SECONDS : MASTERNODE_SYNC_TIMEOUT_SECONDS)) {
+                int64_t nTimeSyncTimeout = vNodesCopy.size() > 3 ? MASTERNODE_SYNC_TICK_SECONDS : MASTERNODE_SYNC_TIMEOUT_SECONDS;
+                if (fReachedBestHeader && (GetTime() - nTimeLastBumped > nTimeSyncTimeout)) {
                     // At this point we know that:
                     // a) there are peers (because we are looping on at least one of them);
                     // b) we waited for at least MASTERNODE_SYNC_TICK_SECONDS/MASTERNODE_SYNC_TIMEOUT_SECONDS

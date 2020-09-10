@@ -1394,7 +1394,7 @@ void CConnman::NotifyNumConnectionsChanged()
 
     // If we had zero connections before and new connections now or if we just dropped
     // to zero connections reset the sync process if its outdated.
-    if (vNodesSize && !nPrevNodeCount || !vNodesSize && nPrevNodeCount) {
+    if ((vNodesSize > 0 && nPrevNodeCount == 0) || (vNodesSize == 0 && nPrevNodeCount > 0)) {
         masternodeSync.Reset();
     }
 
