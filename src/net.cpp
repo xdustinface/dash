@@ -2516,7 +2516,7 @@ void CConnman::ThreadOpenMasternodeConnections()
 
         didConnect = false;
 
-        if (!fNetworkActive)
+        if (!fNetworkActive || !masternodeSync.IsBlockchainSynced())
             continue;
 
         std::set<CService> connectedNodes;
