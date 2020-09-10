@@ -153,6 +153,13 @@ private:
     /** Stop the spinner animation in the status bar */
     void stopSpinner();
 
+    /** Timer to update the connection icon during connecting phase */
+    QTimer* timerConnecting;
+    /** Start the connecting animation */
+    void startConnectingAnimation();
+    /** Stop the connecting animation */
+    void stopConnectingAnimation();
+
     struct IncomingTransactionMessage {
         QString date;
         int unit;
