@@ -169,6 +169,9 @@
            <property name="fieldGrowthPolicy">
             <enum>QFormLayout::FieldsStayAtSizeHint</enum>
            </property>
+           <property name="formAlignment">
+            <set>Qt::AlignHCenter|Qt::AlignTop</set>
+           </property>
            <property name="horizontalSpacing">
             <number>6</number>
            </property>
