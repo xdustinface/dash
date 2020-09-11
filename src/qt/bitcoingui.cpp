@@ -1088,10 +1088,10 @@ void BitcoinGUI::gotoVerifyMessageTab(QString addr)
 
 void BitcoinGUI::updateNetworkState()
 {
-    static int nPreviousCount{0};
-    static bool fPreviousState{false};
+    static int nCountPrev{0};
+    static bool fNetworkActivePrev{false};
     int count = clientModel->getNumConnections();
-    bool fNetworkState = clientModel->getNetworkActive();
+    bool fNetworkActive = clientModel->getNetworkActive();
     QString icon;
     GUIUtil::ThemedColor color = GUIUtil::ThemedColor::ORANGE;
     switch(count)
@@ -1106,8 +1106,8 @@ void BitcoinGUI::updateNetworkState()
     labelBlocksIcon->setVisible(count > 0);
     updateProgressBarVisibility();
 
-    bool fNetworkBecameActive = (!fPreviousState && fNetworkState) || (nPreviousCount == 0 && count > 0);
-    bool fNetworkBecameInactive = (fPreviousState && !fNetworkState) || (nPreviousCount > 0 && count == 0);
+    bool fNetworkBecameActive = (!fNetworkActivePrev && fNetworkActive) || (nCountPrev == 0 && count > 0);
+    bool fNetworkBecameInactive = (fNetworkActivePrev && !fNetworkActive) || (nCountPrev > 0 && count == 0);
 
     if (fNetworkBecameActive) {
         // If the sync process still signals synced after five seconds represent it in the UI.
@@ -1128,10 +1128,10 @@ void BitcoinGUI::updateNetworkState()
         setNumBlocks(clientModel->getNumBlocks(), clientModel->getLastBlockDate(), clientModel->getLastBlockHash(), clientModel->getVerificationProgress(nullptr), false);
     }
 
-    nPreviousCount = count;
-    fPreviousState = fNetworkState;
+    nCountPrev = count;
+    fNetworkActivePrev = fNetworkActive;
 
-    if (fNetworkState) {
+    if (fNetworkActive) {
         labelConnectionsIcon->setToolTip(tr("%n active connection(s) to Dash network", "", count));
     } else {
         labelConnectionsIcon->setToolTip(tr("Network activity disabled"));
@@ -1139,10 +1139,10 @@ void BitcoinGUI::updateNetworkState()
         color = GUIUtil::ThemedColor::RED;
     }
 
-    if (fNetworkState && count == 0) {
+    if (fNetworkActive && count == 0) {
         startConnectingAnimation();
     }
-    if(!fNetworkState || count > 0) {
+    if(!fNetworkActive || count > 0) {
         stopConnectingAnimation();
         labelConnectionsIcon->setPixmap(GUIUtil::getIcon(icon, color).pixmap(STATUSBAR_ICONSIZE, STATUSBAR_ICONSIZE));
     }
