@@ -26,8 +26,9 @@
 #include <QTimer>
 
 #define DECORATION_SIZE 54
-#define NUM_ITEMS 5
-#define NUM_ITEMS_ADV 7
+#define NUM_ITEMS_DISABLED 5
+#define NUM_ITEMS_ENABLED_NORMAL 7
+#define NUM_ITEMS_ENABLED_ADVANCED 9
 
 class TxViewDelegate : public QAbstractItemDelegate
 {
@@ -480,6 +481,12 @@ void OverviewPage::privateSendStatus(bool fForce)
     auto tempWidgets = {ui->labelSubmittedDenomText,
                         ui->labelSubmittedDenom};
 
+    bool fIsEnabled = CPrivateSendClientOptions::IsEnabled();
+    if (!fIsEnabled) {
+        SetupTransactionList(NUM_ITEMS_DISABLED);
+        return;
+    }
+
     auto setWidgetsVisible = [&](bool fVisible) {
         for (const auto& it : tempWidgets) {
             it->setVisible(fVisible);
@@ -520,7 +527,13 @@ void OverviewPage::privateSendStatus(bool fForce)
         if (fShowAdvancedPSUI) strEnabled += ", " + strKeysLeftText;
         ui->labelPrivateSendEnabled->setText(strEnabled);
 
+        // If mixing isn't active always show the lower number of txes because there are
+        // anyway the most PS widgets hidden.
+        SetupTransactionList(NUM_ITEMS_ENABLED_NORMAL);
+
         return;
+    } else {
+        SetupTransactionList(fShowAdvancedPSUI ? NUM_ITEMS_ENABLED_ADVANCED : NUM_ITEMS_ENABLED_NORMAL);
     }
 
     // Warn user that wallet is running out of keys
