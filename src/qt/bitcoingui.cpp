@@ -1169,16 +1169,17 @@ void BitcoinGUI::updateHeadersSyncProgressLabel()
 
 void BitcoinGUI::updateProgressBarVisibility()
 {
-    if (clientModel != nullptr) {
-        // Show the progress bar label if the network is active + we are out of sync or we have no connections.
-        bool fShowProgressBarLabel = clientModel->getNetworkActive() && (!masternodeSync.IsSynced() || clientModel->getNumConnections() == 0);
-        // Show the progress bar only if the the network active + we are not synced + we have any connection. Unlike with the label
-        // which gives an info text about the connecting phase there is no reason to show the progress bar if we don't have connections
-        // since it will not get any updates in this case.
-        bool fShowProgressBar = clientModel->getNetworkActive() && !masternodeSync.IsSynced() && clientModel->getNumConnections() > 0;
-        progressBarLabel->setVisible(fShowProgressBarLabel);
-        progressBar->setVisible(fShowProgressBar);
+    if (clientModel == nullptr) {
+        return;
     }
+    // Show the progress bar label if the network is active + we are out of sync or we have no connections.
+    bool fShowProgressBarLabel = clientModel->getNetworkActive() && (!masternodeSync.IsSynced() || clientModel->getNumConnections() == 0);
+    // Show the progress bar only if the the network active + we are not synced + we have any connection. Unlike with the label
+    // which gives an info text about the connecting phase there is no reason to show the progress bar if we don't have connections
+    // since it will not get any updates in this case.
+    bool fShowProgressBar = clientModel->getNetworkActive() && !masternodeSync.IsSynced() && clientModel->getNumConnections() > 0;
+    progressBarLabel->setVisible(fShowProgressBarLabel);
+    progressBar->setVisible(fShowProgressBar);
 }
 
 void BitcoinGUI::setNumBlocks(int count, const QDateTime& blockDate, const QString& blockHash, double nVerificationProgress, bool header)
