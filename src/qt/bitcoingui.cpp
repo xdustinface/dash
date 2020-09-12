@@ -1142,7 +1142,7 @@ void BitcoinGUI::updateNetworkState()
     if (fNetworkActive && count == 0) {
         startConnectingAnimation();
     }
-    if(!fNetworkActive || count > 0) {
+    if (!fNetworkActive || count > 0) {
         stopConnectingAnimation();
         labelConnectionsIcon->setPixmap(GUIUtil::getIcon(icon, color).pixmap(STATUSBAR_ICONSIZE, STATUSBAR_ICONSIZE));
     }
