@@ -2367,7 +2367,7 @@ CAmount CWalletTx::GetAvailableWatchOnlyCredit(const bool fUseCache) const
     return nCredit;
 }
 
-CAmount CWalletTx::GetAnonymizedCredit(bool fUseCache, const CCoinControl* coinControl) const
+CAmount CWalletTx::GetAnonymizedCredit(const CCoinControl* coinControl) const
 {
     if (!pwallet)
         return 0;
@@ -2376,7 +2376,7 @@ CAmount CWalletTx::GetAnonymizedCredit(bool fUseCache, const CCoinControl* coinC
     if (IsCoinBase() || GetDepthInMainChain() < 0)
         return 0;
 
-    if (fUseCache && fAnonymizedCreditCached)
+    if (coinControl == nullptr && fAnonymizedCreditCached)
         return nAnonymizedCreditCached;
 
     CAmount nCredit = 0;
@@ -2399,8 +2399,11 @@ CAmount CWalletTx::GetAnonymizedCredit(bool fUseCache, const CCoinControl* coinC
         }
     }
 
-    nAnonymizedCreditCached = nCredit;
-    fAnonymizedCreditCached = true;
+    if (coinControl == nullptr) {
+        nAnonymizedCreditCached = nCredit;
+        fAnonymizedCreditCached = true;
+    }
+
     return nCredit;
 }
 
@@ -2630,7 +2633,7 @@ CAmount CWallet::GetAnonymizedBalance(const CCoinControl* coinControl) const
     LOCK2(cs_main, cs_wallet);
 
     for (auto pcoin : GetSpendableTXs()) {
-        nTotal += pcoin->GetAnonymizedCredit(coinControl == nullptr, coinControl);
+        nTotal += pcoin->GetAnonymizedCredit(coinControl);
     }
 
     return nTotal;

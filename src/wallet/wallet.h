@@ -480,7 +480,7 @@ public:
     CAmount GetAvailableWatchOnlyCredit(const bool fUseCache=true) const;
     CAmount GetChange() const;
 
-    CAmount GetAnonymizedCredit(bool fUseCache = true, const CCoinControl* coinControl = nullptr) const;
+    CAmount GetAnonymizedCredit(const CCoinControl* coinControl = nullptr) const;
     CAmount GetDenominatedCredit(bool unconfirmed, bool fUseCache=true) const;
 
     void GetAmounts(std::list<COutputEntry>& listReceived,
