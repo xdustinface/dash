@@ -135,12 +135,12 @@ CoinControlDialog::CoinControlDialog(QWidget* parent) :
     // Toggle lock state
     connect(ui->pushButtonToggleLock, SIGNAL(clicked()), this, SLOT(buttonToggleLockClicked()));
 
-    ui->treeWidget->setColumnWidth(COLUMN_CHECKBOX, 84);
+    ui->treeWidget->setColumnWidth(COLUMN_CHECKBOX, 94);
     ui->treeWidget->setColumnWidth(COLUMN_AMOUNT, 100);
     ui->treeWidget->setColumnWidth(COLUMN_LABEL, 170);
     ui->treeWidget->setColumnWidth(COLUMN_PRIVATESEND_ROUNDS, 88);
-    ui->treeWidget->setColumnWidth(COLUMN_DATE, 80);
-    ui->treeWidget->setColumnWidth(COLUMN_CONFIRMATIONS, 100);
+    ui->treeWidget->setColumnWidth(COLUMN_DATE, 120);
+    ui->treeWidget->setColumnWidth(COLUMN_CONFIRMATIONS, 110);
 
     ui->treeWidget->header()->setStretchLastSection(false);
     ui->treeWidget->header()->setSectionResizeMode(COLUMN_ADDRESS, QHeaderView::Stretch);
