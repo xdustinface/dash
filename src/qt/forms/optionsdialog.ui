@@ -882,6 +882,9 @@ https://www.transifex.com/projects/p/dash/</string>
           <property name="textFormat">
            <enum>Qt::PlainText</enum>
           </property>
+          <property name="wordWrap">
+           <bool>true</bool>
+          </property>
          </widget>
         </item>
         <item>
