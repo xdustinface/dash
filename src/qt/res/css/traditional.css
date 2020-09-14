@@ -190,17 +190,6 @@ QDialog#AppearanceSetup > AppearanceWidget {
 AppearanceWidget
 ******************************************************/
 
-AppearanceWidget #lblSmaller,
-AppearanceWidget #lblBigger,
-AppearanceWidget #lblBolderNormal,
-AppearanceWidget #lblBolderBold,
-AppearanceWidget #lblLighterNormal,
-AppearanceWidget #lblLighterBold {
-    /* Exceptional use of font-size here to
-    avoid changes of the slider postions */
-    font-size: 13px;
-}
-
 AppearanceWidget #lblTheme,
 AppearanceWidget #lblFontFamily,
 AppearanceWidget #lblFontScale,
@@ -220,8 +209,21 @@ AppearanceWidget #lblFontFamily,
 AppearanceWidget #lblFontScale,
 AppearanceWidget #lblFontWeightNormal,
 AppearanceWidget #lblFontWeightBold {
-    min-width: 170px;
-    max-width: 170px;
+    min-width: 280px;
+    max-width: 280px;
+}
+
+/******************************************************
+OptionsDialog
+******************************************************/
+
+QDialog#OptionsDialog {
+    min-width: 650px;
+}
+
+QDialog#OptionsDialog QCheckBox#connectSocksTor,
+QDialog#OptionsDialog QLabel#overriddenByCommandLineInfoLabel {
+    min-width: 550px;
 }
 
 /******************************************************
