@@ -621,7 +621,6 @@ QPushButton - Special case, tabbar replacement buttons
 #btnMain,
 #btnWallet,
 #btnNetwork,
-#btnWindow,
 #btnDisplay,
 #btnAppearance,
 /* Sign/Verify dialog buttons */
@@ -644,7 +643,6 @@ QPushButton - Special case, tabbar replacement buttons
 #btnMain:hover:checked,
 #btnWallet:hover:checked,
 #btnNetwork:hover:checked,
-#btnWindow:hover:checked,
 #btnDisplay:hover:checked,
 #btnAppearance:hover:checked,
 /* Sign/Verify dialog buttons */
@@ -667,7 +665,6 @@ QPushButton - Special case, tabbar replacement buttons
 #btnMain:hover:!checked,
 #btnWallet:hover:!checked,
 #btnNetwork:hover:!checked,
-#btnWindow:hover:!checked,
 #btnDisplay:hover:!checked,
 #btnAppearance:hover:!checked,
 /* Sign/Verify dialog buttons */
@@ -690,7 +687,6 @@ QPushButton - Special case, tabbar replacement buttons
 #btnMain:checked,
 #btnWallet:checked,
 #btnNetwork:checked,
-#btnWindow:checked,
 #btnDisplay:checked,
 #btnAppearance:checked,
 /* Sign/Verify dialog buttons */
@@ -712,7 +708,6 @@ QPushButton - Special case, tabbar replacement buttons
 #btnMain:hover:pressed,
 #btnWallet:hover:pressed,
 #btnNetwork:hover:pressed,
-#btnWindow:hover:pressed,
 #btnDisplay:hover:pressed,
 #btnAppearance:hover:pressed,
 /* Sign/Verify dialog buttons */

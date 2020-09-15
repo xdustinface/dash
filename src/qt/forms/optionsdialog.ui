@@ -62,16 +62,6 @@
       </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="btnWindow">
-       <property name="text">
-        <string>&amp;Window</string>
-       </property>
-       <property name="checkable">
-        <bool>true</bool>
-       </property>
-      </widget>
-     </item>
-     <item>
       <widget class="QPushButton" name="btnDisplay">
        <property name="text">
         <string>&amp;Display</string>
@@ -113,6 +103,36 @@
          </property>
          <property name="text">
           <string>&amp;Start %1 on system login</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QCheckBox" name="hideTrayIcon">
+         <property name="toolTip">
+          <string>Hide the icon from the system tray.</string>
+         </property>
+         <property name="text">
+          <string>&amp;Hide tray icon</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QCheckBox" name="minimizeToTray">
+         <property name="toolTip">
+          <string>Show only a tray icon after minimizing the window.</string>
+         </property>
+         <property name="text">
+          <string>&amp;Minimize to the tray instead of the taskbar</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QCheckBox" name="minimizeOnClose">
+         <property name="toolTip">
+          <string>Minimize instead of exit the application when the window is closed. When this option is enabled, the application will be closed only after selecting Exit in the menu.</string>
+         </property>
+         <property name="text">
+          <string>M&amp;inimize on close</string>
          </property>
         </widget>
        </item>
@@ -648,53 +668,6 @@
        </item>
        <item>
         <spacer name="verticalSpacer_Network">
-         <property name="orientation">
-          <enum>Qt::Vertical</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>20</width>
-           <height>40</height>
-          </size>
-         </property>
-        </spacer>
-       </item>
-      </layout>
-     </widget>
-     <widget class="QWidget" name="pageWindow">
-      <layout class="QVBoxLayout" name="verticalLayout_Window">
-       <item>
-        <widget class="QCheckBox" name="hideTrayIcon">
-         <property name="toolTip">
-          <string>Hide the icon from the system tray.</string>
-         </property>
-         <property name="text">
-          <string>&amp;Hide tray icon</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QCheckBox" name="minimizeToTray">
-         <property name="toolTip">
-          <string>Show only a tray icon after minimizing the window.</string>
-         </property>
-         <property name="text">
-          <string>&amp;Minimize to the tray instead of the taskbar</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QCheckBox" name="minimizeOnClose">
-         <property name="toolTip">
-          <string>Minimize instead of exit the application when the window is closed. When this option is enabled, the application will be closed only after selecting Exit in the menu.</string>
-         </property>
-         <property name="text">
-          <string>M&amp;inimize on close</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <spacer name="verticalSpacer_Window">
          <property name="orientation">
           <enum>Qt::Vertical</enum>
          </property>
