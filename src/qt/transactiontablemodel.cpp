@@ -502,6 +502,27 @@ QString TransactionTableModel::formatTxAmount(const TransactionRecord *wtx, bool
     return QString(str);
 }
 
+QVariant TransactionTableModel::amountColor(const TransactionRecord *rec) const
+{
+    switch (rec->type) {
+    case TransactionRecord::Generated:
+        return GUIUtil::getThemedQColor(GUIUtil::ThemedColor::BLUE);
+    case TransactionRecord::RecvWithPrivateSend:
+    case TransactionRecord::RecvWithAddress:
+    case TransactionRecord::RecvFromOther:
+        return GUIUtil::getThemedQColor(GUIUtil::ThemedColor::GREEN);
+    case TransactionRecord::PrivateSend:
+    case TransactionRecord::SendToAddress:
+    case TransactionRecord::SendToOther:
+        return GUIUtil::getThemedQColor(GUIUtil::ThemedColor::RED);
+    case TransactionRecord::PrivateSendDenominate:
+        return GUIUtil::getThemedQColor(GUIUtil::ThemedColor::DEFAULT);
+    default:
+        break;
+    }
+    return GUIUtil::getThemedQColor(GUIUtil::ThemedColor::ORANGE);
+}
+
 QVariant TransactionTableModel::txStatusDecoration(const TransactionRecord *wtx) const
 {
     switch(wtx->status.status)
@@ -622,20 +643,7 @@ QVariant TransactionTableModel::data(const QModelIndex &index, int role) const
             return GUIUtil::getThemedQColor(GUIUtil::ThemedColor::UNCONFIRMED);
         }
         if (index.column() == Amount) {
-            switch (rec->type) {
-            case TransactionRecord::Generated:
-                return GUIUtil::getThemedQColor(GUIUtil::ThemedColor::BLUE);
-            case TransactionRecord::RecvWithPrivateSend:
-            case TransactionRecord::RecvWithAddress:
-            case TransactionRecord::RecvFromOther:
-                return GUIUtil::getThemedQColor(GUIUtil::ThemedColor::GREEN);
-            case TransactionRecord::PrivateSend:
-            case TransactionRecord::SendToAddress:
-            case TransactionRecord::SendToOther:
-                return GUIUtil::getThemedQColor(GUIUtil::ThemedColor::RED);
-            default:
-                return GUIUtil::getThemedQColor(GUIUtil::ThemedColor::ORANGE);
-            }
+            return amountColor(rec);
         }
         if(index.column() == ToAddress)
         {
