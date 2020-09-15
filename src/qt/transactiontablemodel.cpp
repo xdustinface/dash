@@ -358,10 +358,10 @@ QString TransactionTableModel::formatTxStatus(const TransactionRecord *wtx) cons
         break;
     }
 
-    if ((wtx->status.status == TransactionStatus::Unconfirmed || wtx->status.status == TransactionStatus::Confirming) && wtx->status.lockedByInstantSend) {
+    if (wtx->status.lockedByInstantSend) {
         status += ", " + tr("verified via InstantSend");
     }
-    if ((wtx->status.status == TransactionStatus::Confirming || wtx->status.status == TransactionStatus::Confirmed) && wtx->status.lockedByChainLocks) {
+    if (wtx->status.lockedByChainLocks) {
         status += ", " + tr("locked via ChainLocks");
     }
 
@@ -430,7 +430,7 @@ QString TransactionTableModel::formatTxType(const TransactionRecord *wtx) const
 
 QVariant TransactionTableModel::txAddressDecoration(const TransactionRecord *wtx) const
 {
-    if (wtx->status.depth < 6 && wtx->status.lockedByInstantSend && !wtx->status.lockedByChainLocks) {
+    if (wtx->status.lockedByInstantSend) {
         return GUIUtil::getIcon("verify", GUIUtil::ThemedColor::BLUE);
     }
     return QVariant();
