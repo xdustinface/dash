@@ -164,7 +164,7 @@ OverviewPage::OverviewPage(QWidget* parent) :
     ui->labelTransactionsStatus->setText("(" + tr("out of sync") + ")");
 
     // hide PS frame (helps to preserve saved size)
-    // we'll setup and make it visible in updateAdvancedPSUI() later
+    // we'll setup and make it visible in privateSendStatus() later
     ui->framePrivateSend->setVisible(false);
 
     // start with displaying the "out of sync" warnings
@@ -304,9 +304,6 @@ void OverviewPage::setWalletModel(WalletModel *model)
 
         // explicitly update PS frame and transaction list to reflect actual settings
         updateAdvancedPSUI(model->getOptionsModel()->getShowAdvancedPSUI());
-
-        // Initialize PS UI
-        privateSendStatus(true);
 
         if (!CPrivateSendClientOptions::IsEnabled()) return;
 
@@ -460,16 +457,7 @@ void OverviewPage::updatePrivateSendProgress()
 
 void OverviewPage::updateAdvancedPSUI(bool fShowAdvancedPSUI) {
     this->fShowAdvancedPSUI = fShowAdvancedPSUI;
-    int nNumItems = (!CPrivateSendClientOptions::IsEnabled() || !fShowAdvancedPSUI) ? NUM_ITEMS : NUM_ITEMS_ADV;
-    SetupTransactionList(nNumItems);
-
-    if (!CPrivateSendClientOptions::IsEnabled()) return;
-
-    ui->framePrivateSend->setVisible(true);
-    ui->labelCompletitionText->setVisible(fShowAdvancedPSUI);
-    ui->privateSendProgress->setVisible(fShowAdvancedPSUI);
-    ui->labelSubmittedDenomText->setVisible(fShowAdvancedPSUI);
-    ui->labelSubmittedDenom->setVisible(fShowAdvancedPSUI);
+    privateSendStatus(true);
 }
 
 void OverviewPage::privateSendStatus(bool fForce)
@@ -478,19 +466,43 @@ void OverviewPage::privateSendStatus(bool fForce)
 
     if(!walletModel) return;
 
-    auto tempWidgets = {ui->labelSubmittedDenomText,
-                        ui->labelSubmittedDenom};
-
     bool fIsEnabled = CPrivateSendClientOptions::IsEnabled();
+    ui->framePrivateSend->setVisible(fIsEnabled);
     if (!fIsEnabled) {
         SetupTransactionList(NUM_ITEMS_DISABLED);
         return;
     }
 
+    // Wrap all privatesend related widgets we want to show/hide state based.
+    // Value of the map contains a flag if this widget belongs to the advanced
+    // PrivateSend UI option or not. True if it does, false if not.
+    std::map<QWidget*, bool> privateSendWidgets = {
+        {ui->labelCompletitionText, true},
+        {ui->privateSendProgress, true},
+        {ui->labelSubmittedDenomText, true},
+        {ui->labelSubmittedDenom, true},
+        {ui->labelAmountAndRoundsText, false},
+        {ui->labelAmountRounds, false}
+    };
+
     auto setWidgetsVisible = [&](bool fVisible) {
-        for (const auto& it : tempWidgets) {
-            it->setVisible(fVisible);
+        static bool fInitial{true};
+        static bool fLastVisible{false};
+        static bool fLastShowAdvanced{false};
+        // Only update the widget's visibility if something changed since the last call of setWidgetsVisible
+        if (fLastShowAdvanced == fShowAdvancedPSUI && fLastVisible == fVisible) {
+            if (fInitial) {
+                fInitial = false;
+            } else {
+                return;
+            }
         }
+        // Set visible if: fVisible and not advanced UI element or advanced ui element and advanced ui active
+        for (const auto& it : privateSendWidgets) {
+            it.first->setVisible(fVisible && (!it.second || it.second == fShowAdvancedPSUI));
+        }
+        fLastVisible = fVisible;
+        fLastShowAdvanced = fShowAdvancedPSUI;
     };
 
     static int64_t nLastDSProgressBlockTime = 0;
