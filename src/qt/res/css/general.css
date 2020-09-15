@@ -1055,8 +1055,8 @@ AppearanceWidget #lblFontFamily,
 AppearanceWidget #lblFontScale,
 AppearanceWidget #lblFontWeightNormal,
 AppearanceWidget #lblFontWeightBold {
-    min-width: 280px;
-    max-width: 280px;
+    min-width: 200px;
+    max-width: 200px;
 }
 
 /******************************************************
@@ -1248,7 +1248,7 @@ OptionsDialog
 ******************************************************/
 
 QDialog#OptionsDialog {
-    min-width: 650px;
+    min-width: 585px;
 }
 
 QDialog#OptionsDialog QValueComboBox,
