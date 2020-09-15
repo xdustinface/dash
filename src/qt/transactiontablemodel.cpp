@@ -359,10 +359,10 @@ QString TransactionTableModel::formatTxStatus(const TransactionRecord *wtx) cons
     }
 
     if ((wtx->status.status == TransactionStatus::Unconfirmed || wtx->status.status == TransactionStatus::Confirming) && wtx->status.lockedByInstantSend) {
-        status += " (" + tr("verified via LLMQ based InstantSend") + ")";
+        status += " (" + tr("verified via InstantSend") + ")";
     }
     if ((wtx->status.status == TransactionStatus::Confirming || wtx->status.status == TransactionStatus::Confirmed) && wtx->status.lockedByChainLocks) {
-        status += " (" + tr("locked via LLMQ based ChainLocks") + ")";
+        status += " (" + tr("locked via ChainLocks") + ")";
     }
 
     return status;
