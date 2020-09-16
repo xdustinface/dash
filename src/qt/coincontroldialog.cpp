@@ -665,6 +665,8 @@ void CoinControlDialog::updateView()
     if (!model || !model->getOptionsModel() || !model->getAddressTableModel())
         return;
 
+    ui->treeWidget->setColumnHidden(COLUMN_PRIVATESEND_ROUNDS, mode == Mode::NORMAL);
+
     bool treeMode = ui->radioTreeMode->isChecked();
     ui->treeWidget->clear();
     ui->treeWidget->setEnabled(false); // performance, otherwise updateLabels would be called for every checked checkbox
