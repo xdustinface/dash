@@ -33,6 +33,7 @@ in the <theme.css> file.
 # Used colors in general.css for commit 44de8a93f2
 
 #00000000
+#222222
 #5e8c41
 #a84832
 #c79304
@@ -1299,6 +1300,17 @@ QDialog#OptionsDialog #frame {
 QDialog#OptionsDialog QGroupBox {
     margin-top: 10px;
 }
+
+/******************************************************
+ OverviewPage
+ ******************************************************/
+
+QWidget#OverviewPage QLabel#labelAlerts {
+     background-color: #c79304;
+     color: #222222;
+     border-radius: 5px;
+     padding: 5px;
+ }
 
 /******************************************************
 OverviewPage Balances
