@@ -138,7 +138,7 @@ CoinControlDialog::CoinControlDialog(QWidget* parent) :
     ui->treeWidget->setColumnWidth(COLUMN_CHECKBOX, 94);
     ui->treeWidget->setColumnWidth(COLUMN_AMOUNT, 100);
     ui->treeWidget->setColumnWidth(COLUMN_LABEL, 170);
-    ui->treeWidget->setColumnWidth(COLUMN_PRIVATESEND_ROUNDS, 88);
+    ui->treeWidget->setColumnWidth(COLUMN_PRIVATESEND_ROUNDS, 110);
     ui->treeWidget->setColumnWidth(COLUMN_DATE, 120);
     ui->treeWidget->setColumnWidth(COLUMN_CONFIRMATIONS, 110);
 

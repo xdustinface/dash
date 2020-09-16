@@ -422,7 +422,7 @@
      </column>
      <column>
       <property name="text">
-       <string>PS Rounds</string>
+       <string>Mixing Rounds</string>
       </property>
      </column>
      <column>
