@@ -676,7 +676,13 @@ void CoinControlDialog::updateView()
     if (!model || !model->getOptionsModel() || !model->getAddressTableModel())
         return;
 
-    ui->treeWidget->setColumnHidden(COLUMN_PRIVATESEND_ROUNDS, mode == Mode::NORMAL);
+    bool fNormalMode = mode == Mode::NORMAL;
+    ui->treeWidget->setColumnHidden(COLUMN_PRIVATESEND_ROUNDS, fNormalMode);
+    ui->radioTreeMode->setVisible(fNormalMode);
+    ui->radioListMode->setVisible(fNormalMode);
+    if (mode == Mode::PRIVATESEND) {
+        ui->radioListMode->setChecked(true);
+    }
 
     QString strHideButton;
     switch (mode) {
