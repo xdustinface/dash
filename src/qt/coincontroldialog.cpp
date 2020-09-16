@@ -852,12 +852,15 @@ void CoinControlDialog::updateView()
         }
     }
 
-    // expand all partially selected
+    // expand all partially selected and hide the empty
     if (treeMode)
     {
-        for (int i = 0; i < ui->treeWidget->topLevelItemCount(); i++)
-            if (ui->treeWidget->topLevelItem(i)->checkState(COLUMN_CHECKBOX) == Qt::PartiallyChecked)
-                ui->treeWidget->topLevelItem(i)->setExpanded(true);
+        for (int i = 0; i < ui->treeWidget->topLevelItemCount(); i++) {
+            QTreeWidgetItem* topLevelItem = ui->treeWidget->topLevelItem(i);
+            topLevelItem->setHidden(topLevelItem->childCount() == 0);
+            if (topLevelItem->checkState(COLUMN_CHECKBOX) == Qt::PartiallyChecked)
+                topLevelItem->setExpanded(true);
+        }
     }
 
     // sort view
