@@ -13,7 +13,6 @@
 #include <qt/optionsmodel.h>
 #include <qt/transactionfilterproxy.h>
 #include <qt/transactiontablemodel.h>
-#include <qt/transactionrecord.h>
 #include <qt/utilitydialog.h>
 #include <qt/walletmodel.h>
 
@@ -25,7 +24,7 @@
 #include <QSettings>
 #include <QTimer>
 
-#define DECORATION_SIZE 54
+#define ITEM_HEIGHT 54
 #define NUM_ITEMS_DISABLED 5
 #define NUM_ITEMS_ENABLED_NORMAL 7
 #define NUM_ITEMS_ENABLED_ADVANCED 9
@@ -49,67 +48,61 @@ public:
         int xspace = 8;
         int ypad = 8;
         int halfheight = (mainRect.height() - 2*ypad)/2;
-        QRect amountRect(mainRect.left() + xspace, mainRect.top()+ypad, mainRect.width() - xspace, halfheight);
-        QRect addressRect(mainRect.left() + xspace, mainRect.top()+ypad+halfheight + 5, mainRect.width() - xspace, halfheight);
+        QRect rectTopHalf(mainRect.left() + xspace, mainRect.top() + ypad, mainRect.width() - xspace, halfheight);
+        QRect rectBottomHalf(mainRect.left() + xspace, mainRect.top() + ypad + halfheight + 5, mainRect.width() - xspace, halfheight);
+        QRect rectBounding;
+        QColor colorForeground;
+        QFont fontInitial = painter->font();
 
-        QDateTime date = index.data(TransactionTableModel::DateRole).toDateTime();
-        QString address = index.data(Qt::DisplayRole).toString();
-        qint64 amount = index.data(TransactionTableModel::AmountRole).toLongLong();
-        bool confirmed = index.data(TransactionTableModel::ConfirmedRole).toBool();
-        TransactionRecord::Type type = static_cast<TransactionRecord::Type>(index.data(TransactionTableModel::TypeRole).toInt());
-        QColor foreground = qvariant_cast<QColor>(index.data(Qt::ForegroundRole));
+        // Grab model indexes for desired data from TransactionTableModel
+        QModelIndex indexDate = index.sibling(index.row(), TransactionTableModel::Date);
+        QModelIndex indexAmount = index.sibling(index.row(), TransactionTableModel::Amount);
+        QModelIndex indexAddress = index.sibling(index.row(), TransactionTableModel::ToAddress);
 
-        painter->setPen(foreground);
-        QRect boundingRect;
-        painter->drawText(addressRect, Qt::AlignLeft|Qt::AlignVCenter, address, &boundingRect);
+        // Draw first line (with slightly bigger font than the second line will get)
+        // Content: Date/Time, Optional IS indicator, Amount
+        QFont font = fontInitial;
+        font.setPointSize(font.pointSize() * 1.17);
+        painter->setFont(font);
+        // Date/Time
+        colorForeground = qvariant_cast<QColor>(indexDate.data(Qt::ForegroundRole));
+        QString strDate = indexDate.data(Qt::DisplayRole).toString();
+        painter->setPen(colorForeground);
+        painter->drawText(rectTopHalf, Qt::AlignLeft | Qt::AlignVCenter, strDate, &rectBounding);
+        // Optional IS indicator
+        QIcon iconInstantSend = qvariant_cast<QIcon>(indexAddress.data(TransactionTableModel::RawDecorationRole));
+        QRect rectInstantSend(rectBounding.right() + 5, rectTopHalf.top(), 16, halfheight);
+        iconInstantSend.paint(painter, rectInstantSend);
+        // Amount
+        colorForeground = qvariant_cast<QColor>(indexAmount.data(Qt::ForegroundRole));
+        // Note: do NOT use Qt::DisplayRole, have format properly here
+        qint64 nAmount = index.data(TransactionTableModel::AmountRole).toLongLong();
+        QString strAmount = BitcoinUnits::floorWithUnit(unit, nAmount, true, BitcoinUnits::separatorAlways);
+        painter->setPen(colorForeground);
+        painter->drawText(rectTopHalf, Qt::AlignRight | Qt::AlignVCenter, strAmount);
 
+        // Draw second line (with the initial font)
+        // Content: Address/label, Optional Watchonly indicator
+        painter->setFont(fontInitial);
+        // Address/Label
+        colorForeground = qvariant_cast<QColor>(indexAddress.data(Qt::ForegroundRole));
+        QString address = indexAddress.data(Qt::DisplayRole).toString();
+        painter->setPen(colorForeground);
+        painter->drawText(rectBottomHalf, Qt::AlignLeft | Qt::AlignVCenter, address, &rectBounding);
+        // Optional Watchonly indicator
         if (index.data(TransactionTableModel::WatchonlyRole).toBool())
         {
             QIcon iconWatchonly = qvariant_cast<QIcon>(index.data(TransactionTableModel::WatchonlyDecorationRole));
-            QRect watchonlyRect(boundingRect.right() + 5, mainRect.top()+ypad+halfheight, 16, halfheight);
-            iconWatchonly.paint(painter, watchonlyRect);
+            QRect rectWatchonly(rectBounding.right() + 5, rectBottomHalf.top(), 16, halfheight);
+            iconWatchonly.paint(painter, rectWatchonly);
         }
-
-        switch (type) {
-        case TransactionRecord::Generated:
-            foreground = GUIUtil::getThemedQColor(GUIUtil::ThemedColor::BLUE);
-            break;
-        case TransactionRecord::RecvWithPrivateSend:
-        case TransactionRecord::RecvWithAddress:
-        case TransactionRecord::RecvFromOther:
-            foreground = GUIUtil::getThemedQColor(GUIUtil::ThemedColor::GREEN);
-            break;
-        case TransactionRecord::PrivateSend:
-        case TransactionRecord::SendToAddress:
-        case TransactionRecord::SendToOther:
-            foreground = GUIUtil::getThemedQColor(GUIUtil::ThemedColor::RED);
-            break;
-        default:
-            foreground = GUIUtil::getThemedQColor(GUIUtil::ThemedColor::ORANGE);
-        }
-        painter->setPen(foreground);
-        QString amountText = BitcoinUnits::floorWithUnit(unit, amount, true, BitcoinUnits::separatorAlways);
-        if(!confirmed)
-        {
-            foreground = GUIUtil::getThemedQColor(GUIUtil::ThemedColor::UNCONFIRMED);
-            amountText = QString("[") + amountText + QString("]");
-        }
-
-        QFont font = painter->font();
-        font.setPointSize(font.pointSize() * 1.17);
-        painter->setFont(font);
-
-        painter->drawText(amountRect, Qt::AlignRight|Qt::AlignVCenter, amountText);
-
-        painter->setPen(GUIUtil::getThemedQColor(GUIUtil::ThemedColor::DEFAULT));
-        painter->drawText(amountRect, Qt::AlignLeft|Qt::AlignVCenter, GUIUtil::dateTimeStr(date));
 
         painter->restore();
     }
 
     inline QSize sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const
     {
-        return QSize(DECORATION_SIZE, DECORATION_SIZE);
+        return QSize(ITEM_HEIGHT, ITEM_HEIGHT);
     }
 
     int unit;
@@ -680,7 +673,7 @@ void OverviewPage::togglePrivateSend(){
 }
 
 void OverviewPage::SetupTransactionList(int nNumItems) {
-    ui->listTransactions->setMinimumHeight(nNumItems * (DECORATION_SIZE + 2));
+    ui->listTransactions->setMinimumHeight(nNumItems * (ITEM_HEIGHT + 4));
 
     if(walletModel && walletModel->getOptionsModel()) {
         // Set up transaction list
