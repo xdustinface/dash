@@ -678,6 +678,7 @@ void CoinControlDialog::updateView()
 
     bool fNormalMode = mode == Mode::NORMAL;
     ui->treeWidget->setColumnHidden(COLUMN_PRIVATESEND_ROUNDS, fNormalMode);
+    ui->treeWidget->setColumnHidden(COLUMN_LABEL, !fNormalMode);
     ui->radioTreeMode->setVisible(fNormalMode);
     ui->radioListMode->setVisible(fNormalMode);
     if (mode == Mode::PRIVATESEND) {
