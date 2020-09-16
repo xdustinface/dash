@@ -67,6 +67,8 @@ private:
     QAction *lockAction;
     QAction *unlockAction;
 
+    bool fHideAdditional{true};
+
     void sortView(int, Qt::SortOrder);
     void updateView();
 
@@ -119,6 +121,7 @@ private Q_SLOTS:
     void buttonSelectAllClicked();
     void buttonToggleLockClicked();
     void updateLabelLocked();
+    void on_hideButton_clicked();
 };
 
 #endif // BITCOIN_QT_COINCONTROLDIALOG_H
