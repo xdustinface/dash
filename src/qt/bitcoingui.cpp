@@ -817,6 +817,8 @@ void BitcoinGUI::setClientModel(ClientModel *_clientModel)
         }
 #endif
     }
+
+    updatePrivateSendVisibility();
 }
 
 #ifdef ENABLE_WALLET
@@ -951,6 +953,8 @@ void BitcoinGUI::optionsClicked()
     OptionsDialog dlg(this, enableWallet);
     dlg.setModel(clientModel->getOptionsModel());
     dlg.exec();
+
+    updatePrivateSendVisibility();
 }
 
 void BitcoinGUI::aboutClicked()
@@ -1180,6 +1184,20 @@ void BitcoinGUI::updateProgressBarVisibility()
     bool fShowProgressBar = clientModel->getNetworkActive() && !masternodeSync.IsSynced() && clientModel->getNumConnections() > 0;
     progressBarLabel->setVisible(fShowProgressBarLabel);
     progressBar->setVisible(fShowProgressBar);
+}
+
+void BitcoinGUI::updatePrivateSendVisibility()
+{
+#ifdef ENABLE_WALLET
+    bool fEnabled = CPrivateSendClientOptions::IsEnabled();
+#else
+    bool fEnabled = false;
+#endif
+    // PrivateSend button is the third QToolButton, show/hide the underlying QAction
+    // Hiding the QToolButton itself doesn't work.
+    appToolBar->actions()[2]->setVisible(fEnabled);
+    privateSendCoinsMenuAction->setVisible(fEnabled);
+    showPrivateSendHelpAction->setVisible(fEnabled);
 }
 
 void BitcoinGUI::setNumBlocks(int count, const QDateTime& blockDate, const QString& blockHash, double nVerificationProgress, bool header)
