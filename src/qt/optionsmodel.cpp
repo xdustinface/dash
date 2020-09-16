@@ -113,6 +113,11 @@ void OptionsModel::Init(bool resetSettings)
         settings.setValue("digits", "2");
 
     // PrivateSend
+    if (!settings.contains("fPrivateSendEnabled"))
+        settings.setValue("fPrivateSendEnabled", false);
+    if (!gArgs.SoftSetBoolArg("-enableprivatesend", settings.value("fPrivateSendEnabled").toBool()))
+        addOverriddenOption("-enableprivatesend");
+
     if (!settings.contains("fShowAdvancedPSUI"))
         settings.setValue("fShowAdvancedPSUI", false);
     fShowAdvancedPSUI = settings.value("fShowAdvancedPSUI", false).toBool();
@@ -330,6 +335,8 @@ QVariant OptionsModel::data(const QModelIndex & index, int role) const
             return settings.value("bSpendZeroConfChange");
         case ShowMasternodesTab:
             return settings.value("fShowMasternodesTab");
+        case PrivateSendEnabled:
+            return settings.value("fPrivateSendEnabled");
         case ShowAdvancedPSUI:
             return fShowAdvancedPSUI;
         case ShowPrivateSendPopups:
@@ -486,6 +493,9 @@ bool OptionsModel::setData(const QModelIndex & index, const QVariant & value, in
                 setRestartRequired(true);
             }
             break;
+        case PrivateSendEnabled:
+            // Set in togglePrivateSendEnabled()
+            break;
         case ShowAdvancedPSUI:
             fShowAdvancedPSUI = value.toBool();
             settings.setValue("fShowAdvancedPSUI", fShowAdvancedPSUI);
@@ -636,6 +646,17 @@ bool OptionsModel::getProxySettings(QNetworkProxy& proxy) const
         proxy.setType(QNetworkProxy::NoProxy);
 
     return false;
+}
+
+void OptionsModel::togglePrivateSendEnabledChanged()
+{
+#ifdef ENABLE_WALLET
+    QSettings settings;
+    bool fToggled = !settings.value("fPrivateSendEnabled").toBool();
+    settings.setValue("fPrivateSendEnabled", fToggled);
+    CPrivateSendClientOptions::SetEnabled(fToggled);
+    Q_EMIT privateSendEnabledChanged();
+#endif
 }
 
 void OptionsModel::setRestartRequired(bool fRequired)

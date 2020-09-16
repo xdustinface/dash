@@ -79,12 +79,15 @@ OptionsDialog::OptionsDialog(QWidget *parent, bool enableWallet) :
     connect(ui->connectSocksTor, SIGNAL(toggled(bool)), this, SLOT(updateProxyValidationState()));
 
     pageButtons.addButton(ui->btnMain, pageButtons.buttons().size());
-    /* remove Wallet tab in case of -disablewallet */
+    /* Remove Wallet/PrivateSend tabs in case of -disablewallet */
     if (!enableWallet) {
         ui->stackedWidgetOptions->removeWidget(ui->pageWallet);
         ui->btnWallet->hide();
+        ui->stackedWidgetOptions->removeWidget(ui->pagePrivateSend);
+        ui->btnPrivateSend->hide();
     } else {
         pageButtons.addButton(ui->btnWallet, pageButtons.buttons().size());
+        pageButtons.addButton(ui->btnPrivateSend, pageButtons.buttons().size());
     }
     pageButtons.addButton(ui->btnNetwork, pageButtons.buttons().size());
     pageButtons.addButton(ui->btnDisplay, pageButtons.buttons().size());
@@ -179,6 +182,15 @@ void OptionsDialog::setModel(OptionsModel *_model)
             ui->overriddenByCommandLineLabel->setText(strLabel);
         }
 
+
+#ifdef ENABLE_WALLET
+        if (strLabel.contains("-enableprivatesend")) {
+            bool fEnabled = CPrivateSendClientOptions::IsEnabled();
+            ui->privateSendEnabled->setChecked(fEnabled);
+            ui->privateSendEnabled->setEnabled(false);
+        }
+#endif
+
         mapper->setModel(_model);
         setMapper();
         mapper->toFirst();
@@ -204,6 +216,12 @@ void OptionsDialog::setModel(OptionsModel *_model)
     connect(ui->digits, SIGNAL(valueChanged()), this, SLOT(showRestartWarning()));
     connect(ui->lang, SIGNAL(valueChanged()), this, SLOT(showRestartWarning()));
     connect(ui->thirdPartyTxUrls, SIGNAL(textChanged(const QString &)), this, SLOT(showRestartWarning()));
+
+    connect(ui->privateSendEnabled, &QCheckBox::clicked, [=]() {
+        const QSignalBlocker blocker(ui->privateSendEnabled);
+        _model->togglePrivateSendEnabledChanged();
+        updatePrivateSendVisibility();
+    });
 }
 
 void OptionsDialog::setMapper()
@@ -217,6 +235,7 @@ void OptionsDialog::setMapper()
 #endif
     mapper->addMapping(ui->threadsScriptVerif, OptionsModel::ThreadsScriptVerif);
     mapper->addMapping(ui->databaseCache, OptionsModel::DatabaseCache);
+    mapper->addMapping(ui->privateSendEnabled, OptionsModel::PrivateSendEnabled);
 
     /* Wallet */
     mapper->addMapping(ui->coinControlFeatures, OptionsModel::CoinControlFeatures);
@@ -397,6 +416,7 @@ void OptionsDialog::updatePrivateSendVisibility()
     bool fEnabled = false;
 #endif
     std::vector<QWidget*> vecWidgets{
+        ui->btnPrivateSend,
         ui->showAdvancedPSUI,
         ui->showPrivateSendPopups,
         ui->lowKeysWarning,
