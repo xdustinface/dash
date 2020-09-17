@@ -681,9 +681,6 @@ void CoinControlDialog::updateView()
     ui->treeWidget->setColumnHidden(COLUMN_LABEL, !fNormalMode);
     ui->radioTreeMode->setVisible(fNormalMode);
     ui->radioListMode->setVisible(fNormalMode);
-    if (mode == Mode::PRIVATESEND) {
-        ui->radioListMode->setChecked(true);
-    }
 
     QString strHideButton;
     switch (mode) {
@@ -700,6 +697,7 @@ void CoinControlDialog::updateView()
         } else {
             strHideButton = tr("Show spendable coins only");
         }
+        ui->radioListMode->setChecked(true);
         break;
     }
     ui->hideButton->setText(strHideButton);
