@@ -85,7 +85,7 @@ public:
     bool getCoinControlFeatures() const { return fCoinControlFeatures; }
     bool getShowAdvancedPSUI() { return fShowAdvancedPSUI; }
     const QString& getOverriddenByCommandLine() { return strOverriddenByCommandLine; }
-    void togglePrivateSendEnabledChanged();
+    void emitPrivateSendEnabledChanged();
 
     /* Restart flag helper */
     void setRestartRequired(bool fRequired);

@@ -217,10 +217,14 @@ void OptionsDialog::setModel(OptionsModel *_model)
     connect(ui->lang, SIGNAL(valueChanged()), this, SLOT(showRestartWarning()));
     connect(ui->thirdPartyTxUrls, SIGNAL(textChanged(const QString &)), this, SLOT(showRestartWarning()));
 
-    connect(ui->privateSendEnabled, &QCheckBox::clicked, [=]() {
-        const QSignalBlocker blocker(ui->privateSendEnabled);
-        _model->togglePrivateSendEnabledChanged();
+    connect(ui->privateSendEnabled, &QCheckBox::clicked, [=](bool fChecked) {
+#ifdef ENABLE_WALLET
+        CPrivateSendClientOptions::SetEnabled(fChecked);
+#endif
         updatePrivateSendVisibility();
+        if (_model != nullptr) {
+            _model->emitPrivateSendEnabledChanged();
+        }
     });
 }
 

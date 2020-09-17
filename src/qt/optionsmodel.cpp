@@ -494,7 +494,10 @@ bool OptionsModel::setData(const QModelIndex & index, const QVariant & value, in
             }
             break;
         case PrivateSendEnabled:
-            // Set in togglePrivateSendEnabled()
+            if (settings.value("fPrivateSendEnabled") != value) {
+                settings.setValue("fPrivateSendEnabled", value.toBool());
+                Q_EMIT privateSendEnabledChanged();
+            }
             break;
         case ShowAdvancedPSUI:
             if (settings.value("fShowAdvancedPSUI") != value) {
@@ -650,15 +653,9 @@ bool OptionsModel::getProxySettings(QNetworkProxy& proxy) const
     return false;
 }
 
-void OptionsModel::togglePrivateSendEnabledChanged()
+void OptionsModel::emitPrivateSendEnabledChanged()
 {
-#ifdef ENABLE_WALLET
-    QSettings settings;
-    bool fToggled = !settings.value("fPrivateSendEnabled").toBool();
-    settings.setValue("fPrivateSendEnabled", fToggled);
-    CPrivateSendClientOptions::SetEnabled(fToggled);
     Q_EMIT privateSendEnabledChanged();
-#endif
 }
 
 void OptionsModel::setRestartRequired(bool fRequired)
