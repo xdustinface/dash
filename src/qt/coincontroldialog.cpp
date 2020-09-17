@@ -682,6 +682,11 @@ void CoinControlDialog::updateView()
     ui->radioTreeMode->setVisible(fNormalMode);
     ui->radioListMode->setVisible(fNormalMode);
 
+    if (!CPrivateSendClientOptions::IsEnabled()) {
+        fHideAdditional = false;
+        ui->hideButton->setVisible(false);
+    }
+
     QString strHideButton;
     switch (mode) {
     case Mode::NORMAL:
