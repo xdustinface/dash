@@ -689,16 +689,16 @@ void CoinControlDialog::updateView()
     switch (mode) {
     case Mode::NORMAL:
         if (fHideAdditional) {
-            strHideButton = tr("Show PrivateSend coins");
+            strHideButton = tr("Show all coins");
         } else {
             strHideButton = tr("Hide PrivateSend coins");
         }
         break;
     case Mode::PRIVATESEND:
         if (fHideAdditional) {
-            strHideButton = tr("Show partially mixed coins");
+            strHideButton = tr("Show all PrivateSend coins");
         } else {
-            strHideButton = tr("Hide partially mixed coins");
+            strHideButton = tr("Show spendable coins only");
         }
         break;
     }
@@ -745,19 +745,19 @@ void CoinControlDialog::updateView()
         int nChildren = 0;
         for (const COutput& out : coins.second) {
             COutPoint outpoint = COutPoint(out.tx->tx->GetHash(), out.i);
-            int nRounds = model->getRealOutpointPrivateSendRounds(outpoint);
             bool fFullyMixed{false};
             CAmount nAmount = out.tx->tx->vout[out.i].nValue;
 
+            bool fPrivateSendAmount = CPrivateSend::IsDenominatedAmount(nAmount) || CPrivateSend::IsCollateralAmount(nAmount);
+
             if (coinControl()->IsUsingPrivateSend()) {
                 fFullyMixed = model->isFullyMixed(outpoint);
-                if ((fHideAdditional && !fFullyMixed) || (!fHideAdditional && nRounds <= 0)) {
+                if ((fHideAdditional && !fFullyMixed) || (!fHideAdditional && !fPrivateSendAmount)) {
                     coinControl()->UnSelect(outpoint);
                     continue;
                 }
             } else {
-                if (fHideAdditional && (CPrivateSend::IsDenominatedAmount(nAmount) ||
-                                        CPrivateSend::IsCollateralAmount(nAmount))) {
+                if (fHideAdditional && fPrivateSendAmount) {
                     coinControl()->UnSelect(outpoint);
                     continue;
                 }
@@ -813,6 +813,7 @@ void CoinControlDialog::updateView()
             itemOutput->setData(COLUMN_DATE, Qt::UserRole, QVariant((qlonglong)out.tx->GetTxTime()));
 
             // PrivateSend rounds
+            int nRounds = model->getRealOutpointPrivateSendRounds(outpoint);
             if (nRounds >= 0 || LogAcceptCategory(BCLog::PRIVATESEND)) {
                 itemOutput->setText(COLUMN_PRIVATESEND_ROUNDS, QString::number(nRounds));
             } else {
