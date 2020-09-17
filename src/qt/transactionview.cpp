@@ -750,8 +750,8 @@ void TransactionView::updateWatchOnlyColumn(bool fHaveWatchOnly)
 void TransactionView::updatePrivateSendVisibility()
 {
     bool fEnabled = CPrivateSendClientOptions::IsEnabled();
-    // If PrivateSend gets enabled use "Most common" else "All"
-    typeWidget->setCurrentIndex(fEnabled ? 1 : 0);
+    // If PrivateSend gets enabled use "All" else "Most common"
+    typeWidget->setCurrentIndex(fEnabled ? 0 : 1);
     // Hide all PrivateSend related filters
     QListView* typeList = qobject_cast<QListView*>(typeWidget->view());
     std::vector<int> vecRows{4, 5, 6, 7, 8};
