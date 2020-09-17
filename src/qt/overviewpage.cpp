@@ -285,7 +285,9 @@ void OverviewPage::setWalletModel(WalletModel *model)
         connect(model->getOptionsModel(), SIGNAL(privateSendRoundsChanged()), this, SLOT(updatePrivateSendProgress()));
         connect(model->getOptionsModel(), SIGNAL(privateSentAmountChanged()), this, SLOT(updatePrivateSendProgress()));
         connect(model->getOptionsModel(), SIGNAL(advancedPSUIChanged(bool)), this, SLOT(updateAdvancedPSUI(bool)));
-        connect(model->getOptionsModel(), SIGNAL(privateSendEnabledChanged()), this, SLOT(privateSendStatus(true)));
+        connect(model->getOptionsModel(), &OptionsModel::privateSendEnabledChanged, [=]() {
+            privateSendStatus(true);
+        });
 
         connect(ui->togglePrivateSend, SIGNAL(clicked()), this, SLOT(togglePrivateSend()));
 
