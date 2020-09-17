@@ -497,9 +497,11 @@ bool OptionsModel::setData(const QModelIndex & index, const QVariant & value, in
             // Set in togglePrivateSendEnabled()
             break;
         case ShowAdvancedPSUI:
-            fShowAdvancedPSUI = value.toBool();
-            settings.setValue("fShowAdvancedPSUI", fShowAdvancedPSUI);
-            Q_EMIT advancedPSUIChanged(fShowAdvancedPSUI);
+            if (settings.value("fShowAdvancedPSUI") != value) {
+                fShowAdvancedPSUI = value.toBool();
+                settings.setValue("fShowAdvancedPSUI", fShowAdvancedPSUI);
+                Q_EMIT advancedPSUIChanged(fShowAdvancedPSUI);
+            }
             break;
         case ShowPrivateSendPopups:
             settings.setValue("fShowPrivateSendPopups", value);
