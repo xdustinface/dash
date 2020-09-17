@@ -158,6 +158,11 @@ OptionsDialog::OptionsDialog(QWidget *parent, bool enableWallet) :
     ui->widgetAppearance->setLayout(appearanceLayout);
 
     updatePrivateSendVisibility();
+
+    // Store the current PrivateSend enabled state to recover it if it gets changed but the dialog gets not accepted but declined.
+#ifdef ENABLE_WALLET
+    fPrivateSendEnabledPrev = CPrivateSendClientOptions::IsEnabled();
+#endif
 }
 
 OptionsDialog::~OptionsDialog()
@@ -333,6 +338,11 @@ void OptionsDialog::on_okButton_clicked()
 void OptionsDialog::on_cancelButton_clicked()
 {
     reject();
+#ifdef ENABLE_WALLET
+    if (fPrivateSendEnabledPrev != CPrivateSendClientOptions::IsEnabled()) {
+        ui->privateSendEnabled->click();
+    }
+#endif
 }
 
 void OptionsDialog::on_hideTrayIcon_stateChanged(int fState)
