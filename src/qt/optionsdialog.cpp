@@ -415,20 +415,7 @@ void OptionsDialog::updatePrivateSendVisibility()
 #else
     bool fEnabled = false;
 #endif
-    std::vector<QWidget*> vecWidgets{
-        ui->btnPrivateSend,
-        ui->showAdvancedPSUI,
-        ui->showPrivateSendPopups,
-        ui->lowKeysWarning,
-        ui->privateSendMultiSession,
-        ui->privateSendAmount,
-        ui->lblPrivateSendAmountText,
-        ui->lblPrivateSendRoundsText,
-        ui->privateSendRounds,
-    };
-    for (auto w : vecWidgets) {
-        w->setVisible(fEnabled);
-    }
+    ui->btnPrivateSend->setVisible(fEnabled);
 }
 
 ProxyAddressValidator::ProxyAddressValidator(QObject *parent) :
