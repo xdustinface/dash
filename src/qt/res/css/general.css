@@ -1098,10 +1098,6 @@ BitcoinAmountField{
 CoinControlDialog
 ******************************************************/
 
-QDialog#CoinControlDialog .CoinControlTreeWidget#treeWidget::item {
-    border-bottom: 1px solid red;
-}
-
 QDialog#CoinControlDialog .QLabel#labelCoinControlQuantityText { /* Coin Control Quantity Label */
     min-height: 30px;
     padding-left: 15px;
@@ -1165,6 +1161,7 @@ QDialog#CoinControlDialog QHeaderView::section:first { /* Bug Fix: the number 1 
 }
 
 QDialog#CoinControlDialog .CoinControlTreeWidget#treeWidget::item {
+    border-bottom: 1px solid red;
     min-height: 25px;
 }
 QDialog#CoinControlDialog .CoinControlTreeWidget#treeWidget::item:hover {
