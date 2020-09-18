@@ -159,6 +159,8 @@ static const std::map<ThemedColor, QColor> themedColors = {
     { ThemedColor::TX_STATUS_LOCKED, QColor(28, 117, 188) },
     { ThemedColor::BACKGROUND_WIDGET, QColor(234, 234, 236) },
     { ThemedColor::BORDER_WIDGET, QColor(220, 220, 220) },
+    { ThemedColor::BACKGROUND_NETSTATS, QColor(210, 210, 210, 230) },
+    { ThemedColor::BORDER_NETSTATS, QColor(180, 180, 180) },
     { ThemedColor::QR_PIXEL, QColor(85, 85, 85) },
     { ThemedColor::ICON_ALTERNATIVE_COLOR, QColor(167, 167, 167) },
 };
@@ -176,6 +178,8 @@ static const std::map<ThemedColor, QColor> themedDarkColors = {
     { ThemedColor::TX_STATUS_LOCKED, QColor(28, 117, 188) },
     { ThemedColor::BACKGROUND_WIDGET, QColor(45, 45, 46) },
     { ThemedColor::BORDER_WIDGET, QColor(74, 74, 75) },
+    { ThemedColor::BACKGROUND_NETSTATS, QColor(45, 45, 46, 230) },
+    { ThemedColor::BORDER_NETSTATS, QColor(74, 74, 75) },
     { ThemedColor::QR_PIXEL, QColor(199, 199, 199) },
     { ThemedColor::ICON_ALTERNATIVE_COLOR, QColor(74, 74, 75) },
 };

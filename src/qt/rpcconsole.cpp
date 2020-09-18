@@ -597,9 +597,6 @@ void RPCConsole::setClientModel(ClientModel *model)
         connect(model, SIGNAL(masternodeListChanged()), this, SLOT(updateMasternodeCount()));
         clientModel->refreshMasternodeList();
 
-        updateTrafficStats(model->getTotalBytesRecv(), model->getTotalBytesSent());
-        connect(model, SIGNAL(bytesChanged(quint64,quint64)), this, SLOT(updateTrafficStats(quint64, quint64)));
-
         connect(model, SIGNAL(mempoolSizeChanged(long,size_t)), this, SLOT(setMempoolSize(long,size_t)));
         connect(model, SIGNAL(islockCountChanged(size_t)), this, SLOT(setInstantSendLockCount(size_t)));
 
@@ -1111,12 +1108,6 @@ void RPCConsole::setTrafficGraphRange(TrafficGraphData::GraphRange range)
 {
     ui->trafficGraph->setGraphRangeMins(range);
     ui->lblGraphRange->setText(GUIUtil::formatDurationStr(TrafficGraphData::RangeMinutes[range] * 60));
-}
-
-void RPCConsole::updateTrafficStats(quint64 totalBytesIn, quint64 totalBytesOut)
-{
-    ui->lblBytesIn->setText(GUIUtil::formatBytes(totalBytesIn));
-    ui->lblBytesOut->setText(GUIUtil::formatBytes(totalBytesOut));
 }
 
 void RPCConsole::peerSelected(const QItemSelection &selected, const QItemSelection &deselected)
