@@ -513,11 +513,16 @@ QVariant TransactionTableModel::amountColor(const TransactionRecord *rec) const
     case TransactionRecord::PrivateSend:
     case TransactionRecord::SendToAddress:
     case TransactionRecord::SendToOther:
+    case TransactionRecord::Other:
         return GUIUtil::getThemedQColor(GUIUtil::ThemedColor::RED);
-    default:
-        break;
+    case TransactionRecord::SendToSelf:
+    case TransactionRecord::PrivateSendDenominate:
+    case TransactionRecord::PrivateSendCollateralPayment:
+    case TransactionRecord::PrivateSendMakeCollaterals:
+    case TransactionRecord::PrivateSendCreateDenominations:
+        return GUIUtil::getThemedQColor(GUIUtil::ThemedColor::ORANGE);
     }
-    return GUIUtil::getThemedQColor(GUIUtil::ThemedColor::ORANGE);
+    return GUIUtil::getThemedQColor(GUIUtil::ThemedColor::DEFAULT);
 }
 
 QVariant TransactionTableModel::txStatusDecoration(const TransactionRecord *wtx) const
