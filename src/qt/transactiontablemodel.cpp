@@ -506,7 +506,6 @@ QVariant TransactionTableModel::amountColor(const TransactionRecord *rec) const
 {
     switch (rec->type) {
     case TransactionRecord::Generated:
-        return GUIUtil::getThemedQColor(GUIUtil::ThemedColor::BLUE);
     case TransactionRecord::RecvWithPrivateSend:
     case TransactionRecord::RecvWithAddress:
     case TransactionRecord::RecvFromOther:
@@ -515,8 +514,6 @@ QVariant TransactionTableModel::amountColor(const TransactionRecord *rec) const
     case TransactionRecord::SendToAddress:
     case TransactionRecord::SendToOther:
         return GUIUtil::getThemedQColor(GUIUtil::ThemedColor::RED);
-    case TransactionRecord::PrivateSendDenominate:
-        return GUIUtil::getThemedQColor(GUIUtil::ThemedColor::DEFAULT);
     default:
         break;
     }
