@@ -673,25 +673,25 @@ void OverviewPage::togglePrivateSend(){
 }
 
 void OverviewPage::SetupTransactionList(int nNumItems) {
-    ui->listTransactions->setMinimumHeight(nNumItems * ITEM_HEIGHT);
 
-    if(walletModel && walletModel->getTransactionTableModel()) {
-        // Set up transaction list
-        if (filter == nullptr) {
-            filter.reset(new TransactionFilterProxy());
-            filter->setSourceModel(walletModel->getTransactionTableModel());
-            filter->setLimit(nNumItems);
-            filter->setDynamicSortFilter(true);
-            filter->setSortRole(Qt::EditRole);
-            filter->setShowInactive(false);
-            filter->sort(TransactionTableModel::Date, Qt::DescendingOrder);
-        } else {
-            filter->setLimit(nNumItems);
-        }
+    if(walletModel == nullptr || walletModel->getTransactionTableModel() == nullptr) {
+        return;
+    }
 
+    // Set up transaction list
+    if (filter == nullptr) {
+        filter.reset(new TransactionFilterProxy());
+        filter->setSourceModel(walletModel->getTransactionTableModel());
+        filter->setDynamicSortFilter(true);
+        filter->setSortRole(Qt::EditRole);
+        filter->setShowInactive(false);
+        filter->sort(TransactionTableModel::Date, Qt::DescendingOrder);
         ui->listTransactions->setModel(filter.get());
         ui->listTransactions->setModelColumn(TransactionTableModel::ToAddress);
     }
+
+    filter->setLimit(nNumItems);
+    ui->listTransactions->setMinimumHeight(nNumItems * ITEM_HEIGHT);
 }
 
 void OverviewPage::DisablePrivateSendCompletely() {
