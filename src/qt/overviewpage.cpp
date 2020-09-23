@@ -675,7 +675,7 @@ void OverviewPage::togglePrivateSend(){
 void OverviewPage::SetupTransactionList(int nNumItems) {
     ui->listTransactions->setMinimumHeight(nNumItems * ITEM_HEIGHT);
 
-    if(walletModel && walletModel->getOptionsModel()) {
+    if(walletModel && walletModel->getTransactionTableModel()) {
         // Set up transaction list
         if (filter == nullptr) {
             filter.reset(new TransactionFilterProxy());
