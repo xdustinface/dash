@@ -427,11 +427,24 @@ void SendCoinsDialog::send(QList<SendCoinsRecipient> recipients)
         questionString.append(tr("This transaction will consume %n input(s)", "", nInputs));
 
         // warn about potential privacy issues when spending too many inputs at once
-        if (nInputs >= 10 && ctrl.IsUsingPrivateSend()) {
-            questionString.append("<br />");
-            questionString.append("<span style='" + GUIUtil::getThemedStyleQString(GUIUtil::ThemedStyle::TS_ERROR) + "'>");
-            questionString.append(tr("Warning: Using PrivateSend with %1 or more inputs can harm your privacy and is not recommended").arg(10));
-            questionString.append("</span> ");
+        if (ctrl.IsUsingPrivateSend()) {
+            if (nInputs >= 20) {
+                // Display a scary warning if LOTS of inputs were used
+                questionString.append("<br />");
+                questionString.append("<span style='" + GUIUtil::getThemedStyleQString(GUIUtil::ThemedStyle::TS_ERROR) + "'>");
+                questionString.append(tr("Warning: Using PrivateSend with %1 or more inputs may significantly "
+                                         "harm your privacy and is not recommended. The more inputs used, the more "
+                                         "vulnerable a transaction may be to different potential attacks.").arg(20));
+                questionString.append("</span> ");
+            } else if (nInputs >= 10) {
+                // Display a less scary warning if the number of inputs wasn't excessive, but could still make cluster analysis attacks easier
+                questionString.append("<br />");
+                questionString.append(tr("Warning: Using PrivateSend with %1 or more inputs may mildly harm your "
+                                         "privacy and is not recommended for users requiring a high level of privacy. "
+                                         "The more inputs used, the more vulnerable a transaction may be to different "
+                                         "potential attacks. Most users can ignore this warning.").arg(10));
+                questionString.append("</span> ");
+            }
         }
     }
 
