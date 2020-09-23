@@ -672,9 +672,9 @@ void OverviewPage::togglePrivateSend(){
     }
 }
 
-void OverviewPage::SetupTransactionList(int nNumItems) {
-
-    if(walletModel == nullptr || walletModel->getTransactionTableModel() == nullptr) {
+void OverviewPage::SetupTransactionList(int nNumItems)
+{
+    if (walletModel == nullptr || walletModel->getTransactionTableModel() == nullptr) {
         return;
     }
 
