@@ -690,6 +690,10 @@ void OverviewPage::SetupTransactionList(int nNumItems)
         ui->listTransactions->setModelColumn(TransactionTableModel::ToAddress);
     }
 
+    if (filter->rowCount() == nNumItems) {
+        return;
+    }
+
     filter->setLimit(nNumItems);
     ui->listTransactions->setMinimumHeight(nNumItems * ITEM_HEIGHT);
 }
