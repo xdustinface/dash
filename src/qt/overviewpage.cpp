@@ -694,9 +694,6 @@ void OverviewPage::SetupTransactionList(int nNumItems)
     }
 
     filter->setLimit(nNumItems);
-    // Workaround to make sure the number of transactions always equals nNumItems.
-    // For details about the unsolved issue see https://github.com/dashpay/dash/pull/3715#issuecomment-698038707
-    ui->listTransactions->setModelColumn(TransactionTableModel::ToAddress);
 }
 
 void OverviewPage::DisablePrivateSendCompletely() {
