@@ -168,6 +168,8 @@ OptionsDialog::OptionsDialog(QWidget *parent, bool enableWallet) :
         }
     });
 #endif
+
+    updateWidth();
 }
 
 OptionsDialog::~OptionsDialog()
@@ -237,6 +239,7 @@ void OptionsDialog::setModel(OptionsModel *_model)
         if (_model != nullptr) {
             _model->emitPrivateSendEnabledChanged();
         }
+        updateWidth();
     });
 }
 
@@ -432,6 +435,24 @@ void OptionsDialog::updatePrivateSendVisibility()
     bool fEnabled = false;
 #endif
     ui->btnPrivateSend->setVisible(fEnabled);
+}
+
+void OptionsDialog::updateWidth()
+{
+    int nWidthWidestButton{0};
+    int nButtonsVisible{0};
+    for (QAbstractButton* button : pageButtons.buttons()) {
+        if (!button->isVisible()) {
+            continue;
+        }
+        QFontMetrics fm(button->font());
+        nWidthWidestButton = std::max<int>(nWidthWidestButton, fm.width(button->text()));
+        ++nButtonsVisible;
+    }
+    // Add 10 per button as padding and use minimum 585 which is what we used in css before
+    int nWidth = std::max<int>(585, (nWidthWidestButton + 10) * nButtonsVisible);
+    setMinimumWidth(nWidth);
+    setMaximumWidth(nWidth);
 }
 
 ProxyAddressValidator::ProxyAddressValidator(QObject *parent) :

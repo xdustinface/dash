@@ -64,6 +64,8 @@ private Q_SLOTS:
 
     void updatePrivateSendVisibility();
 
+    void updateWidth();
+
 Q_SIGNALS:
     void proxyIpChecks(QValidatedLineEdit *pUiProxyIp, int nProxyPort);
 
