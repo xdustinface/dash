@@ -1385,7 +1385,7 @@ void setFontScale(int nScale)
 
 double getScaledFontSize(int nSize)
 {
-    return (nSize * (1 + (fontScale * fontScaleSteps)));
+    return std::round(nSize * (1 + (fontScale * fontScaleSteps)) * 4) / 4.0;
 }
 
 bool loadFonts()
