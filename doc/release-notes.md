@@ -8,8 +8,7 @@ Release is now available from:
 This is a new major version release, bringing new features, various bugfixes
 and other improvements.
 
-This release is mandatory for masternodes and optional for other nodes.
-***TODO: this won't be true if block reward reallocation code is going to be included***
+This release is mandatory for all nodes.
 
 Please report bugs using the issue tracker at github:
 
@@ -52,6 +51,36 @@ so it is not recommended to downgrade masternodes.
 
 Notable changes
 ===============
+
+Block Reward Reallocation
+-------------------------
+This version implements Block Reward Reallocation which was proposed in order
+to slow the growth rate of Dash’s circulating supply by encouraging the
+formation of masternodes and was voted in by the network. The resulting allocation
+will split all non-proposal block rewards 40% toward miners and 60% toward
+masternodes in the end-state once the transition period is complete.
+
+The reallocation will take place gradually over 4.5 years to avoid market volatility
+and transition toward the new end-state allocation with minimal network disruption.
+The proposed changes will occur every three superblock cycles until the reallocation
+is complete, or approximately once per quarter.
+
+Note that this is a hardfork which must be activated by miners. To do this they
+should start creating blocks signalling bit 5 in `version` field of the block header.
+
+Dynamic Activation Thresholds
+-----------------------------
+In Dash we used to use lower thresholds (80% vs 95% in BTC) to activate upgrades
+via BIP9-like mechanism for quite some time. While it's preferable to have as much
+of the network hashrate to signal update readiness as possible this can result in
+quite lengthy upgrades sometimes when one large non-upgraded entity would stale
+the whole progress. Simply lowering thresholds even further can result in network
+upgrades being too fast which can cause some chaos potentially. This version
+implements BIP9-like dynamic activation thresholds which drop from some initial
+level to a minimally acceptable one over time at an increasing rate providing
+a safe non-blocking way of activating proposals.
+
+This mechanism applies to the Block Reward Reallocation proposal mentioned above.
 
 Concentrated Recovery
 ---------------------
@@ -142,23 +171,48 @@ now the empty string `""` instead of `"wallet.dat"`. If Dash Core is started
 with any `--wallet=<path>` options, there is no change in behavior, and the
 name of any wallet is just its `<path>` string.
 
-PrivateSend improvements
-------------------------
+PrivateSend coin management improvements
+----------------------------------------
 A new algorithm for creation of mixing denominations was implemented which
 should reduce the number of the smallest inputs created and give users more
-control on soft and hard caps.
+control on soft and hard caps. A much more accurate fee management was
+also implemented which should fix issues for users who have custom fees
+specified in wallet config or in times when network is under a stress.
+
+There is a new tab in GUI called "PrivateSend" which allows spending fully
+mixed coins only. CoinControl feature was also improved to display coins
+based on the tab it was opened at, to protect users from accidentally spending
+mixed and non-mixed coins in one transaction and to give better overview of
+spendable mixed coins.
+
+PrivateSend Random Round Mixing
+-------------------------------
+Some potential attacks on PrivateSend assume that all inputs had been mixed
+for the same number of rounds (up to 16). While this assumtion alone is not
+enough to break PrivateSend privacy, it could still provide some additional
+information for other methods like cluster analysis and help to narrow results.
+
+With Random Round Mixing, an input will be mixed to N rounds like prior. However,
+at this point, SHA256(input, salt) will be calculated and roughly a half of inputs
+will be mixed for one more round and this rule will be applied to newly created
+inputs again and so on. This results in an exponential decay where if you mix a set
+of inputs, half of those inputs will be mixed for N rounds, 1/4 will be mixed N+1,
+1/8 will be mixed N+2, etc. Current implementation caps it at N+3 which results
+in mixing an average of N+0.875 rounds and sounds like a reasonable compromise
+given the privacy gains.
 
 GUI changes
 -----------
-***TODO: Lots of GUI elements were reworked internally and the look of some of them
-was significantly improved.***
+Many dialogs, tabs, icons, colors and various interface elements were reworked
+to improve user experience and to make wallet look more consistent. The wallet
+GUI is also much more flexible now. For regular users there is a new "Appearance"
+dialog and a corresponding tab in Options which allows them to pick a theme and
+to tweak various font parameters. This feature specifically should help users
+who had issues on some systems previously.
 
-The "PrivateSend" checkbox was removed from the "Send" tab. There is a new tab
-called "PrivateSend" which allows spending fully mixed coins only now.
-Advanced users who use CoinControl feature will have all selected non-mixed
-coins unselected when switching from "Send" to "PrivateSend" tab and
-non-mixed coins won't even appear in the CoinControl dialog if it was opened
-on the "PrivateSend" tab.
+For advanced users and developers there is a new way to control wallet look
+by specifying a path to css files via `--custom-css-dir`. Adding `--debug-ui`
+will force it to reload these css files and to apply all changes live.
 
 The "Pay To" field on "Send" and "PrivateSend" tabs accepts not only plain
 Dash addresses but also Dash URIs now. The Dash address and the amount from
@@ -166,10 +220,16 @@ the URI are assigned to corresponding fields automatically.
 
 Sporks
 ------
-`SPORK_21_QUORUM_ALL_CONNECTED` was added to control Concentrated Recovery and
-Masternode Probing activation. Sporks `SPORK_15_DETERMINISTIC_MNS_ENABLED`,
-`SPORK_16_INSTANTSEND_AUTOLOCKS` and `SPORK_20_INSTANTSEND_LLMQ_BASED` which
-were previously deprecated in v0.15 are completely removed now.
+Two new sporks were introduced in this version:
+- `SPORK_21_QUORUM_ALL_CONNECTED` allows to control Concentrated Recovery and
+Masternode Probing activation;
+- `SPORK_22_PS_MORE_PARTICIPANTS` rises the number of users that can participate
+in a single PrivateSend mixng transaction to 20.
+
+Sporks `SPORK_15_DETERMINISTIC_MNS_ENABLED`, `SPORK_16_INSTANTSEND_AUTOLOCKS`
+and `SPORK_20_INSTANTSEND_LLMQ_BASED` which were previously deprecated in v0.15
+are completely removed now. `SPORK_6_NEW_SIGS` was never activated on mainnet
+and was also removed in this version.
 
 Build system
 ------------
@@ -210,16 +270,21 @@ Command-line options
 Changes in existing cmd-line options:
 
 New cmd-line options:
+- `--custom-css-dir`
+- `--debug-ui`
+- `--disablegovernance`
+- `--font-family`
+- `--font-scale`
+- `--font-weight-bold`
+- `--font-weight-normal`
 - `--llmqdevnetparams`
 - `--llmqtestparams`
 - `--privatesenddenomsgoal`
 - `--privatesenddenomshardcap`
 - `--socketevents`
-- ***TODO: qt/gui related ones***
-- ***TODO: `--disablegovernance`***
 
 Few cmd-line options are no longer supported:
-- ***TODO: `--litemode`***
+- `--litemode`
 - `--privatesenddenoms`
 
 There are also new command-line options backported from Bitcoin Core 0.16:
@@ -258,6 +323,88 @@ A lot of refactoring, code cleanups and other small fixes were done in this rele
 
 See detailed [set of changes](https://github.com/dashpay/dash/compare/v0.15.0.0...dashpay:v0.16.0.0).
 
+- [`dbfdf8cb15`](https://github.com/dashpay/dash/commit/dbfdf8cb15) qt: Finetune OverviewPage (#3715)
+- [`9028712b60`](https://github.com/dashpay/dash/commit/9028712b60) qt: Finetune TransactionsView (#3710)
+- [`f4e3bf95d0`](https://github.com/dashpay/dash/commit/f4e3bf95d0) qt: Finetune CoinControlDialog + bitcoin#14828 (#3701)
+- [`e405f553b9`](https://github.com/dashpay/dash/commit/e405f553b9) RPC: Update getprivatesendinfo help (#3727)
+- [`b4a78fb285`](https://github.com/dashpay/dash/commit/b4a78fb285) Fix testnet icon (#3726)
+- [`3650ee6556`](https://github.com/dashpay/dash/commit/3650ee6556) qt: Remove unused assets (#3721)
+- [`cb078422cd`](https://github.com/dashpay/dash/commit/cb078422cd) qt: Finetune RPCConsole (#3720)
+- [`a198a74a4f`](https://github.com/dashpay/dash/commit/a198a74a4f) privatesend: Avoid interacting with keypool in CTransactionBuilder ctor (#3723)
+- [`f601122cbd`](https://github.com/dashpay/dash/commit/f601122cbd) qt: Hide remaining PrivateSend UI if PrivateSend is not enabled  (#3716)
+- [`c7896eb657`](https://github.com/dashpay/dash/commit/c7896eb657) qt: Disable missing macOS focus rects in AddressBookPage (#3711)
+- [`c136522e84`](https://github.com/dashpay/dash/commit/c136522e84) qt: Finetune Options Dialog (#3709)
+- [`bb0d5d4808`](https://github.com/dashpay/dash/commit/bb0d5d4808) qt: Make sure send confirmation dialog uses correct font settings (#3714)
+- [`ab5ffe3c11`](https://github.com/dashpay/dash/commit/ab5ffe3c11) qt: Use scaled font size for all QToolTip instances (#3708)
+- [`42b606ea76`](https://github.com/dashpay/dash/commit/42b606ea76) qt: Make sure font size in  TransactionDescDialog is adjusted properly (#3707)
+- [`8fa280140a`](https://github.com/dashpay/dash/commit/8fa280140a) qt: Tweak few strings (#3706)
+- [`a70056c5a8`](https://github.com/dashpay/dash/commit/a70056c5a8) privatesend: Implement Random Round Mixing (#3661)
+- [`eb163c53a5`](https://github.com/dashpay/dash/commit/eb163c53a5) Implement dynamic activation thresholds (#3692)
+- [`7d6aba47cf`](https://github.com/dashpay/dash/commit/7d6aba47cf) Implement Block Reward Reallocation (#3691)
+- [`19aab3a1d8`](https://github.com/dashpay/dash/commit/19aab3a1d8) qt|wallet: Fix "Use available balance" for PrivateSend  (#3700)
+- [`37af70a188`](https://github.com/dashpay/dash/commit/37af70a188) Merge #13622: Remove mapRequest tracking that just effects Qt display. (#3694)
+- [`e13c746a7d`](https://github.com/dashpay/dash/commit/e13c746a7d) chainparams: Remove llmq_50_60 from regtest (#3696)
+- [`f2c1a9213c`](https://github.com/dashpay/dash/commit/f2c1a9213c) Fix two potential issues in the way pending islocks are processed (#3678)
+- [`01a3a6c81a`](https://github.com/dashpay/dash/commit/01a3a6c81a) qt: Finetune ModalOverlay (#3699)
+- [`16f9d94404`](https://github.com/dashpay/dash/commit/16f9d94404) qt: Make sure the statusbar reflects internal states correct (#3698)
+- [`9e425d66c6`](https://github.com/dashpay/dash/commit/9e425d66c6) Partially merge #3604:
+- [`2bb94c73eb`](https://github.com/dashpay/dash/commit/2bb94c73eb) masternode|net|rpc: Improve masternode sync process (#3690)
+- [`aa81a06264`](https://github.com/dashpay/dash/commit/aa81a06264) masternode|rpc: Remove unused code (#3689)
+- [`2e92237865`](https://github.com/dashpay/dash/commit/2e92237865) qt: Improved status bar (#3688)
+- [`54ed089f97`](https://github.com/dashpay/dash/commit/54ed089f97) test: Implement unit tests for CTransactionBuilder (#3677)
+- [`ab0f789be6`](https://github.com/dashpay/dash/commit/ab0f789be6) wallet: Fix and improve CWallet::CreateTransaction (#3668)
+- [`dd55609d6b`](https://github.com/dashpay/dash/commit/dd55609d6b) test: Implement unit tests for CWallet::CreateTransaction (#3667)
+- [`9c988d5b5a`](https://github.com/dashpay/dash/commit/9c988d5b5a) privatesend|wallet|qt: Improve calculations in CreateDenominated/MakeCollateralAmounts (#3657)
+- [`ba2dcb0399`](https://github.com/dashpay/dash/commit/ba2dcb0399) qt: Update assets and colorize them theme related (#3574)
+- [`50d7a2fecf`](https://github.com/dashpay/dash/commit/50d7a2fecf) qt: Ignore GUIUtil::updateFont calls until GUIUtil::loadFonts was called (#3687)
+- [`608f481a9c`](https://github.com/dashpay/dash/commit/608f481a9c) qt: Fix block update signals/slots in BitcoinGUI and SendCoinsDialog (#3685)
+- [`25e4fed75b`](https://github.com/dashpay/dash/commit/25e4fed75b) QT: add last block hash to debug ui (#3672)
+- [`195dcad1ee`](https://github.com/dashpay/dash/commit/195dcad1ee) trivial/docs: minor adjustments to PrivateSend help text (#3669)
+- [`b1a35b2d32`](https://github.com/dashpay/dash/commit/b1a35b2d32) Merge #13007: test: Fix dangling wallet pointer in vpwallets (#3666)
+- [`f9bf42cb90`](https://github.com/dashpay/dash/commit/f9bf42cb90) Harden spork6 logic then remove spork6 (#3662)
+- [`604d6a4225`](https://github.com/dashpay/dash/commit/604d6a4225) Fix some translation issues (#3656)
+- [`60d298376b`](https://github.com/dashpay/dash/commit/60d298376b) Fix crash on splash screen when wallet fails to load (#3629)
+- [`ca76dd0868`](https://github.com/dashpay/dash/commit/ca76dd0868) qt: Give PrivateSend separate instances of SendCoinsDialog + CCoinControl (#3625)
+- [`0969c2d268`](https://github.com/dashpay/dash/commit/0969c2d268) qt: Splashscreen redesign (#3613)
+- [`966be38c79`](https://github.com/dashpay/dash/commit/966be38c79) qt: Make sure stylesheet updates of -debug-ui are activated (#3623)
+- [`0ed7f1672c`](https://github.com/dashpay/dash/commit/0ed7f1672c) qt: Add missing placeholders (#3575)
+- [`103fda2cb7`](https://github.com/dashpay/dash/commit/103fda2cb7) qt: Fix appearancewidget.h to make lint-include-guards.sh happy (#3627)
+- [`2cc36dffde`](https://github.com/dashpay/dash/commit/2cc36dffde) qt: Drop PlatformStyle (#3573)
+- [`b073ae9853`](https://github.com/dashpay/dash/commit/b073ae9853) qt: Redesign scrollbar styles (#3571)
+- [`1a2867f886`](https://github.com/dashpay/dash/commit/1a2867f886) qt: Introduce appearance tab and setup dialog (#3568)
+- [`d44611bc2b`](https://github.com/dashpay/dash/commit/d44611bc2b) qt: General qt/c++ related fixes and updates (#3562)
+- [`d22ab43910`](https://github.com/dashpay/dash/commit/d22ab43910) qt: Introduce platform specific css sections (#3570)
+- [`a16cfa77de`](https://github.com/dashpay/dash/commit/a16cfa77de) qt: Redesign BitcoinAmountField (#3569)
+- [`7db9909a17`](https://github.com/dashpay/dash/commit/7db9909a17) qt: Introduce runtime theme changes (#3559)
+- [`b3738648d6`](https://github.com/dashpay/dash/commit/b3738648d6) qt: General CSS related redesigns (#3563)
+- [`1dea248d0d`](https://github.com/dashpay/dash/commit/1dea248d0d) qt: Make use of GUIUtil themed colors/styles (#3561)
+- [`06d69d74c2`](https://github.com/dashpay/dash/commit/06d69d74c2) qt: Replace usage of QTabBar with custom replacement (#3560)
+- [`edfc3a4646`](https://github.com/dashpay/dash/commit/edfc3a4646) qt: Call GUIUtil::loadFonts earlier (#3593)
+- [`f371e4771c`](https://github.com/dashpay/dash/commit/f371e4771c) qt: Add -debug-ui command line parameter (#3558)
+- [`dde4ab5f84`](https://github.com/dashpay/dash/commit/dde4ab5f84) qt: Add -custom-css-dir commmand line parameter (#3557)
+- [`067622764c`](https://github.com/dashpay/dash/commit/067622764c) qt: Disable macOS system focus rectangles for dash themes (#3556)
+- [`d296cbdca1`](https://github.com/dashpay/dash/commit/d296cbdca1) qt: Implement application wide font management (#3555)
+- [`b409254587`](https://github.com/dashpay/dash/commit/b409254587) qt: Redesign of the main toolbar (#3554)
+- [`c5fcc811d6`](https://github.com/dashpay/dash/commit/c5fcc811d6) qt: Generalized css files, simple design changes, added scripts to keep track of color usage (#3508)
+- [`8aeeb97995`](https://github.com/dashpay/dash/commit/8aeeb97995) Print exception origin in crash messages (#3653)
+- [`bd5c047e28`](https://github.com/dashpay/dash/commit/bd5c047e28) Implement a safer version of GetCrashInfoFromException (#3652)
+- [`4414b5c3c7`](https://github.com/dashpay/dash/commit/4414b5c3c7) llmq: Fix spork check in CSigSharesManager::ForceReAnnouncement (#3650)
+- [`c232f2a12d`](https://github.com/dashpay/dash/commit/c232f2a12d) [RPC] Show address of fundDest when no funds (#3649)
+- [`abe3d578b2`](https://github.com/dashpay/dash/commit/abe3d578b2) Include protocol version into MNAUTH (#3631)
+- [`4db8968d4a`](https://github.com/dashpay/dash/commit/4db8968d4a) rpc: update help text for BLS operator key arguments (#3628)
+- [`bbb0064b60`](https://github.com/dashpay/dash/commit/bbb0064b60) init: Fix crash due to -litemode and improve its deprecation warning (#3626)
+- [`8d99e7836c`](https://github.com/dashpay/dash/commit/8d99e7836c) Fix `-resetguisettings` (#3624)
+- [`508fc2db4b`](https://github.com/dashpay/dash/commit/508fc2db4b) privatesend: Increase max participants to 20 (#3610)
+- [`f425316eed`](https://github.com/dashpay/dash/commit/f425316eed) util: Change TraceThread's "name" type: "const char*" -> "const std::string" (#3609)
+- [`a170c649b8`](https://github.com/dashpay/dash/commit/a170c649b8) Fail GetTransaction when the block from txindex is not in mapBlockIndex (#3606)
+- [`62c3fb5748`](https://github.com/dashpay/dash/commit/62c3fb5748) llmq: Fix thread handling in CDKGSessionManager and CDKGSessionHandler (#3601)
+- [`aa3bec6106`](https://github.com/dashpay/dash/commit/aa3bec6106) evo: Avoid some unnecessary copying in BuildNewListFromBlock (#3594)
+- [`6a249f59b6`](https://github.com/dashpay/dash/commit/6a249f59b6) Merge #13564: [wallet] loadwallet shouldn't create new wallets. (#3592)
+- [`b45b1373a0`](https://github.com/dashpay/dash/commit/b45b1373a0) Prefer creating larger denoms at the second step of CreateDenominated (#3589)
+- [`bac02d0c9a`](https://github.com/dashpay/dash/commit/bac02d0c9a) More accurate fee calculation in CreateDenominated (#3588)
+- [`baf18a35d5`](https://github.com/dashpay/dash/commit/baf18a35d5) More pruning improvements (#3579)
+- [`0297eb428a`](https://github.com/dashpay/dash/commit/0297eb428a) Change litemode to disablegovernance (#3577)
+- [`da38e2bf83`](https://github.com/dashpay/dash/commit/da38e2bf83) Change litemode from disabling all Dash specific features to disabling governance validation (#3488)
 - [`772b6bfe7c`](https://github.com/dashpay/dash/commit/772b6bfe7c) Disable new connection handling and concentrated recovery for large LLMQs (#3548)
 - [`c72bc354f8`](https://github.com/dashpay/dash/commit/c72bc354f8) contrib: Move dustinface.pgp into contrib/gitian-keys (#3547)
 - [`0b70380fff`](https://github.com/dashpay/dash/commit/0b70380fff) Fix argument handling for devnets (#3549)
@@ -507,13 +654,16 @@ Credits
 Thanks to everyone who directly contributed to this release:
 
 - 10xcryptodev
+- Akshay CM (akshaynexus)
 - Alexander Block (codablock)
 - Cofresi
+- CryptoTeller
 - dustinface (xdustinface)
 - konez2k
 - Oleg Girko (OlegGirko)
 - PastaPastaPasta
 - Piter Bushnell (Bushstar)
+- sc-9310
 - thephez
 - UdjinM6
 
