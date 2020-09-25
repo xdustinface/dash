@@ -113,10 +113,12 @@ void OptionsModel::Init(bool resetSettings)
         settings.setValue("digits", "2");
 
     // PrivateSend
-    if (!settings.contains("fPrivateSendEnabled"))
+    if (!settings.contains("fPrivateSendEnabled")) {
         settings.setValue("fPrivateSendEnabled", true);
-    if (!gArgs.SoftSetBoolArg("-enableprivatesend", settings.value("fPrivateSendEnabled").toBool()))
+    }
+    if (!gArgs.SoftSetBoolArg("-enableprivatesend", settings.value("fPrivateSendEnabled").toBool())) {
         addOverriddenOption("-enableprivatesend");
+    }
 
     if (!settings.contains("fShowAdvancedPSUI"))
         settings.setValue("fShowAdvancedPSUI", false);
