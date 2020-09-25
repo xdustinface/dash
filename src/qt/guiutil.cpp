@@ -1566,8 +1566,6 @@ void updateFonts()
         return;
     }
 
-    setApplicationFont();
-
     auto getKey = [](QWidget* w) -> QString {
         return w->parent() ? w->parent()->objectName() + w->objectName() : w->objectName();
     };
