@@ -278,7 +278,7 @@
           <item>
            <widget class="QCheckBox" name="privateSendEnabled">
             <property name="toolTip">
-             <string>Show mixing interface on Overview screen and reveal PrivateSend screen which allows to spend fully mixed coins only. A new tab with more settings will also appear in this dialog, please make sure to check them before mixing your coins.</string>
+             <string>Show mixing interface on Overview screen and reveal PrivateSend screen which allows to spend fully mixed coins only.&lt;br/&gt;A new tab with more settings will also appear in this dialog, please make sure to check them before mixing your coins.</string>
             </property>
             <property name="text">
              <string>Enable PrivateSend features</string>
