@@ -189,9 +189,9 @@ void OptionsDialog::setModel(OptionsModel *_model)
 
 
 #ifdef ENABLE_WALLET
-        if (strLabel.contains("-enableprivatesend")) {
         // If -enableprivatesend was passed in on the command line, set the checkbox
         // to the value given via commandline and disable it (make it unclickable).
+        if (strLabel.contains("-enableprivatesend")) {
             bool fEnabled = CPrivateSendClientOptions::IsEnabled();
             ui->privateSendEnabled->setChecked(fEnabled);
             ui->privateSendEnabled->setEnabled(false);
