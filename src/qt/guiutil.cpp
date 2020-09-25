@@ -1624,15 +1624,27 @@ void updateFonts()
         it.first->setFont(it.second);
     }
 
-    // Get the global font for QToolTip labels
+    // Scale the global font for QToolTip labels, QMenu and QMessageBox instances
     QFont fontToolTip = qApp->font("QTipLabel");
-    // Store the default QToolTip font size before ever applying any scale to it
+    QFont fontMenu = qApp->font("QMenu");
+    QFont fontMessageBox = qApp->font("QMessageBox");
+    // Store their default font sizes before ever applying any scale to it
     if (!mapDefaultFontSizes.count("QTipLabel")) {
         mapDefaultFontSizes.emplace("QTipLabel", fontToolTip.pointSize());
     }
-    // And give it the proper scaled size based on its default size
+    if (!mapDefaultFontSizes.count("QMenu")) {
+        mapDefaultFontSizes.emplace("QMenu", fontMenu.pointSize());
+    }
+    if (!mapDefaultFontSizes.count("QMessageBox")) {
+        mapDefaultFontSizes.emplace("QMessageBox", fontMessageBox.pointSize());
+    }
     fontToolTip.setPointSizeF(getScaledFontSize(mapDefaultFontSizes["QTipLabel"]));
+    fontMenu.setPointSizeF(getScaledFontSize(mapDefaultFontSizes["QMenu"]));
+    fontMessageBox.setPointSizeF(getScaledFontSize(mapDefaultFontSizes["QMessageBox"]));
     qApp->setFont(fontToolTip, "QTipLabel");
+    qApp->setFont(fontMenu, "QMenu");
+    qApp->setFont(fontMessageBox, "QMessageBox");
+    // And give them the proper scaled size based on their default sizes if required
 }
 
 QFont getFont(FontFamily family, QFont::Weight qWeight, bool fItalic, int nPointSize)
