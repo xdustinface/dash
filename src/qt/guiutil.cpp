@@ -1574,6 +1574,12 @@ void updateFonts()
     std::map<QWidget*, QFont> mapWidgetFonts;
 
     for (QWidget* w : qApp->allWidgets()) {
+        if (strcmp(w->metaObject()->className(), "QTipLabel") == 0 ||
+            strcmp(w->metaObject()->className(), "QMessageBox") == 0 ||
+            strcmp(w->metaObject()->className(), "QMenu") == 0) {
+            // Ignore any of those because their font is set through application fonts later.
+            continue;
+        }
         QFont font = w->font();
         font.setFamily(qApp->font().family());
         font.setWeight(getFontWeightNormal());
