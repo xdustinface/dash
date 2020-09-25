@@ -114,7 +114,7 @@ void OptionsModel::Init(bool resetSettings)
 
     // PrivateSend
     if (!settings.contains("fPrivateSendEnabled"))
-        settings.setValue("fPrivateSendEnabled", false);
+        settings.setValue("fPrivateSendEnabled", true);
     if (!gArgs.SoftSetBoolArg("-enableprivatesend", settings.value("fPrivateSendEnabled").toBool()))
         addOverriddenOption("-enableprivatesend");
 
