@@ -132,12 +132,10 @@ static QFont::Weight fontWeightNormal = defaultFontWeightNormal;
 // Application font weight for bold text. May be overwritten by -font-weight-bold.
 static QFont::Weight fontWeightBold = defaultFontWeightBold;
 
-// Contains all widgets and its font attributes (weight, italic) with font changes due to GUIUtil::setFont
-static std::map<QWidget*, std::pair<FontWeight, bool>> mapNormalFontUpdates;
+// Contains all widgets and its font attributes (weight, italic, size) with font changes due to GUIUtil::setFont
+static std::map<QWidget*, std::tuple<FontWeight, bool, int>> mapNormalFontUpdates;
 // Contains all widgets where a fixed pitch font has been set with GUIUtil::setFixedPitchFont
 static std::set<QWidget*> setFixedPitchFontUpdates;
-// Contains all widgets where a non-default fontsize has been seet with GUIUtil::setFont
-static std::map<QWidget*, int> mapFontSizeUpdates;
 // Contains a list of supported font weights for all members of GUIUtil::FontFamily
 static std::map<FontFamily, std::vector<QFont::Weight>> mapSupportedWeights;
 
@@ -1538,15 +1536,8 @@ void setFont(const std::vector<QWidget*>& vecWidgets, FontWeight weight, int nPo
     QFont font = getFont(weight, fItalic, nPointSize);
 
     for (auto it : vecWidgets) {
-        auto fontAttributes = std::make_pair(weight, fItalic);
-        auto itw = mapNormalFontUpdates.emplace(std::make_pair(it, fontAttributes));
-        if (!itw.second) itw.first->second = fontAttributes;
-
-        if (nPointSize != -1) {
-            auto its = mapFontSizeUpdates.emplace(std::make_pair(it, nPointSize));
-            if (!its.second) its.first->second = nPointSize;
-        }
-
+        auto fontAttributes = std::make_tuple(weight, fItalic, nPointSize);
+        mapNormalFontUpdates.emplace(std::make_pair(it, fontAttributes));
         it->setFont(font);
     }
 }
@@ -1594,7 +1585,6 @@ void updateFonts()
             fAdded = true;
         }
         bool fDefaultFont = mapNormalFontUpdates.find(w) == mapNormalFontUpdates.end() &&
-                            mapFontSizeUpdates.find(w) == mapFontSizeUpdates.end() &&
                             setFixedPitchFontUpdates.find(w) == setFixedPitchFontUpdates.end();
         bool fDefaultFontChanged = font.pointSizeF() != getScaledFontSize(mapDefaultFontSizes[key]);
         font.setPointSizeF(getScaledFontSize(mapDefaultFontSizes[key]));
@@ -1605,12 +1595,11 @@ void updateFonts()
     while (itn != mapNormalFontUpdates.end()) {
         auto itw = mapWidgetFonts.find(itn->first);
         if (itw != mapWidgetFonts.end()) {
-            int nSize = mapDefaultFontSizes[getKey(itn->first)];
-            auto its = mapFontSizeUpdates.find(itn->first);
-            if (its != mapFontSizeUpdates.end()) {
-                nSize = its->second;
+            int nSize = std::get<2>(itn->second);
+            if (nSize == -1) {
+                nSize = mapDefaultFontSizes[getKey(itn->first)];
             }
-            QFont&& font = getFont(itn->second.first, itn->second.second, nSize);
+            QFont&& font = getFont(std::get<0>(itn->second), std::get<1>(itn->second), nSize);
             if (itn->first->font() != font) {
                 itw->second.first = font;
                 itw->second.second = true;
@@ -1618,21 +1607,6 @@ void updateFonts()
             ++itn;
         } else {
             itn = mapNormalFontUpdates.erase(itn);
-        }
-    }
-    auto its = mapFontSizeUpdates.begin();
-    while (its != mapFontSizeUpdates.end()) {
-        auto itw = mapWidgetFonts.find(its->first);
-        if (itw != mapWidgetFonts.end()) {
-            if (its->first->font().pointSizeF() != getScaledFontSize(its->second)) {
-                QFont font = mapWidgetFonts[its->first].first;
-                font.setPointSizeF(getScaledFontSize(its->second));
-                itw->second.first = font;
-                itw->second.second = true;
-            }
-            ++its;
-        } else {
-            its = mapFontSizeUpdates.erase(its);
         }
     }
     auto itf = setFixedPitchFontUpdates.begin();
