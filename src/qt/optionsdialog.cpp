@@ -28,6 +28,7 @@
 #include <QLocale>
 #include <QMessageBox>
 #include <QSettings>
+#include <QShowEvent>
 #include <QTimer>
 
 OptionsDialog::OptionsDialog(QWidget *parent, bool enableWallet) :
@@ -172,8 +173,6 @@ OptionsDialog::OptionsDialog(QWidget *parent, bool enableWallet) :
         }
     });
 #endif
-
-    updateWidth();
 }
 
 OptionsDialog::~OptionsDialog()
@@ -457,6 +456,13 @@ void OptionsDialog::updateWidth()
     int nWidth = std::max<int>(585, (nWidthWidestButton + 10) * nButtonsVisible);
     setMinimumWidth(nWidth);
     setMaximumWidth(nWidth);
+}
+
+void OptionsDialog::showEvent(QShowEvent* event)
+{
+    if (!event->spontaneous()) {
+        updateWidth();
+    }
 }
 
 ProxyAddressValidator::ProxyAddressValidator(QObject *parent) :

@@ -77,6 +77,8 @@ private:
     QString previousTheme;
     AppearanceWidget* appearance;
     bool fPrivateSendEnabledPrev{false};
+
+    void showEvent(QShowEvent* event);
 };
 
 #endif // BITCOIN_QT_OPTIONSDIALOG_H
