@@ -157,6 +157,10 @@ OptionsDialog::OptionsDialog(QWidget *parent, bool enableWallet) :
     appearanceLayout->addWidget(appearance);
     ui->widgetAppearance->setLayout(appearanceLayout);
 
+    connect(appearance, &AppearanceWidget::appearanceChanged, [=](){
+        updateWidth();
+    });
+
     updatePrivateSendVisibility();
 
     // Store the current PrivateSend enabled state to recover it if it gets changed but the dialog gets not accepted but declined.
