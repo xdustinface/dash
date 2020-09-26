@@ -67,6 +67,7 @@ private Q_SLOTS:
     void updateWidth();
 
 Q_SIGNALS:
+    void appearanceChanged();
     void proxyIpChecks(QValidatedLineEdit *pUiProxyIp, int nProxyPort);
 
 private:

@@ -160,6 +160,7 @@ OptionsDialog::OptionsDialog(QWidget *parent, bool enableWallet) :
 
     connect(appearance, &AppearanceWidget::appearanceChanged, [=](){
         updateWidth();
+        Q_EMIT appearanceChanged();
     });
 
     updatePrivateSendVisibility();
