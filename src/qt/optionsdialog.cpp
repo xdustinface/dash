@@ -463,6 +463,7 @@ void OptionsDialog::showEvent(QShowEvent* event)
     if (!event->spontaneous()) {
         updateWidth();
     }
+    QDialog::showEvent(event);
 }
 
 ProxyAddressValidator::ProxyAddressValidator(QObject *parent) :

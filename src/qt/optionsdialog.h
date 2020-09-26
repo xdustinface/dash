@@ -78,7 +78,7 @@ private:
     AppearanceWidget* appearance;
     bool fPrivateSendEnabledPrev{false};
 
-    void showEvent(QShowEvent* event);
+    void showEvent(QShowEvent* event) override;
 };
 
 #endif // BITCOIN_QT_OPTIONSDIALOG_H
