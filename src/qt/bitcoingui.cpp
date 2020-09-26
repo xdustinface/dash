@@ -924,6 +924,9 @@ void BitcoinGUI::optionsClicked()
 
     OptionsDialog dlg(this, enableWallet);
     dlg.setModel(clientModel->getOptionsModel());
+    connect(&dlg, &OptionsDialog::appearanceChanged, [=]() {
+        updateWidth();
+    });
     dlg.exec();
 
     updatePrivateSendVisibility();
@@ -1171,6 +1174,26 @@ void BitcoinGUI::updatePrivateSendVisibility()
     privateSendCoinsMenuAction->setVisible(fEnabled);
     showPrivateSendHelpAction->setVisible(fEnabled);
     updateToolBarShortcuts();
+    updateWidth();
+}
+
+void BitcoinGUI::updateWidth()
+{
+    int nWidthWidestButton{0};
+    int nButtonsVisible{0};
+    for (QAbstractButton* button : tabGroup->buttons()) {
+        if (!button->isEnabled()) {
+            continue;
+        }
+        QFontMetrics fm(button->font());
+        nWidthWidestButton = std::max<int>(nWidthWidestButton, fm.width(button->text()));
+        ++nButtonsVisible;
+    }
+    // Add 30 per button as padding and use minimum 980 which is the minimum required to show all tab's contents
+    // Use nButtonsVisible + 1 <- for the dash logo
+    int nWidth = std::max<int>(980, (nWidthWidestButton + 30) * (nButtonsVisible + 1));
+    setMinimumWidth(nWidth);
+    setMaximumWidth(nWidth);
 }
 
 void BitcoinGUI::updateToolBarShortcuts()
@@ -1490,6 +1513,10 @@ void BitcoinGUI::showEvent(QShowEvent *event)
     openRepairAction->setEnabled(true);
     aboutAction->setEnabled(true);
     optionsAction->setEnabled(true);
+
+    if (!event->spontaneous()) {
+        updateWidth();
+    }
 }
 
 #ifdef ENABLE_WALLET
