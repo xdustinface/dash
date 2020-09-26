@@ -1194,6 +1194,10 @@ void BitcoinGUI::updateWidth()
     int nWidth = std::max<int>(980, (nWidthWidestButton + 30) * (nButtonsVisible + 1));
     setMinimumWidth(nWidth);
     setMaximumWidth(nWidth);
+    // Reset the max width after it has been set to still allow window resizing
+    QTimer::singleShot(0, this, [=]() {
+        setMaximumWidth(std::numeric_limits<int>::max());
+    });
 }
 
 void BitcoinGUI::updateToolBarShortcuts()

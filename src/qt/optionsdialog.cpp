@@ -457,6 +457,10 @@ void OptionsDialog::updateWidth()
     int nWidth = std::max<int>(585, (nWidthWidestButton + 10) * nButtonsVisible);
     setMinimumWidth(nWidth);
     setMaximumWidth(nWidth);
+    // Reset the max width after it has been set to still allow window resizing
+    QTimer::singleShot(0, this, [=]() {
+        setMaximumWidth(std::numeric_limits<int>::max());
+    });
 }
 
 void OptionsDialog::showEvent(QShowEvent* event)
