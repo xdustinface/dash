@@ -1537,7 +1537,10 @@ void setFont(const std::vector<QWidget*>& vecWidgets, FontWeight weight, int nPo
 
     for (auto it : vecWidgets) {
         auto fontAttributes = std::make_tuple(weight, fItalic, nPointSize);
-        mapNormalFontUpdates.emplace(std::make_pair(it, fontAttributes));
+        auto itFontUpdate = mapNormalFontUpdates.emplace(std::make_pair(it, fontAttributes));
+        if (!itFontUpdate.second) {
+            itFontUpdate.first->second = fontAttributes;
+        }
         it->setFont(font);
     }
 }
