@@ -1586,9 +1586,8 @@ void updateFonts()
         }
         bool fDefaultFont = mapNormalFontUpdates.find(w) == mapNormalFontUpdates.end() &&
                             setFixedPitchFontUpdates.find(w) == setFixedPitchFontUpdates.end();
-        bool fDefaultFontChanged = font.pointSizeF() != getScaledFontSize(mapDefaultFontSizes[key]);
         font.setPointSizeF(getScaledFontSize(mapDefaultFontSizes[key]));
-        mapWidgetFonts.emplace(w, std::make_pair(font, fAdded || (fDefaultFont && fDefaultFontChanged)));
+        mapWidgetFonts.emplace(w, std::make_pair(font, fAdded || (fDefaultFont && font != w->font())));
     }
 
     auto itn = mapNormalFontUpdates.begin();
