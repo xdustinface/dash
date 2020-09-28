@@ -35,7 +35,7 @@ static RPCTimerInterface* timerInterface = nullptr;
 static std::map<std::string, std::unique_ptr<RPCTimerBase> > deadlineTimers;
 
 // Any commands submitted by this user will have their commands filtered based on the platformAllowedCommands
-static std::string defaultPlatformUser = "platform-user";
+static const std::string defaultPlatformUser = "platform-user";
 
 static const std::vector<std::pair<std::string /*command*/, std::string /*subcommand*/>> platformAllowedCommands = {
         {"getbestblockhash", ""},
