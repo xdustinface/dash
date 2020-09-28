@@ -80,7 +80,9 @@ implements BIP9-like dynamic activation thresholds which drop from some initial
 level to a minimally acceptable one over time at an increasing rate providing
 a safe non-blocking way of activating proposals.
 
-This mechanism applies to the Block Reward Reallocation proposal mentioned above.
+This mechanism applies to the Block Reward Reallocation proposal mentioned above
+threshold for which will begin at an 80% level and decay down to 60% over the
+course of 10 periods.
 
 Concentrated Recovery
 ---------------------
@@ -94,18 +96,23 @@ The new system initially sends all shares to a single deterministically selected
 so that this node can recover the signature and propagate the recovered signature.
 This way only the recovered signature needs to be propagated and verified by all
 members. After sending the share to this single node, each member waits for some
-time and repeats sending it to another deterministically selected member. This
-process is repeated until a recovered signature is finally created and propagated.
+time and repeats sending it to another deterministically selected member. To avoid
+making too many requests when nodes are under heavy load already we use an exponential
+backoff starting with 2 seconds and limited to 10 seconds, so it should be a sequence
+of timeouts like `2, 4, 8, 10, 10, 10, ...`. This process is repeated until a recovered
+signature is finally created and propagated.
 
-The new system is activated with the newly added `SPORK_21_QUORUM_ALL_CONNECTED`.
+The new system is activated with the newly added `SPORK_21_QUORUM_ALL_CONNECTED`
+which has two hardcoded values with a special meaning: `0` activates Concentrated
+Recovery for every LLMQ and `1` excludes `400_60` and `400_85` ones.
 
 Increased number of masternode connections
 ------------------------------------------
 To implement "Concentrated Recovery", it is now required that all members of a LLMQ
-connect to all other members of the same LLMQ. This significantly increases general connection count
-for masternodes. These intra-quorum connections are less resource consuming than
-normal p2p connections as they only exchange LLMQ/masternode related messages, but
-the hardware and network requirements will still be higher than before.
+connect to all other members of the same LLMQ. This significantly increases general
+connection count for masternodes. These intra-quorum connections are less resource
+consuming than normal p2p connections as they only exchange LLMQ/masternode related
+messages, but the hardware and network requirements will still be higher than before.
 
 This change will at first only be activated for the smaller LLMQs (50 members) and
 then may later be activated for larger quorums (400 members).
@@ -145,7 +152,9 @@ systems. This removes most of the CPU overhead caused by the sub-optimal use of 
 which could easily use up 50-80% of the CPU time spent in the network thread when many
 connections were involved.
 
-Since these optimizations are exclusive to linux, it is possible that masternodes hosted on windows servers will be unable to handle the network load and should consider migrating to a linux based operating system. 
+Since these optimizations are exclusive to linux, it is possible that masternodes hosted
+on windows servers will be unable to handle the network load and should consider migrating
+to a linux based operating system.
 
 Other improvements were made to the p2p message handling code, so that for example LLMQ
 related connections do less work than full/normal p2p connections.
