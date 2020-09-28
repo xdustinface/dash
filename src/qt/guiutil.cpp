@@ -1521,15 +1521,12 @@ void setApplicationFont()
 
 void setFont(const std::vector<QWidget*>& vecWidgets, FontWeight weight, int nPointSize, bool fItalic)
 {
-    QFont font = getFont(weight, fItalic, nPointSize);
-
     for (auto it : vecWidgets) {
         auto fontAttributes = std::make_tuple(weight, fItalic, nPointSize);
         auto itFontUpdate = mapNormalFontUpdates.emplace(std::make_pair(it, fontAttributes));
         if (!itFontUpdate.second) {
             itFontUpdate.first->second = fontAttributes;
         }
-        it->setFont(font);
     }
 }
 

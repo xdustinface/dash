@@ -144,6 +144,8 @@ OverviewPage::OverviewPage(QWidget* parent) :
                       ui->labelSpendable
                      }, GUIUtil::FontWeight::Bold);
 
+    GUIUtil::updateFonts();
+
     // Recent transactions
     ui->listTransactions->setItemDelegate(txdelegate);
     // Note: minimum height of listTransactions will be set later in updateAdvancedPSUI() to reflect actual settings

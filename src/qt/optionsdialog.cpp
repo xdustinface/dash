@@ -306,6 +306,7 @@ void OptionsDialog::showPage(int index)
 
     GUIUtil::setFont({btnActive}, GUIUtil::FontWeight::Bold, 16);
     GUIUtil::setFont(vecNormal, GUIUtil::FontWeight::Normal, 16);
+    GUIUtil::updateFonts();
 
     ui->stackedWidgetOptions->setCurrentIndex(index);
     btnActive->setChecked(true);

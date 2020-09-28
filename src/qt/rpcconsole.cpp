@@ -458,6 +458,8 @@ RPCConsole::RPCConsole(QWidget* parent) :
                       ui->banHeading
                      }, GUIUtil::FontWeight::Bold, 16);
 
+    GUIUtil::updateFonts();
+
     GUIUtil::disableMacFocusRect(this);
 
     QSettings settings;
@@ -974,6 +976,7 @@ void RPCConsole::showPage(int index)
 
     GUIUtil::setFont({btnActive}, GUIUtil::FontWeight::Bold, 16);
     GUIUtil::setFont(vecNormal, GUIUtil::FontWeight::Normal, 16);
+    GUIUtil::updateFonts();
 
     ui->stackedWidgetRPC->setCurrentIndex(index);
     btnActive->setChecked(true);
