@@ -1565,10 +1565,12 @@ void updateFonts()
     std::map<QWidget*, std::pair<QFont, bool>> mapWidgetFonts;
 
     for (QWidget* w : qApp->allWidgets()) {
-        if (strcmp(w->metaObject()->className(), "QTipLabel") == 0 ||
-            strcmp(w->metaObject()->className(), "QMessageBox") == 0 ||
-            strcmp(w->metaObject()->className(), "QMenu") == 0) {
-            // Ignore any of those because their font is set through application fonts later.
+        std::vector<QString> vecIgnore{
+            "QWidget", "QDialog", "QFrame", "QStackedWidget", "QDesktopWidget", "QDesktopScreenWidget",
+            "QTipLabel", "QMessageBox", "QMenu", "QComboBoxPrivateScroller", "QComboBoxPrivateContainer",
+            "QScrollBar", "BitcoinGUI", "WalletView", "WalletFrame"
+        };
+        if (std::find(vecIgnore.begin(), vecIgnore.end(), w->metaObject()->className()) != vecIgnore.end()) {
             continue;
         }
         QFont font = w->font();
