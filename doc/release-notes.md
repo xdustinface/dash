@@ -87,10 +87,10 @@ Concentrated Recovery
 In the current system, signature shares are propagated to all LLMQ members,
 until one of them has enough shares collected to recover the signature. Until
 this recovered signature is propagated in the LLMQ, all members will keep
-propagating shares and verifying each one. This causes quite some load on the
-LLMQ, which will be avoided with the new system.
+propagating shares and verifying each one. This causes significant load on the
+LLMQ, resulting in decreased throughput, which will be avoided with the new system.
 
-The new system sends all shares to only a single deterministically selected node,
+The new system initially sends all shares to a single deterministically selected node,
 so that this node can recover the signature and propagate the recovered signature.
 This way only the recovered signature needs to be propagated and verified by all
 members. After sending the share to this single node, each member waits for some
@@ -102,13 +102,13 @@ The new system is activated with the newly added `SPORK_21_QUORUM_ALL_CONNECTED`
 Increased number of masternode connections
 ------------------------------------------
 To implement "Concentrated Recovery", it is now required that all members of a LLMQ
-connect to all other members of the same LLMQ. This increases general connection count
-for masternodes a lot. These intra-quorum connections are less resource consuming than
+connect to all other members of the same LLMQ. This significantly increases general connection count
+for masternodes. These intra-quorum connections are less resource consuming than
 normal p2p connections as they only exchange LLMQ/masternode related messages, but
 the hardware and network requirements will still be higher than before.
 
 This change will at first only be activated for the smaller LLMQs (50 members) and
-then later for the larger ones (400 members).
+then may later be activated for larger quorums (400 members).
 
 This is also controlled via `SPORK_21_QUORUM_ALL_CONNECTED`.
 
@@ -145,6 +145,8 @@ systems. This removes most of the CPU overhead caused by the sub-optimal use of 
 which could easily use up 50-80% of the CPU time spent in the network thread when many
 connections were involved.
 
+Since these optimizations are exclusive to linux, it is possible that masternodes hosted on windows servers will be unable to handle the network load and should consider migrating to a linux based operating system. 
+
 Other improvements were made to the p2p message handling code, so that for example LLMQ
 related connections do less work than full/normal p2p connections.
 
@@ -175,14 +177,14 @@ PrivateSend coin management improvements
 ----------------------------------------
 A new algorithm for creation of mixing denominations was implemented which
 should reduce the number of the smallest inputs created and give users more
-control on soft and hard caps. A much more accurate fee management was
+control on soft and hard caps. A much more accurate fee management algortihm was
 also implemented which should fix issues for users who have custom fees
-specified in wallet config or in times when network is under a stress.
+specified in wallet config or in times when network is under load.
 
-There is a new tab in GUI called "PrivateSend" which allows spending fully
+There is a new "PrivateSend" tab in the GUI which allows spending fully
 mixed coins only. CoinControl feature was also improved to display coins
-based on the tab it was opened at, to protect users from accidentally spending
-mixed and non-mixed coins in one transaction and to give better overview of
+based on the tab it was opened in, to protect users from accidentally spending
+mixed and non-mixed coins in the same transaction and to give better overview of
 spendable mixed coins.
 
 PrivateSend Random Round Mixing
