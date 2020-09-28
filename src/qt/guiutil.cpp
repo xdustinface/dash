@@ -1560,11 +1560,8 @@ void updateFonts()
         return;
     }
 
-    auto getKey = [](QWidget* w) -> QString {
-        return w->parent() ? w->parent()->objectName() + w->objectName() : w->objectName();
-    };
-
-    static std::map<QString, int> mapDefaultFontSizes;
+    static std::map<QWidget*, int> mapWidgetDefaultFontSizes;
+    static std::map<QString, int> mapClassDefaultFontSizes;
     std::map<QWidget*, std::pair<QFont, bool>> mapWidgetFonts;
 
     for (QWidget* w : qApp->allWidgets()) {
@@ -1580,16 +1577,14 @@ void updateFonts()
         font.setStyleName(qApp->font().styleName());
         font.setStyle(qApp->font().style());
         // Set the font size based on the widgets default font size + the font scale
-        QString key = getKey(w);
-
         bool fAdded = false;
-        if (!mapDefaultFontSizes.count(key)) {
-            mapDefaultFontSizes.emplace(std::make_pair(key, font.pointSize() > 0 ? font.pointSize() : defaultFontSize));
+        if (!mapWidgetDefaultFontSizes.count(w)) {
+            mapWidgetDefaultFontSizes.emplace(std::make_pair(w, font.pointSize() > 0 ? font.pointSize() : defaultFontSize));
             fAdded = true;
         }
         bool fDefaultFont = mapNormalFontUpdates.find(w) == mapNormalFontUpdates.end() &&
                             setFixedPitchFontUpdates.find(w) == setFixedPitchFontUpdates.end();
-        font.setPointSizeF(getScaledFontSize(mapDefaultFontSizes[key]));
+        font.setPointSizeF(getScaledFontSize(mapWidgetDefaultFontSizes[w]));
         mapWidgetFonts.emplace(w, std::make_pair(font, fAdded || (fDefaultFont && font != w->font())));
     }
 
@@ -1599,7 +1594,7 @@ void updateFonts()
         if (itw != mapWidgetFonts.end()) {
             int nSize = std::get<2>(itn->second);
             if (nSize == -1) {
-                nSize = mapDefaultFontSizes[getKey(itn->first)];
+                nSize = mapWidgetDefaultFontSizes[itn->first];
             }
             QFont&& font = getFont(std::get<0>(itn->second), std::get<1>(itn->second), nSize);
             if (itn->first->font() != font) {
@@ -1616,7 +1611,7 @@ void updateFonts()
         auto itw = mapWidgetFonts.find(*itf);
         if (itw != mapWidgetFonts.end()) {
             QFont font = fixedPitchFont();
-            font.setPointSizeF(getScaledFontSize(mapDefaultFontSizes[getKey(*itf)]));
+            font.setPointSizeF(getScaledFontSize(mapWidgetDefaultFontSizes[*itf]));
             if ((*itf)->font() != font) {
                 itw->second.first = font;
                 itw->second.second = true;
@@ -1633,32 +1628,42 @@ void updateFonts()
         }
     }
 
+    // Cleanup mapDefaultFontSize to remove deleted widgets
+    auto itd = mapWidgetDefaultFontSizes.begin();
+    while (itd != mapWidgetDefaultFontSizes.end()) {
+        if (qApp->allWidgets().contains(itd->first)) {
+            ++itd;
+        } else {
+            itd = mapWidgetDefaultFontSizes.erase(itd);
+        }
+    }
+
     // Scale the global font for QToolTip labels, QMenu and QMessageBox instances
     QFont fontToolTip = qApp->font("QTipLabel");
     QFont fontMenu = qApp->font("QMenu");
     QFont fontMessageBox = qApp->font("QMessageBox");
     // Store their default font sizes before ever applying any scale to it
-    if (!mapDefaultFontSizes.count("QTipLabel")) {
-        mapDefaultFontSizes.emplace("QTipLabel", fontToolTip.pointSize());
+    if (!mapClassDefaultFontSizes.count("QTipLabel")) {
+        mapClassDefaultFontSizes.emplace("QTipLabel", fontToolTip.pointSize());
     }
-    if (!mapDefaultFontSizes.count("QMenu")) {
-        mapDefaultFontSizes.emplace("QMenu", fontMenu.pointSize());
+    if (!mapClassDefaultFontSizes.count("QMenu")) {
+        mapClassDefaultFontSizes.emplace("QMenu", fontMenu.pointSize());
     }
-    if (!mapDefaultFontSizes.count("QMessageBox")) {
-        mapDefaultFontSizes.emplace("QMessageBox", fontMessageBox.pointSize());
+    if (!mapClassDefaultFontSizes.count("QMessageBox")) {
+        mapClassDefaultFontSizes.emplace("QMessageBox", fontMessageBox.pointSize());
     }
     // And give them the proper scaled size based on their default sizes if required
-    double dSize = getScaledFontSize(mapDefaultFontSizes["QTipLabel"]);
+    double dSize = getScaledFontSize(mapClassDefaultFontSizes["QTipLabel"]);
     if (fontToolTip.pointSizeF() != dSize) {
         fontToolTip.setPointSizeF(dSize);
         qApp->setFont(fontToolTip, "QTipLabel");
     }
-    dSize = getScaledFontSize(mapDefaultFontSizes["QMenu"]);
+    dSize = getScaledFontSize(mapClassDefaultFontSizes["QMenu"]);
     if (fontMenu.pointSizeF() != dSize) {
         fontMenu.setPointSizeF(dSize);
         qApp->setFont(fontMenu, "QMenu");
     }
-    dSize = getScaledFontSize(getScaledFontSize(mapDefaultFontSizes["QMessageBox"]));
+    dSize = getScaledFontSize(getScaledFontSize(mapClassDefaultFontSizes["QMessageBox"]));
     if (fontMessageBox.pointSizeF() != dSize) {
         fontMessageBox.setPointSizeF(dSize);
         qApp->setFont(fontMessageBox, "QMessageBox");
