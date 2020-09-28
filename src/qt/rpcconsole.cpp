@@ -858,7 +858,7 @@ void RPCConsole::clear(bool clearHistory)
                 "td.message { " + GUIUtil::getThemedStyleQString(GUIUtil::ThemedStyle::TS_PRIMARY) + " font-family: %1; font-size: %2; white-space:pre-wrap; } "
                 "td.cmd-request, b { " + GUIUtil::getThemedStyleQString(GUIUtil::ThemedStyle::TS_COMMAND) + " } "
                 "td.cmd-error, .secwarning { " + GUIUtil::getThemedStyleQString(GUIUtil::ThemedStyle::TS_ERROR) + " }"
-            ).arg(fixedFontInfo.family(), QString("%1pt").arg(consoleFontSize)).arg(consoleFontSize * 0.1)
+            ).arg(fixedFontInfo.family(), QString("%1pt").arg(consoleFontSize))
         );
 
 #ifdef Q_OS_MAC
