@@ -850,7 +850,7 @@ void RPCConsole::clear(bool clearHistory)
     ui->lineEdit->setFocus();
 
     // Set default style sheet
-    QFontInfo fixedFontInfo(GUIUtil::fixedPitchFont());
+    QFontInfo fixedFontInfo(GUIUtil::getFontNormal());
     ui->messagesWidget->document()->setDefaultStyleSheet(
         QString(
                 "table { }"

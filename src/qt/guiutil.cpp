@@ -134,8 +134,6 @@ static QFont::Weight fontWeightBold = defaultFontWeightBold;
 
 // Contains all widgets and its font attributes (weight, italic, size) with font changes due to GUIUtil::setFont
 static std::map<QWidget*, std::tuple<FontWeight, bool, int>> mapNormalFontUpdates;
-// Contains all widgets where a fixed pitch font has been set with GUIUtil::setFixedPitchFont
-static std::set<QWidget*> setFixedPitchFontUpdates;
 // Contains a list of supported font weights for all members of GUIUtil::FontFamily
 static std::map<FontFamily, std::vector<QFont::Weight>> mapSupportedWeights;
 
@@ -260,15 +258,6 @@ QString dateTimeStr(qint64 nTime)
     return dateTimeStr(QDateTime::fromTime_t((qint32)nTime));
 }
 
-QFont fixedPitchFont()
-{
-    if (dashThemeActive()) {
-        return getFontNormal();
-    } else {
-        return QFontDatabase::systemFont(QFontDatabase::FixedFont);
-    }
-}
-
 // Just some dummy data to generate a convincing random-looking (but consistent) address
 static const uint8_t dummydata[] = {0xeb,0x15,0x23,0x1d,0xfc,0xeb,0x60,0x92,0x58,0x86,0xb6,0x7d,0x06,0x52,0x99,0x92,0x59,0x15,0xae,0xb1,0x72,0xc0,0x66,0x47};
 
@@ -291,7 +280,6 @@ void setupAddressWidget(QValidatedLineEdit *widget, QWidget *parent, bool fAllow
 {
     parent->setFocusProxy(widget);
 
-    setFixedPitchFont({widget});
     // We don't want translators to use own addresses in translations
     // and this is the only place, where this address is supplied.
     widget->setPlaceholderText(QObject::tr("Enter a Dash address (e.g. %1)").arg(
@@ -1545,14 +1533,6 @@ void setFont(const std::vector<QWidget*>& vecWidgets, FontWeight weight, int nPo
     }
 }
 
-void setFixedPitchFont(const std::vector<QWidget*>& vecWidgets)
-{
-    for (auto it : vecWidgets) {
-        setFixedPitchFontUpdates.emplace(it);
-        it->setFont(fixedPitchFont());
-    }
-}
-
 void updateFonts()
 {
     // Fonts need to be loaded by GUIIUtil::loadFonts(), if not just return.
@@ -1584,10 +1564,9 @@ void updateFonts()
             mapWidgetDefaultFontSizes.emplace(std::make_pair(w, font.pointSize() > 0 ? font.pointSize() : defaultFontSize));
             fAdded = true;
         }
-        bool fDefaultFont = mapNormalFontUpdates.find(w) == mapNormalFontUpdates.end() &&
-                            setFixedPitchFontUpdates.find(w) == setFixedPitchFontUpdates.end();
         font.setPointSizeF(getScaledFontSize(mapWidgetDefaultFontSizes[w]));
-        mapWidgetFonts.emplace(w, std::make_pair(font, fAdded || (fDefaultFont && font != w->font())));
+        bool fUpdateRequired = fAdded || (mapNormalFontUpdates.find(w) == mapNormalFontUpdates.end() && font != w->font());
+        mapWidgetFonts.emplace(w, std::make_pair(font, fUpdateRequired));
     }
 
     auto itn = mapNormalFontUpdates.begin();
@@ -1606,21 +1585,6 @@ void updateFonts()
             ++itn;
         } else {
             itn = mapNormalFontUpdates.erase(itn);
-        }
-    }
-    auto itf = setFixedPitchFontUpdates.begin();
-    while (itf != setFixedPitchFontUpdates.end()) {
-        auto itw = mapWidgetFonts.find(*itf);
-        if (itw != mapWidgetFonts.end()) {
-            QFont font = fixedPitchFont();
-            font.setPointSizeF(getScaledFontSize(mapWidgetDefaultFontSizes[*itf]));
-            if ((*itf)->font() != font) {
-                itw->second.first = font;
-                itw->second.second = true;
-            }
-            ++itf;
-        } else {
-            itf = setFixedPitchFontUpdates.erase(itf);
         }
     }
 

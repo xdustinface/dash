@@ -31,8 +31,6 @@ SendCoinsEntry::SendCoinsEntry(QWidget* parent) :
 
     // normal dash address field
     GUIUtil::setupAddressWidget(ui->payTo, this, true);
-    // just a label for displaying dash address(es)
-    GUIUtil::setFixedPitchFont({ui->payToLabel_is});
 
     GUIUtil::setFont({ui->payToLabel,
                      ui->labellLabel,
