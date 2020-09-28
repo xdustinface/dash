@@ -559,16 +559,12 @@ UniValue CRPCTable::execute(const JSONRPCRequest &request) const
     // Before executing the RPC Command, filter commands from platform rpc user
     if (fMasternodeMode && request.authUser == gArgs.GetArg("-platform-user", defaultPlatformUser)) {
         auto it = find_if(platformAllowedCommands.begin(), platformAllowedCommands.end(), [request](const std::pair<std::string /*command*/, std::string /*subcommand*/>& cmd) {
-            // Check if this request matches a valid masternode rpc command
-            if (request.strMethod == cmd.first) {
-                // First arg / command matched, if there is no subcommand return true
-                if (cmd.second.empty()) return true;
-                if (request.params[0].isStr() && request.params[0].getValStr() == cmd.second) {
-                    // Sub command was needed and matched, return true
-                    return true;
-                }
-            }
-            return false;
+            // Check if this request matches a valid platform allowed rpc command
+            return (request.strMethod == cmd.first) &&
+                // and there is no subcommand
+                (cmd.second.empty() ||
+                // or a subcommand was needed and it matches too
+                (request.params[0].isStr() && request.params[0].getValStr() == cmd.second));
         });
         if (it == platformAllowedCommands.end()) {
             throw JSONRPCError(RPC_PROTECTED_COMMAND, "Method prohibited for platform user");
