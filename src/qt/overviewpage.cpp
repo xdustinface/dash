@@ -52,6 +52,7 @@ public:
         QRect rectBottomHalf(mainRect.left() + xspace, mainRect.top() + ypad + halfheight + 5, mainRect.width() - xspace, halfheight);
         QRect rectBounding;
         QColor colorForeground;
+        qreal initialFontSize = painter->font().pointSizeF();
 
         // Grab model indexes for desired data from TransactionTableModel
         QModelIndex indexDate = index.sibling(index.row(), TransactionTableModel::Date);
@@ -60,7 +61,7 @@ public:
 
         // Draw first line (with slightly bigger font than the second line will get)
         // Content: Date/Time, Optional IS indicator, Amount
-        painter->setFont(GUIUtil::getFont(GUIUtil::FontWeight::Normal, false, GUIUtil::getScaledFontSize(painter->font().pointSizeF() * 1.17)));
+        painter->setFont(GUIUtil::getFont(GUIUtil::FontWeight::Normal, false, GUIUtil::getScaledFontSize(initialFontSize * 1.17)));
         // Date/Time
         colorForeground = qvariant_cast<QColor>(indexDate.data(Qt::ForegroundRole));
         QString strDate = indexDate.data(Qt::DisplayRole).toString();
@@ -80,7 +81,7 @@ public:
 
         // Draw second line (with the initial font)
         // Content: Address/label, Optional Watchonly indicator
-        painter->setFont(GUIUtil::getFont(GUIUtil::FontWeight::Normal, false, GUIUtil::getScaledFontSize(painter->font().pointSizeF())));
+        painter->setFont(GUIUtil::getFont(GUIUtil::FontWeight::Normal, false, GUIUtil::getScaledFontSize(initialFontSize)));
         // Address/Label
         colorForeground = qvariant_cast<QColor>(indexAddress.data(Qt::ForegroundRole));
         QString address = indexAddress.data(Qt::DisplayRole).toString();
