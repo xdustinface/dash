@@ -335,6 +335,13 @@ A lot of refactoring, code cleanups and other small fixes were done in this rele
 
 See detailed [set of changes](https://github.com/dashpay/dash/compare/v0.15.0.0...dashpay:v0.16.0.0).
 
+- [`37fe9a6e2f`](https://github.com/dashpay/dash/commit/37fe9a6e2f) Fix mempool sync (#3725)
+- [`69b77765ba`](https://github.com/dashpay/dash/commit/69b77765ba) qt: Fix font family updates (#3746)
+- [`cf2da32ffe`](https://github.com/dashpay/dash/commit/cf2da32ffe) qt: Fix font size and scaling issues (#3734)
+- [`586f166499`](https://github.com/dashpay/dash/commit/586f166499) qt: Fix Recent transactions list height (#3744)
+- [`12d0782071`](https://github.com/dashpay/dash/commit/12d0782071) Translations 2020-09 (#3736)
+- [`fc8ca6ad50`](https://github.com/dashpay/dash/commit/fc8ca6ad50) Bump few things and update man pages for v0.16 (#3737)
+- [`8e6706dede`](https://github.com/dashpay/dash/commit/8e6706dede) qt: Add PrivateSend tab in OptionsDialog, allow to show/hide PS UI (#3717)
 - [`dbfdf8cb15`](https://github.com/dashpay/dash/commit/dbfdf8cb15) qt: Finetune OverviewPage (#3715)
 - [`9028712b60`](https://github.com/dashpay/dash/commit/9028712b60) qt: Finetune TransactionsView (#3710)
 - [`f4e3bf95d0`](https://github.com/dashpay/dash/commit/f4e3bf95d0) qt: Finetune CoinControlDialog + bitcoin#14828 (#3701)
