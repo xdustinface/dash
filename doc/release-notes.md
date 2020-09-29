@@ -157,7 +157,7 @@ Since these optimizations are exclusive to linux, it is possible that masternode
 on windows servers will be unable to handle the network load and should consider migrating
 to a linux based operating system.
 
-Other improvements were made to the p2p message handling code, so that for example LLMQ
+Other improvements were made to the p2p message handling code, so that LLMQ
 related connections do less work than full/normal p2p connections.
 
 Wallet files
