@@ -46,7 +46,7 @@ you have to perform a reindex or re-sync the whole chain.
 ### Downgrade of masternodes to < 0.16
 
 Starting with this release, masternodes will verify protocol versions of other
-masternodes. This will cause PoSe punishment/banning of downgraded masternodes,
+masternodes. This will cause PoSe punishment/banning of out of date masternodes,
 so it is not recommended to downgrade masternodes.
 
 Notable changes
@@ -87,7 +87,7 @@ course of 10 periods.
 Concentrated Recovery
 ---------------------
 In the current system, signature shares are propagated to all LLMQ members
-until one of them has enough shares collected to recover the signature. Until
+until one of them has collected enough shares to recover the signature. Until
 this recovered signature is propagated in the LLMQ, all members will keep
 propagating shares and verifying each one. This causes significant load on the
 LLMQ, resulting in decreased throughput, which will be avoided with the new system.
@@ -95,12 +95,13 @@ LLMQ, resulting in decreased throughput, which will be avoided with the new syst
 The new system initially sends all shares to a single deterministically selected node,
 so that this node can recover the signature and propagate the recovered signature.
 This way only the recovered signature needs to be propagated and verified by all
-members. After sending the share to this single node, each member waits for some
-time and repeats sending it to another deterministically selected member. To avoid
-making too many requests when nodes are under heavy load already, we use an exponential
-backoff starting with 2 seconds and limited to 10 seconds, so it should be a sequence
-of timeouts like `2, 4, 8, 10, 10, 10, ...`. This process is repeated until a recovered
-signature is finally created and propagated.
+members. Each member, after sending their share to this node, waits for some
+timeout and then sends their share to another deterministically selected member. This process is 
+repeated until a recovered signature is finally created and propagated.
+
+This timeout begins at two seconds and increases exponentially up to ten seconds (ie. `2,4,8,10,10`) for 
+each node that times out. This is in order to minimize the time taken to generate a signature in the case 
+that the recovery node is down, while also minimizing the traffic generated when the network is under stress. 
 
 The new system is activated with the newly added `SPORK_21_QUORUM_ALL_CONNECTED`
 which has two hardcoded values with a special meaning: `0` activates Concentrated
@@ -111,7 +112,7 @@ Increased number of masternode connections
 To implement "Concentrated Recovery", it is now required that all members of a LLMQ
 connect to all other members of the same LLMQ. This significantly increases general
 connection count for masternodes. These intra-quorum connections are less resource
-consuming than normal p2p connections as they only exchange LLMQ/masternode related
+demanding than normal p2p connections as they only exchange LLMQ/masternode related
 messages, but the hardware and network requirements will still be higher than before.
 
 This change will at first only be activated for the smaller LLMQs (50 members) and
@@ -184,7 +185,7 @@ name of any wallet is just its `<path>` string.
 
 PrivateSend coin management improvements
 ----------------------------------------
-A new algorithm for creation of mixing denominations was implemented which
+A new algorithm for the creation of mixing denominations was implemented which
 should reduce the number of the smallest inputs created and give users more
 control on soft and hard caps. A much more accurate fee management algorithm was
 also implemented which should fix issues for users who have custom fees
@@ -217,7 +218,7 @@ GUI changes
 Many dialogs, tabs, icons, colors and various interface elements were reworked
 to improve user experience and to make wallet look more consistent. The wallet
 GUI is also much more flexible now. For regular users there is a new "Appearance"
-dialog and a corresponding tab in Options which allows them to pick a theme and
+dialog and a corresponding tab in the options which allows them to pick a theme and
 to tweak various font parameters. This feature specifically should help users
 who had issues on some systems previously.
 
