@@ -92,7 +92,7 @@ this recovered signature is propagated in the LLMQ, all members will keep
 propagating shares and verifying each one. This causes significant load on the
 LLMQ, resulting in decreased throughput, which will be avoided with the new system.
 
-The new system initially sends all shares to a single deterministically selected node,
+This new system initially sends all shares to a single deterministically selected node,
 so that this node can recover the signature and propagate the recovered signature.
 This way only the recovered signature needs to be propagated and verified by all
 members. Each member, after sending their share to this node, waits for some
