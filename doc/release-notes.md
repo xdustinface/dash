@@ -468,167 +468,52 @@ See detailed [set of changes](https://github.com/dashpay/dash/compare/v0.15.0.0.
 - [`7fdc4c7b0d`](https://github.com/dashpay/dash/commit/7fdc4c7b0d) change miniupnp lib server (#3452)
 - [`911b5580e4`](https://github.com/dashpay/dash/commit/911b5580e4) Fix typo in error log when EPOLL_CTL_ADD fails for wakeup pipe (#3451)
 - [`b775fa263f`](https://github.com/dashpay/dash/commit/b775fa263f) Lower DEFAULT_PRIVATESEND_DENOMS (#3434)
-- [`aa46b5ccb2`](https://github.com/dashpay/dash/commit/aa46b5ccb2) Make epoll the default socketevents mode when possible
-- [`3fa94aac56`](https://github.com/dashpay/dash/commit/3fa94aac56) Implement epoll support
-- [`d6b69dbf69`](https://github.com/dashpay/dash/commit/d6b69dbf69) Revert "Only run DisconnectNodes once per second"
-- [`e51580f052`](https://github.com/dashpay/dash/commit/e51580f052) Only linger when the other side has not shutdown/closed the socket yet
-- [`1df71a0f22`](https://github.com/dashpay/dash/commit/1df71a0f22) Don't consider disconnecting nodes in GetNodeCount and GetNodeStats
-- [`98ff8feaf2`](https://github.com/dashpay/dash/commit/98ff8feaf2) Revert "Invoke DisconnectNodes from getconnectioncount/getpeerinfo/getnetworkinfo"
-- [`ccb1f84b3a`](https://github.com/dashpay/dash/commit/ccb1f84b3a) Revert "Invoke DisconnectNodes right before checking for duplicate connections"
-- [`33bfaffbea`](https://github.com/dashpay/dash/commit/33bfaffbea) Don't return nodes with fDisconnect=true in FindNode
-- [`d235364534`](https://github.com/dashpay/dash/commit/d235364534) Wait one additional second for disconnects
-- [`d516e3d1e0`](https://github.com/dashpay/dash/commit/d516e3d1e0) Advance iterator in CConnman::DisconnectNodes when lingering
+- [`d59deea77b`](https://github.com/dashpay/dash/commit/d59deea77b) Implement epoll support (#3445)
 - [`96faa8155e`](https://github.com/dashpay/dash/commit/96faa8155e) Don't disconnect masternode probes for a few seconds (#3449)
 - [`608aed3d85`](https://github.com/dashpay/dash/commit/608aed3d85) Don't try to connect to itself through CLLMQUtils::GetQuorumConnections (#3448)
 - [`d663f48085`](https://github.com/dashpay/dash/commit/d663f48085) Lower SELECT_TIMEOUT_MILLISECONDS for USE_WAKEUP_PIPE case (#3444)
-- [`f5f4ccbf24`](https://github.com/dashpay/dash/commit/f5f4ccbf24) Merge pull request #3432 from codablock/pr_refactor_sockethandler
-- [`47af42a69c`](https://github.com/dashpay/dash/commit/47af42a69c) AddRef/Release when adding/erasing CNodeentries to/from mapNodesWithDataToSend
-- [`e4be48bc7e`](https://github.com/dashpay/dash/commit/e4be48bc7e) Invoke select/poll with 0 timeout in case we know that there is work
-- [`e263edd573`](https://github.com/dashpay/dash/commit/e263edd573) Still invoke ReleaseNodeVector when interrupted
-- [`5c9f548640`](https://github.com/dashpay/dash/commit/5c9f548640) Track which nodes are able to receive/send data
-- [`0e8e22aa16`](https://github.com/dashpay/dash/commit/0e8e22aa16) Track SOCKET to CNodemapping
-- [`94fc4fb027`](https://github.com/dashpay/dash/commit/94fc4fb027) Track size of vSendMsg in atomic nSendMsgSize
-- [`1621e82e95`](https://github.com/dashpay/dash/commit/1621e82e95) Move socket receiving into SocketRecvData
-- [`50fc3c5cce`](https://github.com/dashpay/dash/commit/50fc3c5cce) Make SocketSendData non-const
+- [`f5f4ccbf24`](https://github.com/dashpay/dash/commit/f5f4ccbf24) Refactor/Prepare CConnman for upcoming epoll support (#3432)
 - [`93aa640af8`](https://github.com/dashpay/dash/commit/93aa640af8) Fix #3248: use blue logo for Traditional theme (#3441)
 - [`3d24290bcb`](https://github.com/dashpay/dash/commit/3d24290bcb) Take all nodes into account in check_sigs instead of just just masternodes (#3437)
 - [`d06597a421`](https://github.com/dashpay/dash/commit/d06597a421) [Trivial] Adjust some text in mnauth.cpp (#3413)
-- [`de931a25a3`](https://github.com/dashpay/dash/commit/de931a25a3) Merge pull request #3433 from codablock/pr_wakeup_on_connection
-- [`176d625860`](https://github.com/dashpay/dash/commit/176d625860) Sleep longer when USE_WAKEUP_PIPE is enabled
-- [`97ee3015e1`](https://github.com/dashpay/dash/commit/97ee3015e1) Wakeup select/poll when new nodes are added
+- [`de931a25a3`](https://github.com/dashpay/dash/commit/de931a25a3) Wakeup wakeup-pipe when new peers are added (#3433)
 - [`75a1968c96`](https://github.com/dashpay/dash/commit/75a1968c96) Fix abandonconflict.py (#3436)
 - [`2610e718cd`](https://github.com/dashpay/dash/commit/2610e718cd) Don't delete MN list snapshots and diffs from DB when reorgs take place (#3435)
-- [`6d83b0a053`](https://github.com/dashpay/dash/commit/6d83b0a053) Merge pull request #3431 from codablock/pr_socketevents_arg
-- [`6994d5f8e0`](https://github.com/dashpay/dash/commit/6994d5f8e0) Randomly switch socketevents mode in CI tests
-- [`a6d6c94a74`](https://github.com/dashpay/dash/commit/a6d6c94a74) Allow to pass extra dashd args when running tests
-- [`ea81ab5af7`](https://github.com/dashpay/dash/commit/ea81ab5af7) Make socketevents mode (poll vs select) configurable via parameter
+- [`6d83b0a053`](https://github.com/dashpay/dash/commit/6d83b0a053) Make socketevents mode (poll vs select) configurable via parameter (#3431)
 - [`9a8caf0986`](https://github.com/dashpay/dash/commit/9a8caf0986) Remove fix for fNetworkActive vs OpenNetworkConnection race (#3430)
-- [`96ed9fae39`](https://github.com/dashpay/dash/commit/96ed9fae39) Merge pull request #3429 from codablock/pr_remove_optimistic_send
-- [`08b57c198b`](https://github.com/dashpay/dash/commit/08b57c198b) Add some linger time between fDisconnect=true and actually closing the socket
-- [`d8bbdee7c4`](https://github.com/dashpay/dash/commit/d8bbdee7c4) Remove support for optimistic send
-- [`926beb3406`](https://github.com/dashpay/dash/commit/926beb3406) Handle sockets one last time before closing sockets
-- [`0cb385c567`](https://github.com/dashpay/dash/commit/0cb385c567) Merge pull request #3428 from codablock/pr_better_conn_logging
-- [`4117579e8f`](https://github.com/dashpay/dash/commit/4117579e8f) Honor fLogIPs in OpenNetworkConnection
-- [`6ca78b601e`](https://github.com/dashpay/dash/commit/6ca78b601e) Introduce NETCONN logging category and NET_NETCONN to log in NET and NETCONN
-- [`71f1181d21`](https://github.com/dashpay/dash/commit/71f1181d21) Improve connection logging in net.cpp
+- [`96ed9fae39`](https://github.com/dashpay/dash/commit/96ed9fae39) Fix flushing of rejects before disconnecting (#3429)
+- [`0cb385c567`](https://github.com/dashpay/dash/commit/0cb385c567) Improve network connections related logging (#3428)
 - [`d5092c44cb`](https://github.com/dashpay/dash/commit/d5092c44cb) Make sure that cleanup is not triggered too early in llmq-signing.py (#3427)
-- [`402b13907d`](https://github.com/dashpay/dash/commit/402b13907d) Merge pull request #3421 from codablock/pr_speedups6
-- [`2f1b3a34ab`](https://github.com/dashpay/dash/commit/2f1b3a34ab) Invoke DisconnectNodes from getconnectioncount/getpeerinfo/getnetworkinfo
-- [`305485418b`](https://github.com/dashpay/dash/commit/305485418b) In disconnect_p2ps(), wait for p2p connections to disappear from getpeerinfo()
-- [`76d7b17dcd`](https://github.com/dashpay/dash/commit/76d7b17dcd) Invoke DisconnectNodes right before checking for duplicate connections
-- [`0569997478`](https://github.com/dashpay/dash/commit/0569997478) Also wait for node1 to close all sockets
-- [`30e4afae00`](https://github.com/dashpay/dash/commit/30e4afae00) Only run DisconnectNodes once per second
-- [`ee995ef02a`](https://github.com/dashpay/dash/commit/ee995ef02a) Merge pull request #3422 from codablock/pr_speedups7
-- [`6467995178`](https://github.com/dashpay/dash/commit/6467995178) Instead of manually counting expected probes, rely on what dashd expects
-- [`6c1262f1c8`](https://github.com/dashpay/dash/commit/6c1262f1c8) Add "outbound" field to "quorum dkgstatus" connections
+- [`402b13907d`](https://github.com/dashpay/dash/commit/402b13907d) Only call DisconnectNodes once per second (#3421)
+- [`ee995ef02a`](https://github.com/dashpay/dash/commit/ee995ef02a) Implement more reliable wait_for_masternode_probes in test framework (#3422)
 - [`755a23ca00`](https://github.com/dashpay/dash/commit/755a23ca00) Always pass current mocktime to started nodes (#3423)
-- [`1e30054b9e`](https://github.com/dashpay/dash/commit/1e30054b9e) Merge pull request #3420 from codablock/pr_speedups5
-- [`65fb8bc454`](https://github.com/dashpay/dash/commit/65fb8bc454) Only run InactivityCheck once per second
-- [`9e57c35e82`](https://github.com/dashpay/dash/commit/9e57c35e82) Don't even try to send/receive blocks for fMasternode connections
-- [`a808ff3330`](https://github.com/dashpay/dash/commit/a808ff3330) Temporary hack for unnecessary invocations of Broadcast signal
-- [`24ead62905`](https://github.com/dashpay/dash/commit/24ead62905) Only call SendMessages when ProcessMessages did some work or when some time passed
-- [`8aa85c084b`](https://github.com/dashpay/dash/commit/8aa85c084b) Merge pull request #3419 from codablock/pr_deterministic_connections
-- [`c65d5612de`](https://github.com/dashpay/dash/commit/c65d5612de) Deterministically choose which peers to drop on duplicate MNAUTH
-- [`72afaddf72`](https://github.com/dashpay/dash/commit/72afaddf72) Introduce new way of deterministic selection of outbound LLMQ connections
+- [`1e30054b9e`](https://github.com/dashpay/dash/commit/1e30054b9e) Avoid calling SendMessages (and others) for all nodes all the time (#3420)
+- [`8aa85c084b`](https://github.com/dashpay/dash/commit/8aa85c084b) Deterministically choose which peers to drop on duplicate MNAUTH (#3419)
 - [`79f0bb1033`](https://github.com/dashpay/dash/commit/79f0bb1033) Fix crash in validateaddress (#3418)
-- [`d032d02f10`](https://github.com/dashpay/dash/commit/d032d02f10) Merge pull request #3410 from codablock/pr_fix_tests
-- [`2a87aa9d4f`](https://github.com/dashpay/dash/commit/2a87aa9d4f) Bump mocktime by 60 secs after calling setnetworkactive(True)
-- [`4118b77249`](https://github.com/dashpay/dash/commit/4118b77249) Better clarification for future conflict resolution
-- [`d9911e51fc`](https://github.com/dashpay/dash/commit/d9911e51fc) Bump mocktime while waiting for getblocktemplate
-- [`8dc7ec7e56`](https://github.com/dashpay/dash/commit/8dc7ec7e56) Call set_node_times by default in bump_mocktime
-- [`d80212c47c`](https://github.com/dashpay/dash/commit/d80212c47c) Fix use of mocktime when calling PoissonNextSendInbound
-- [`12ae7e171e`](https://github.com/dashpay/dash/commit/12ae7e171e) Sync mempool before generating blocks
-- [`36d909aa30`](https://github.com/dashpay/dash/commit/36d909aa30) Fix compilation error
-- [`8a0f702f39`](https://github.com/dashpay/dash/commit/8a0f702f39) Use verifiedProRegTxHash.IsNull() instead of fMasternode to check for MN connections
-- [`e20c63f535`](https://github.com/dashpay/dash/commit/e20c63f535) Merge pull request #3398 from codablock/pr_speedups
-- [`fd1875b61f`](https://github.com/dashpay/dash/commit/fd1875b61f) Reserve vector size in CopyNodeVector
-- [`122b740e2d`](https://github.com/dashpay/dash/commit/122b740e2d) Optimize deletion of vNodes entries
-- [`481339355d`](https://github.com/dashpay/dash/commit/481339355d) Don't hold cs_vNodes in ReleaseNodeVector
-- [`201f8eea1a`](https://github.com/dashpay/dash/commit/201f8eea1a) Optimize vInv.reserve in SendMessages
-- [`027a852a77`](https://github.com/dashpay/dash/commit/027a852a77) Use std::list for vSendMsg
-- [`a3bc3fd0f0`](https://github.com/dashpay/dash/commit/a3bc3fd0f0) Use std::chrono for GetTimeMillis/GetTimeMicros
-- [`9bcdeaea57`](https://github.com/dashpay/dash/commit/9bcdeaea57) Merge pull request #3399 from codablock/pr_speedups2
-- [`f142fff881`](https://github.com/dashpay/dash/commit/f142fff881) Skip verification of recovered sigs that were reconstructed in InstantSend
-- [`454fae3bda`](https://github.com/dashpay/dash/commit/454fae3bda) Only process 32 IS locks at a time in ProcessPendingInstantSendLocks
-- [`d856fd1407`](https://github.com/dashpay/dash/commit/d856fd1407) Use salted hasher for pendingInstantSendLocks
-- [`465af48e83`](https://github.com/dashpay/dash/commit/465af48e83) Improve logging in LLMQ sig handling
+- [`d032d02f10`](https://github.com/dashpay/dash/commit/d032d02f10) Multiple fixes for failing tests (#3410)
+- [`e20c63f535`](https://github.com/dashpay/dash/commit/e20c63f535) A few simple/trivial optimizations (#3398)
+- [`9bcdeaea57`](https://github.com/dashpay/dash/commit/9bcdeaea57) Avoid unnecessary processing/verification of reconstructed recovered signatures (#3399)
 - [`38556a3d49`](https://github.com/dashpay/dash/commit/38556a3d49) Don't try to connect to masternodes that we already have a connection to (#3401)
 - [`0e56e32c22`](https://github.com/dashpay/dash/commit/0e56e32c22) Add cache for CBlockTreeDB::HasTxIndex (#3402)
 - [`2dff0501e9`](https://github.com/dashpay/dash/commit/2dff0501e9) Remove semaphore for masternode connections (#3403)
 - [`c1d9dd553a`](https://github.com/dashpay/dash/commit/c1d9dd553a) FindDevNetGenesisBlock remove unused arg (#3405)
-- [`c7b6eb851d`](https://github.com/dashpay/dash/commit/c7b6eb851d) Merge pull request #3389 from codablock/pr_concentrated_recovery
-- [`148bbdd5cf`](https://github.com/dashpay/dash/commit/148bbdd5cf) Use GetTime instead of GetAdjustedTime
-- [`47bd5d7ede`](https://github.com/dashpay/dash/commit/47bd5d7ede) Only update id in spork21 case
-- [`76b6614fe5`](https://github.com/dashpay/dash/commit/76b6614fe5) Use auto keyword in CollectSigSharesToSend
-- [`900ee0f194`](https://github.com/dashpay/dash/commit/900ee0f194) Use range based for loop in SelectMemberForRecovery
-- [`91f811edd9`](https://github.com/dashpay/dash/commit/91f811edd9) Test failure of recovery on first node
-- [`beaf3f40b2`](https://github.com/dashpay/dash/commit/beaf3f40b2) Implement DashTestFramework.get_mninfo
-- [`80533f6c0d`](https://github.com/dashpay/dash/commit/80533f6c0d) Implement "quorum selectquorum" RPC
-- [`5edbeafcea`](https://github.com/dashpay/dash/commit/5edbeafcea) Also run llmq-signing.py with spork21 enabled
-- [`b212f21c15`](https://github.com/dashpay/dash/commit/b212f21c15) Implement new way of concentrated signature recovery
-- [`45064d8dc9`](https://github.com/dashpay/dash/commit/45064d8dc9) Rename sigSharesToSend to sigShareBatchesToSend
+- [`c7b6eb851d`](https://github.com/dashpay/dash/commit/c7b6eb851d) Implement "concentrated recovery" of LLMQ signatures (#3389)
 - [`e518ce4e13`](https://github.com/dashpay/dash/commit/e518ce4e13) Increase DIP0008 bip9 window by 10 years (#3391)
-- [`1aba86567b`](https://github.com/dashpay/dash/commit/1aba86567b) Merge pull request #3390 from codablock/pr_pose_ban_bad_connections
-- [`97ffcd369d`](https://github.com/dashpay/dash/commit/97ffcd369d) Use !fMasternode to disable restart of mnsync instead of checking for regtest
-- [`19e3e8733d`](https://github.com/dashpay/dash/commit/19e3e8733d) Use Params().RequireRoutableExternalIP() wherever possible
-- [`99414ed754`](https://github.com/dashpay/dash/commit/99414ed754) Fix fRequireRoutableExternalIP for devnets
-- [`88d4f551c9`](https://github.com/dashpay/dash/commit/88d4f551c9) Move spork21 condition into VerifyConnectionAndMinProtoVersions
-- [`a3c1fce551`](https://github.com/dashpay/dash/commit/a3c1fce551) Also test banning due to closed ports and old proto versions
-- [`2de860685f`](https://github.com/dashpay/dash/commit/2de860685f) Refactor test_banning to support more scenarios
-- [`535698d31f`](https://github.com/dashpay/dash/commit/535698d31f) Allow calling start_masternode from outside of start_masternodes
-- [`41796bec06`](https://github.com/dashpay/dash/commit/41796bec06) Put (no-)banning loop into `test_(no)_banning`
-- [`4dc483de26`](https://github.com/dashpay/dash/commit/4dc483de26) Support waiting for probes in mine_quorum
-- [`e980b18b68`](https://github.com/dashpay/dash/commit/e980b18b68) Isolate instead of kill MNs in llmq-simplepose.py
-- [`a308a092e2`](https://github.com/dashpay/dash/commit/a308a092e2) Don't touch self.nodes/self.mninfo in llmq-simplepose.py
-- [`908eb8372b`](https://github.com/dashpay/dash/commit/908eb8372b) Allow to pass list of online masternodes to mine_quorum
-- [`dfe9daabd9`](https://github.com/dashpay/dash/commit/dfe9daabd9) Fix test in LLMQSimplePoSeTest
-- [`3e3eba63e2`](https://github.com/dashpay/dash/commit/3e3eba63e2) Fix LLMQ dkgBadVotesThreshold parameter in regtest and devnet
-- [`d3586e1df0`](https://github.com/dashpay/dash/commit/d3586e1df0) Immediately close connections again when fNetworkActive==false
-- [`cace76d07f`](https://github.com/dashpay/dash/commit/cace76d07f) Actually use LLMQConnectionRetryTimeout for probing
-- [`38bf1a31fb`](https://github.com/dashpay/dash/commit/38bf1a31fb) Allow masternode mode and -listen=0 in regtest mode
-- [`bb63327623`](https://github.com/dashpay/dash/commit/bb63327623) Don't restart mnsync in regtest when nothing happens for too long
-- [`d16b7dbcb5`](https://github.com/dashpay/dash/commit/d16b7dbcb5) Implement hidden "-pushversion" parameter for PoSe testing
-- [`32c83b432b`](https://github.com/dashpay/dash/commit/32c83b432b) Verify min proto version and open ports of LLMQ members and vote on bad ones
+- [`1aba86567b`](https://github.com/dashpay/dash/commit/1aba86567b) Implement checking of open ports and min proto versions in DKGs (#3390)
 - [`f43cdbc586`](https://github.com/dashpay/dash/commit/f43cdbc586) Gradually bump mocktime in wait_for_quorum_connections (#3388)
 - [`3b904a0fa1`](https://github.com/dashpay/dash/commit/3b904a0fa1) Add a note about dash_hash under dependencies in test/README.md (#3386)
 - [`b0668028b6`](https://github.com/dashpay/dash/commit/b0668028b6) Implement more randomized behavior in GetQuorumConnections (#3385)
 - [`27dfb5a34d`](https://github.com/dashpay/dash/commit/27dfb5a34d) Move wait_proc into wait_for_quorum_connections (#3384)
 - [`ff6f391aea`](https://github.com/dashpay/dash/commit/ff6f391aea) Refactor Gitlab builds to use multiple stages (#3377)
-- [`a5a3e51554`](https://github.com/dashpay/dash/commit/a5a3e51554) Merge pull request #3380 from codablock/pr_all_mns_connected
-- [`a09e36106e`](https://github.com/dashpay/dash/commit/a09e36106e) Fix onlyOutbound handling
-- [`f82204db95`](https://github.com/dashpay/dash/commit/f82204db95) Move intra-quorum connection calculation into local func
-- [`fdec67a55b`](https://github.com/dashpay/dash/commit/fdec67a55b) Wait for ping/pong after re-connecting all nodes
-- [`882b58c990`](https://github.com/dashpay/dash/commit/882b58c990) Use <> instead of "" for #include
-- [`dbaf13848d`](https://github.com/dashpay/dash/commit/dbaf13848d) Include inbound connections in output of "quorum dkgstatus"
-- [`7df624d380`](https://github.com/dashpay/dash/commit/7df624d380) Implement tests for LLMQ connection handling
-- [`e8bbbec259`](https://github.com/dashpay/dash/commit/e8bbbec259) Don't try to open masternode connections when network is disabled
-- [`c9608bf930`](https://github.com/dashpay/dash/commit/c9608bf930) Only add wallet info to protx list/info when wallet is enabled
-- [`9ef2b05884`](https://github.com/dashpay/dash/commit/9ef2b05884) Add masternode meta info to protx list/info
-- [`8f644d18d7`](https://github.com/dashpay/dash/commit/8f644d18d7) Implement probing of public ip/port of LLMQ members
-- [`14bb62ac8e`](https://github.com/dashpay/dash/commit/14bb62ac8e) Connect all LLMQ members to all other members
-- [`486463d622`](https://github.com/dashpay/dash/commit/486463d622) Add SPORK_21_QUORUM_ALL_CONNECTED
-- [`6c95518807`](https://github.com/dashpay/dash/commit/6c95518807) Bump proto version
+- [`a5a3e51554`](https://github.com/dashpay/dash/commit/a5a3e51554) Let all LLMQ members connect to each other instead of only a few ones (#3380)
 - [`8ab1a3734a`](https://github.com/dashpay/dash/commit/8ab1a3734a) Bump mocktime each time waiting for phase1 fails (#3383)
 - [`c68b5f68aa`](https://github.com/dashpay/dash/commit/c68b5f68aa) Hold CEvoDB lock while iterating mined commitments (#3379)
 - [`deba865b17`](https://github.com/dashpay/dash/commit/deba865b17) Also verify quorumHash when waiting for DKG phases (#3382)
 - [`17ece14f40`](https://github.com/dashpay/dash/commit/17ece14f40) Better/more logging for DKGs (#3381)
 - [`80be2520a2`](https://github.com/dashpay/dash/commit/80be2520a2) Call FlushBackgroundCallbacks before resetting CConnman (#3378)
 - [`b6bdb8be9e`](https://github.com/dashpay/dash/commit/b6bdb8be9e) Faster opening of masternode connections (#3375)
-- [`0635659288`](https://github.com/dashpay/dash/commit/0635659288) Connect all nodes to node1 in llmq-chainlocks.py
-- [`71e57a25fa`](https://github.com/dashpay/dash/commit/71e57a25fa) Add masternode flag to result of getpeerinfo
-- [`31825146a3`](https://github.com/dashpay/dash/commit/31825146a3) Don't relay anything to fMasternode connections
-- [`f4f57fbb63`](https://github.com/dashpay/dash/commit/f4f57fbb63) Pass fMasternode variable in VERSION so that the other end knows about it
-- [`94bcf85347`](https://github.com/dashpay/dash/commit/94bcf85347) Merge pull request #3367 from codablock/pr_refactor_llmq_conns
-- [`7f1f1d12f5`](https://github.com/dashpay/dash/commit/7f1f1d12f5) Make EnsureQuorumConnections re-set connections in every iteration
-- [`9ef1e7cb51`](https://github.com/dashpay/dash/commit/9ef1e7cb51) Only log new quorum connections when it's actually new
-- [`364d6c37f7`](https://github.com/dashpay/dash/commit/364d6c37f7) Move and unify logic for quorum connection establishment into CLLMQUtils
-- [`c0bb06e766`](https://github.com/dashpay/dash/commit/c0bb06e766) Merge pull request #3366 from codablock/pr_fix_mnconns
-- [`51dda92a12`](https://github.com/dashpay/dash/commit/51dda92a12) Bump mocktime after reconnecting nodes
-- [`2a6465a6fb`](https://github.com/dashpay/dash/commit/2a6465a6fb) Move LLMQ connection retry timeout into chainparams
-- [`458a63736d`](https://github.com/dashpay/dash/commit/458a63736d) Track last outbound connection attempts in CMasternodeMetaMan
-- [`93ed22b239`](https://github.com/dashpay/dash/commit/93ed22b239) Logging for outgoing masternode connections
-- [`35d75b19e6`](https://github.com/dashpay/dash/commit/35d75b19e6) Make pending masternode queue proTxHash based
-- [`0adef2cf7a`](https://github.com/dashpay/dash/commit/0adef2cf7a) Fix ThreadOpenMasternodeConnections to not drop pending MN connections
+- [`94bcf85347`](https://github.com/dashpay/dash/commit/94bcf85347) Refactor and unify quorum connection handling #(3367)
+- [`c0bb06e766`](https://github.com/dashpay/dash/commit/c0bb06e766) Multiple fixes for masternode connection handling (#3366)
 - [`f2ece1031f`](https://github.com/dashpay/dash/commit/f2ece1031f) Remove logging for waking of select() (#3370)
 - [`cf1f8c3825`](https://github.com/dashpay/dash/commit/cf1f8c3825) Support devnets in mininode (#3364)
 - [`f7ddee13a1`](https://github.com/dashpay/dash/commit/f7ddee13a1) Fix possible segfault (#3365)
