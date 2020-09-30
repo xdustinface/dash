@@ -420,32 +420,15 @@ void SendCoinsDialog::send(QList<SendCoinsRecipient> recipients)
     CFeeRate feeRate(txFee, currentTransaction.getTransactionSize());
     questionString.append(tr("Fee rate: %1").arg(BitcoinUnits::formatWithUnit(model->getOptionsModel()->getDisplayUnit(), feeRate.GetFeePerK())) + "/kB");
 
-    if (ctrl.IsUsingPrivateSend()) {
-        // append number of inputs
-        questionString.append("<hr />");
-        int nInputs = currentTransaction.getTransaction()->vin.size();
-        questionString.append(tr("This transaction will consume %n input(s)", "", nInputs));
-
+    if (ctrl.IsUsingPrivateSend() && nInputs >= 10) {
         // warn about potential privacy issues when spending too many inputs at once
-        if (ctrl.IsUsingPrivateSend()) {
-            if (nInputs >= 20) {
-                // Display a scary warning if LOTS of inputs were used
-                questionString.append("<br />");
-                questionString.append("<span style='" + GUIUtil::getThemedStyleQString(GUIUtil::ThemedStyle::TS_ERROR) + "'>");
-                questionString.append(tr("Warning: Using PrivateSend with %1 or more inputs may significantly "
-                                         "harm your privacy and is not recommended. The more inputs used, the more "
-                                         "vulnerable a transaction may be to different potential attacks.").arg(20));
-                questionString.append("</span> ");
-            } else if (nInputs >= 10) {
-                // Display a less scary warning if the number of inputs wasn't excessive, but could still make cluster analysis attacks easier
-                questionString.append("<br />");
-                questionString.append(tr("Warning: Using PrivateSend with %1 or more inputs may mildly harm your "
-                                         "privacy and is not recommended for users requiring a high level of privacy. "
-                                         "The more inputs used, the more vulnerable a transaction may be to different "
-                                         "potential attacks. Most users can ignore this warning.").arg(10));
-                questionString.append("</span> ");
-            }
-        }
+        questionString.append("<hr />");
+        questionString.append("<span style='" + GUIUtil::getThemedStyleQString(GUIUtil::ThemedStyle::TS_ERROR) + "'>");
+        questionString.append(QString("Warning: Using PrivateSend with %1 or more inputs may reduce your privacy. ").arg(10));
+        questionString.append("<a style='" + GUIUtil::getThemedStyleQString(GUIUtil::ThemedStyle::TS_COMMAND) + "' href=\"https://docs.dash.org/en/stable/wallets/dashcore/privatesend-instantsend.html#inputs\">");
+        questionString.append(tr("Click to learn more"));
+        questionString.append("</a>");
+        questionString.append("</span> ");
     }
 
     // add total amount in all subdivision units
