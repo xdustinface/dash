@@ -458,9 +458,7 @@ RPCConsole::RPCConsole(QWidget* parent) :
                       ui->banHeading
                      }, GUIUtil::FontWeight::Bold, 16);
 
-    GUIUtil::updateFonts();
-
-    GUIUtil::disableMacFocusRect(this);
+    GUIUtil::loadTheme(this, false);
 
     QSettings settings;
     if (!restoreGeometry(settings.value("RPCConsoleWindowGeometry").toByteArray())) {
@@ -523,6 +521,8 @@ RPCConsole::RPCConsole(QWidget* parent) :
     pageButtons.addButton(ui->btnPeers, pageButtons.buttons().size());
     pageButtons.addButton(ui->btnRepair, pageButtons.buttons().size());
     connect(&pageButtons, SIGNAL(buttonClicked(int)), this, SLOT(showPage(int)));
+
+    showPage(TAB_INFO);
 
     clear();
 }
