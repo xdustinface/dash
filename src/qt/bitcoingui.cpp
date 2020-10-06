@@ -153,6 +153,7 @@ BitcoinGUI::BitcoinGUI(const NetworkStyle* networkStyle, QWidget* parent) :
     {
         /** Create wallet frame*/
         walletFrame = new WalletFrame(this);
+        GUIUtil::loadStyleSheet(rpcConsole);
     } else
 #endif // ENABLE_WALLET
     {
