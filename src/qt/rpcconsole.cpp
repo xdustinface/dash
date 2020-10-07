@@ -438,8 +438,8 @@ void RPCExecutor::request(const QString &command, const QString &walletID)
     }
 }
 
-RPCConsole::RPCConsole(QWidget* parent) :
-    QWidget(parent, Qt::Window),
+RPCConsole::RPCConsole(QWidget* parent, Qt::WindowFlags flags) :
+    QWidget(parent, flags),
     ui(new Ui::RPCConsole),
     clientModel(0),
     historyPtr(0),

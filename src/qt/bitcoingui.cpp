@@ -146,14 +146,13 @@ BitcoinGUI::BitcoinGUI(const NetworkStyle* networkStyle, QWidget* parent) :
     setWindowIcon(networkStyle->getTrayAndWindowIcon());
     setWindowTitle(windowTitle);
 
-    rpcConsole = new RPCConsole(nullptr);
+    rpcConsole = new RPCConsole(this, enableWallet ? Qt::Window : Qt::Widget);
     helpMessageDialog = new HelpMessageDialog(this, HelpMessageDialog::cmdline);
 #ifdef ENABLE_WALLET
     if(enableWallet)
     {
         /** Create wallet frame*/
         walletFrame = new WalletFrame(this);
-        GUIUtil::loadStyleSheet(rpcConsole);
     } else
 #endif // ENABLE_WALLET
     {
