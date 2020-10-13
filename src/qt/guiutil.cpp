@@ -1550,6 +1550,7 @@ void updateFonts()
     // QPointer becomes nullptr for objects that were deleted.
     // Remove them from mapDefaultFontSize and mapNormalFontUpdates
     // before proceeding any further.
+    size_t nMapSize = mapWidgetDefaultFontSizes.size();
     auto itd = mapWidgetDefaultFontSizes.begin();
     while (itd != mapWidgetDefaultFontSizes.end()) {
         if (itd->first.isNull()) {
@@ -1558,7 +1559,12 @@ void updateFonts()
             ++itd;
         }
     }
+    if (nMapSize - mapWidgetDefaultFontSizes.size() > 0) {
+        qDebug() << __func__ << ": removed" << nMapSize - mapWidgetDefaultFontSizes.size()
+                 << "nullptr items from mapWidgetDefaultFontSizes";
+    }
 
+    nMapSize = mapNormalFontUpdates.size();
     auto itn = mapNormalFontUpdates.begin();
     while (itn != mapNormalFontUpdates.end()) {
         if (itn->first.isNull()) {
@@ -1567,7 +1573,12 @@ void updateFonts()
             ++itn;
         }
     }
+    if (nMapSize - mapNormalFontUpdates.size() > 0) {
+        qDebug() << __func__ << ": removed" << nMapSize - mapNormalFontUpdates.size()
+                 << "nullptr items from mapNormalFontUpdates";
+    }
 
+    size_t nUpdatable{0}, nUpdated{0};
     // Loop through all widgets
     for (QWidget* w : qApp->allWidgets()) {
         std::vector<QString> vecIgnore{
@@ -1578,6 +1589,7 @@ void updateFonts()
         if (std::find(vecIgnore.begin(), vecIgnore.end(), w->metaObject()->className()) != vecIgnore.end()) {
             continue;
         }
+        ++nUpdatable;
         QFont font = w->font();
         font.setFamily(qApp->font().family());
         font.setWeight(getFontWeightNormal());
@@ -1599,11 +1611,15 @@ void updateFonts()
             QFont&& fontUpd = getFont(std::get<0>(it->second), std::get<1>(it->second), nSize);
             if (w->font() != fontUpd) {
                 w->setFont(fontUpd);
+                ++nUpdated;
             }
         } else if (w->font() != font) {
             w->setFont(font);
+            ++nUpdated;
         }
     }
+    qDebug() << __func__ << ": updated:" << nUpdated << "/" << nUpdatable
+             << ": total:" << qApp->allWidgets().size();
 
     // Scale the global font for QToolTip labels, QMenu and QMessageBox instances
     QFont fontToolTip = qApp->font("QTipLabel");
