@@ -57,6 +57,7 @@
 #include <QFontDatabase>
 #include <QKeyEvent>
 #include <QLineEdit>
+#include <QPointer>
 #include <QSettings>
 #include <QTextDocument> // for Qt::mightBeRichText
 #include <QThread>
@@ -133,7 +134,7 @@ static QFont::Weight fontWeightNormal = defaultFontWeightNormal;
 static QFont::Weight fontWeightBold = defaultFontWeightBold;
 
 // Contains all widgets and its font attributes (weight, italic, size) with font changes due to GUIUtil::setFont
-static std::map<QWidget*, std::tuple<FontWeight, bool, int>> mapNormalFontUpdates;
+static std::map<QPointer<QWidget>, std::tuple<FontWeight, bool, int>> mapNormalFontUpdates;
 // Contains a list of supported font weights for all members of GUIUtil::FontFamily
 static std::map<FontFamily, std::vector<QFont::Weight>> mapSupportedWeights;
 
@@ -1543,10 +1544,31 @@ void updateFonts()
         return;
     }
 
-    static std::map<QWidget*, int> mapWidgetDefaultFontSizes;
+    static std::map<QPointer<QWidget>, int> mapWidgetDefaultFontSizes;
     static std::map<QString, int> mapClassDefaultFontSizes;
-    std::map<QWidget*, std::pair<QFont, bool>> mapWidgetFonts;
 
+    // QPointer becomes nullptr for objects that were deleted.
+    // Remove them from mapDefaultFontSize and mapNormalFontUpdates
+    // before proceeding any further.
+    auto itd = mapWidgetDefaultFontSizes.begin();
+    while (itd != mapWidgetDefaultFontSizes.end()) {
+        if (itd->first.isNull()) {
+            itd = mapWidgetDefaultFontSizes.erase(itd);
+        } else {
+            ++itd;
+        }
+    }
+
+    auto itn = mapNormalFontUpdates.begin();
+    while (itn != mapNormalFontUpdates.end()) {
+        if (itn->first.isNull()) {
+            itn = mapNormalFontUpdates.erase(itn);
+        } else {
+            ++itn;
+        }
+    }
+
+    // Loop through all widgets
     for (QWidget* w : qApp->allWidgets()) {
         std::vector<QString> vecIgnore{
             "QWidget", "QDialog", "QFrame", "QStackedWidget", "QDesktopWidget", "QDesktopScreenWidget",
@@ -1561,49 +1583,25 @@ void updateFonts()
         font.setWeight(getFontWeightNormal());
         font.setStyleName(qApp->font().styleName());
         font.setStyle(qApp->font().style());
+
         // Set the font size based on the widgets default font size + the font scale
-        bool fAdded = false;
-        if (!mapWidgetDefaultFontSizes.count(w)) {
-            mapWidgetDefaultFontSizes.emplace(std::make_pair(w, font.pointSize() > 0 ? font.pointSize() : defaultFontSize));
-            fAdded = true;
-        }
-        font.setPointSizeF(getScaledFontSize(mapWidgetDefaultFontSizes[w]));
-        bool fUpdateRequired = fAdded || (mapNormalFontUpdates.find(w) == mapNormalFontUpdates.end() && font != w->font());
-        mapWidgetFonts.emplace(w, std::make_pair(font, fUpdateRequired));
-    }
+        int pointSize = font.pointSize() > 0 ? font.pointSize() : defaultFontSize;
+        mapWidgetDefaultFontSizes.emplace(std::make_pair(w, pointSize));
+        int pointSizeStored = mapWidgetDefaultFontSizes.at(w);
+        font.setPointSizeF(getScaledFontSize(pointSizeStored));
 
-    auto itn = mapNormalFontUpdates.begin();
-    while (itn != mapNormalFontUpdates.end()) {
-        auto itw = mapWidgetFonts.find(itn->first);
-        if (itw != mapWidgetFonts.end()) {
-            int nSize = std::get<2>(itn->second);
+        auto it = mapNormalFontUpdates.find(w);
+        if (it != mapNormalFontUpdates.end()) {
+            int nSize = std::get<2>(it->second);
             if (nSize == -1) {
-                nSize = mapWidgetDefaultFontSizes[itn->first];
+                nSize = pointSizeStored;
             }
-            QFont&& font = getFont(std::get<0>(itn->second), std::get<1>(itn->second), nSize);
-            if (itn->first->font() != font) {
-                itw->second.first = font;
-                itw->second.second = true;
+            QFont&& fontUpd = getFont(std::get<0>(it->second), std::get<1>(it->second), nSize);
+            if (w->font() != fontUpd) {
+                w->setFont(fontUpd);
             }
-            ++itn;
-        } else {
-            itn = mapNormalFontUpdates.erase(itn);
-        }
-    }
-
-    for (auto it : mapWidgetFonts) {
-        if (it.second.second) {
-            it.first->setFont(it.second.first);
-        }
-    }
-
-    // Cleanup mapDefaultFontSize to remove deleted widgets
-    auto itd = mapWidgetDefaultFontSizes.begin();
-    while (itd != mapWidgetDefaultFontSizes.end()) {
-        if (qApp->allWidgets().contains(itd->first)) {
-            ++itd;
-        } else {
-            itd = mapWidgetDefaultFontSizes.erase(itd);
+        } else if (w->font() != font) {
+            w->setFont(font);
         }
     }
 
