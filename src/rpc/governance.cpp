@@ -154,7 +154,7 @@ UniValue gobject_prepare(const JSONRPCRequest& request)
     if (request.params[1].get_str() == "0") {
         hashParent = uint256();
     } else {
-        hashParent = ParseHashV(request.params[1], "fee-txid, parameter 1");
+        hashParent = ParseHashV(request.params[1], "parent-hash");
     }
 
     int nRevision = ParseInt32V(request.params[2], "revision");
@@ -263,13 +263,13 @@ UniValue gobject_submit(const JSONRPCRequest& request)
     uint256 txidFee;
 
     if (!request.params[5].isNull()) {
-        txidFee = ParseHashV(request.params[5], "fee-txid, parameter 6");
+        txidFee = ParseHashV(request.params[5], "fee-txid");
     }
     uint256 hashParent;
     if (request.params[1].get_str() == "0") { // attach to root node (root node doesn't really exist, but has a hash of zero)
         hashParent = uint256();
     } else {
-        hashParent = ParseHashV(request.params[1], "parent object hash, parameter 2");
+        hashParent = ParseHashV(request.params[1], "parent-hash");
     }
 
     // GET THE PARAMETERS FROM USER
