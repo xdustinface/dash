@@ -157,10 +157,8 @@ UniValue gobject_prepare(const JSONRPCRequest& request)
         hashParent = ParseHashV(request.params[1], "fee-txid, parameter 1");
     }
 
-    std::string strRevision = request.params[2].get_str();
-    std::string strTime = request.params[3].get_str();
-    int nRevision = atoi(strRevision);
-    int64_t nTime = atoi64(strTime);
+    int nRevision = ParseInt32V(request.params[2], "revision");
+    int64_t nTime = ParseInt64V(request.params[3], "time");
     std::string strDataHex = request.params[4].get_str();
 
     // CREATE A NEW COLLATERAL TRANSACTION FOR THIS SPECIFIC OBJECT
@@ -172,8 +170,8 @@ UniValue gobject_prepare(const JSONRPCRequest& request)
     // users ignore all instructions on dashcentral etc. and do not save them...
     // Let's log them here and hope users do not mess with debug.log
     LogPrintf("gobject_prepare -- params: %s %s %s %s, data: %s, hash: %s\n",
-                request.params[1].get_str(), request.params[2].get_str(),
-                request.params[3].get_str(), request.params[4].get_str(),
+                request.params[1].getValStr(), request.params[2].getValStr(),
+                request.params[3].getValStr(), request.params[4].getValStr(),
                 govobj.GetDataAsPlainString(), govobj.GetHash().ToString());
 
     if (govobj.GetObjectType() == GOVERNANCE_OBJECT_PROPOSAL) {
@@ -276,10 +274,8 @@ UniValue gobject_submit(const JSONRPCRequest& request)
 
     // GET THE PARAMETERS FROM USER
 
-    std::string strRevision = request.params[2].get_str();
-    std::string strTime = request.params[3].get_str();
-    int nRevision = atoi(strRevision);
-    int64_t nTime = atoi64(strTime);
+    int nRevision = ParseInt32V(request.params[2], "revision");
+    int64_t nTime = ParseInt64V(request.params[3], "time");
     std::string strDataHex = request.params[4].get_str();
 
     CGovernanceObject govobj(hashParent, nRevision, nTime, txidFee, strDataHex);
