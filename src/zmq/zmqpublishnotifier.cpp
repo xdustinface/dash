@@ -235,9 +235,10 @@ bool CZMQPublishHashInstantSendDoubleSpendNotifier::NotifyInstantSendDoubleSpend
 bool CZMQPublishHashRecoveredSigNotifier::NotifyRecoveredSig(const llmq::CRecoveredSig &sig)
 {
     LogPrint(BCLog::ZMQ, "zmq: Publish hashrecoveredsig %s\n", sig.msgHash.ToString());
-    CDataStream ss(SER_NETWORK, PROTOCOL_VERSION);
-    ss << sig.msgHash;
-    return SendMessage(MSG_HASHRECSIG, &(*ss.begin()), ss.size());
+    char data[32];
+    for (unsigned int i = 0; i < 32; i++)
+        data[31 - i] = sig.msgHash.begin()[i];
+    return SendMessage(MSG_HASHRECSIG, data, 32);
 }
 
 bool CZMQPublishRawBlockNotifier::NotifyBlock(const CBlockIndex *pindex)
