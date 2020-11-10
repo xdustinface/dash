@@ -110,11 +110,11 @@ class LLMQ_IS_CL_Conflicts(DashTestFramework):
             submit_result = self.nodes[0].submitblock(ToHex(block))
             assert(submit_result == "conflict-tx-lock")
 
-        cl = self.create_chainlock(self.nodes[0].getblockcount() + 1, block.sha256)
+        cl = self.create_chainlock(self.nodes[0].getblockcount() + 1, block)
         self.test_node.send_clsig(cl)
 
         for node in self.nodes:
-            self.wait_for_best_chainlock(node, uint256_to_string(block.sha256))
+            self.wait_for_best_chainlock(node, block.hash)
 
         self.sync_blocks()
 
@@ -129,7 +129,7 @@ class LLMQ_IS_CL_Conflicts(DashTestFramework):
             assert(submit_result is None)
 
         for node in self.nodes:
-            self.wait_for_chainlocked_block(node, uint256_to_string(block.sha256))
+            self.wait_for_chainlocked_block(node, block.hash)
 
         # Create a chained TX on top of tx2
         inputs = []
@@ -273,15 +273,16 @@ class LLMQ_IS_CL_Conflicts(DashTestFramework):
         block.solve()
         return block
 
-    def create_chainlock(self, height, blockHash):
-        request_id = uint256_to_string(uint256_from_str(hash256(ser_string(b"clsig") + struct.pack("<I", height))))
-        message_hash = uint256_to_string(blockHash)
+    def create_chainlock(self, height, block):
+        request_id_buf = ser_string(b"clsig") + struct.pack("<I", height)
+        request_id = hash256(request_id_buf)[::-1].hex()
+        message_hash = block.hash
 
         for mn in self.mninfo:
             mn.node.quorum('sign', 100, request_id, message_hash)
 
         recSig = self.get_recovered_sig(request_id, message_hash)
-        clsig = msg_clsig(height, blockHash, hex_str_to_bytes(recSig['sig']))
+        clsig = msg_clsig(height, block.sha256, hex_str_to_bytes(recSig['sig']))
         return clsig
 
     def create_islock(self, hextx):
@@ -293,8 +294,8 @@ class LLMQ_IS_CL_Conflicts(DashTestFramework):
         for txin in tx.vin:
             request_id_buf += txin.prevout.serialize()
             inputs.append(txin.prevout)
-        request_id = uint256_to_string(uint256_from_str(hash256(request_id_buf)))
-        message_hash = uint256_to_string(tx.sha256)
+        request_id = hash256(request_id_buf)[::-1].hex()
+        message_hash = tx.hash
 
         for mn in self.mninfo:
             mn.node.quorum('sign', 100, request_id, message_hash)
