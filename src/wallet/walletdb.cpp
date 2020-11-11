@@ -10,6 +10,7 @@
 #include <consensus/tx_verify.h>
 #include <consensus/validation.h>
 #include <fs.h>
+#include <governance/governance-object.h>
 #include <protocol.h>
 #include <serialize.h>
 #include <sync.h>
@@ -176,6 +177,11 @@ bool WalletBatch::ReadPrivateSendSalt(uint256& salt)
 bool WalletBatch::WritePrivateSendSalt(const uint256& salt)
 {
     return WriteIC(std::string("ps_salt"), salt);
+}
+
+bool WalletBatch::WriteGovernanceObject(const CGovernanceObject& obj)
+{
+    return WriteIC(std::make_pair(std::string("gobject"), obj.GetHash()), obj, false);
 }
 
 CAmount WalletBatch::GetAccountCreditDebit(const std::string& strAccount)

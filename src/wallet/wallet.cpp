@@ -5492,6 +5492,13 @@ void CWallet::NotifyChainLock(const CBlockIndex* pindexChainLock, const llmq::CC
     NotifyChainLockReceived(pindexChainLock->nHeight);
 }
 
+bool CWallet::WriteGovernanceObject(const CGovernanceObject& obj)
+{
+    AssertLockHeld(cs_wallet);
+    WalletBatch batch(*database);
+    return batch.WriteGovernanceObject(obj);
+}
+
 CKeyPool::CKeyPool()
 {
     nTime = GetTime();

@@ -23,6 +23,7 @@
 #include <wallet/walletdb.h>
 #include <wallet/rpcwallet.h>
 
+#include <governance/governance-object.h>
 #include <privatesend/privatesend.h>
 
 #include <algorithm>
@@ -1233,6 +1234,9 @@ public:
 
     void NotifyTransactionLock(const CTransaction &tx, const llmq::CInstantSendLock& islock) override;
     void NotifyChainLock(const CBlockIndex* pindexChainLock, const llmq::CChainLockSig& clsig) override;
+
+    /** Store a CGovernanceObject in the wallet database. */
+    bool WriteGovernanceObject(const CGovernanceObject& obj);
 
     /**
      * Blocks until the wallet state is up-to-date to /at least/ the current
