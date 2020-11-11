@@ -157,10 +157,8 @@ UniValue gobject_prepare(const JSONRPCRequest& request)
         hashParent = ParseHashV(request.params[1], "fee-txid, parameter 1");
     }
 
-    std::string strRevision = request.params[2].get_str();
-    std::string strTime = request.params[3].get_str();
-    int nRevision = atoi(strRevision);
-    int64_t nTime = atoi64(strTime);
+    int nRevision = ParseInt32V(request.params[2], "revision");
+    int64_t nTime = ParseInt64V(request.params[3], "time");
     std::string strDataHex = request.params[4].get_str();
 
     // CREATE A NEW COLLATERAL TRANSACTION FOR THIS SPECIFIC OBJECT
@@ -172,8 +170,8 @@ UniValue gobject_prepare(const JSONRPCRequest& request)
     // users ignore all instructions on dashcentral etc. and do not save them...
     // Let's log them here and hope users do not mess with debug.log
     LogPrintf("gobject_prepare -- params: %s %s %s %s, data: %s, hash: %s\n",
-                request.params[1].get_str(), request.params[2].get_str(),
-                request.params[3].get_str(), request.params[4].get_str(),
+                request.params[1].getValStr(), request.params[2].getValStr(),
+                request.params[3].getValStr(), request.params[4].getValStr(),
                 govobj.GetDataAsPlainString(), govobj.GetHash().ToString());
 
     if (govobj.GetObjectType() == GOVERNANCE_OBJECT_PROPOSAL) {
@@ -215,6 +213,10 @@ UniValue gobject_prepare(const JSONRPCRequest& request)
         throw JSONRPCError(RPC_INTERNAL_ERROR, err);
     }
 
+    if (!pwallet->WriteGovernanceObject({hashParent, nRevision, nTime, tx->GetHash(), strDataHex})) {
+        throw JSONRPCError(RPC_INTERNAL_ERROR, "WriteGovernanceObject failed");
+    }
+
     // -- make our change address
     CReserveKey reservekey(pwallet);
     // -- send the tx to the network
@@ -227,6 +229,55 @@ UniValue gobject_prepare(const JSONRPCRequest& request)
                 govobj.GetDataAsPlainString(), govobj.GetHash().ToString(), tx->GetHash().ToString());
 
     return tx->GetHash().ToString();
+}
+
+void gobject_list_prepared_help(CWallet* const pwallet)
+{
+    throw std::runtime_error(
+                "gobject list-prepared <limit>\n"
+                "Returns a list of governance objects prepared by this wallet with \"gobject prepare\" sorted by their creation time.\n"
+                + HelpRequiringPassphrase(pwallet) + "\n"
+                "\nArguments:\n"
+                "1. limit (numeric, optional) Maximal number of objects to return.\n"
+                );
+}
+
+UniValue gobject_list_prepared(const JSONRPCRequest& request)
+{
+    CWallet* const pwallet = GetWalletForJSONRPCRequest(request);
+    if (request.fHelp || (request.params.size() > 2)) {
+        gobject_prepare_help(pwallet);
+    }
+
+    if (!EnsureWalletIsAvailable(pwallet, request.fHelp))
+        return NullUniValue;
+
+    EnsureWalletIsUnlocked(pwallet);
+
+    int64_t nLimit = request.params.size() > 1 ? ParseInt64V(request.params[1], "limit") : std::numeric_limits<int64_t>::max();
+    if (nLimit <= 0) {
+        throw JSONRPCError(RPC_INVALID_PARAMETER, "limit needs to be greater 0");
+    }
+    // Get a list of all prepared governance objects stored in the wallet
+    LOCK(pwallet->cs_wallet);
+    std::vector<const CGovernanceObject*> vecObjects = pwallet->GetGovernanceObjects();
+    // Sort the vector by the object creation time/hex data
+    std::sort(vecObjects.begin(), vecObjects.end(), [](const CGovernanceObject* a, const CGovernanceObject* b) {
+        bool fGreater = a->GetCreationTime() > b->GetCreationTime();
+        bool fEqual = a->GetCreationTime() == b->GetCreationTime();
+        bool fHexGreater = a->GetDataAsHexString() > b->GetDataAsHexString();
+        return fGreater || (fEqual && fHexGreater);
+    });
+
+    UniValue jsonArray(UniValue::VARR);
+    for (auto& object : vecObjects) {
+        jsonArray.push_back(object->ToJson());
+        if (jsonArray.size() >= nLimit) {
+            break;
+        }
+    }
+
+    return jsonArray;
 }
 #endif // ENABLE_WALLET
 
@@ -276,10 +327,8 @@ UniValue gobject_submit(const JSONRPCRequest& request)
 
     // GET THE PARAMETERS FROM USER
 
-    std::string strRevision = request.params[2].get_str();
-    std::string strTime = request.params[3].get_str();
-    int nRevision = atoi(strRevision);
-    int64_t nTime = atoi64(strTime);
+    int nRevision = ParseInt32V(request.params[2], "revision");
+    int64_t nTime = ParseInt64V(request.params[3], "time");
     std::string strDataHex = request.params[4].get_str();
 
     CGovernanceObject govobj(hashParent, nRevision, nTime, txidFee, strDataHex);
@@ -888,6 +937,7 @@ UniValue gobject_getcurrentvotes(const JSONRPCRequest& request)
             "  check              - Validate governance object data (proposal only)\n"
 #ifdef ENABLE_WALLET
             "  prepare            - Prepare governance object by signing and creating tx\n"
+            "  list-prepared      - Returns a list of governance objects prepared by this wallet with \"gobject prepare\"\n"
 #endif // ENABLE_WALLET
             "  submit             - Submit governance object to network\n"
             "  deserialize        - Deserialize governance object from hex string to JSON\n"
@@ -928,6 +978,8 @@ UniValue gobject(const JSONRPCRequest& request)
     } else if (strCommand == "prepare") {
         // PREPARE THE GOVERNANCE OBJECT BY CREATING A COLLATERAL TRANSACTION
         return gobject_prepare(request);
+    } else if (strCommand == "list-prepared") {
+        return gobject_list_prepared(request);
 #endif // ENABLE_WALLET
     } else if (strCommand == "submit") {
         // AFTER COLLATERAL TRANSACTION HAS MATURED USER CAN SUBMIT GOVERNANCE OBJECT TO PROPAGATE NETWORK
