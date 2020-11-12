@@ -213,6 +213,10 @@ UniValue gobject_prepare(const JSONRPCRequest& request)
         throw JSONRPCError(RPC_INTERNAL_ERROR, err);
     }
 
+    if (!pwallet->WriteGovernanceObject({hashParent, nRevision, nTime, tx->GetHash(), strDataHex})) {
+        throw JSONRPCError(RPC_INTERNAL_ERROR, "WriteGovernanceObject failed");
+    }
+
     // -- make our change address
     CReserveKey reservekey(pwallet);
     // -- send the tx to the network
