@@ -4,7 +4,7 @@
 # file COPYING or http://www.opensource.org/licenses/mit-license.php.
 """Tests around dash governance objects."""
 
-from test_framework.test_framework import DashTestFramework, SkipTest
+from test_framework.test_framework import DashTestFramework
 from test_framework.util import *
 from test_framework.messages import *
 
