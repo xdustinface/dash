@@ -5494,6 +5494,7 @@ void CWallet::NotifyChainLock(const CBlockIndex* pindexChainLock, const llmq::CC
 
 bool CWallet::LoadGovernanceObject(const CGovernanceObject& obj)
 {
+    AssertLockHeld(cs_wallet);
     return m_gobjects.emplace(obj.GetHash(), obj).second;
 }
 
