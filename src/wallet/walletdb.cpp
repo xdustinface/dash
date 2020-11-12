@@ -552,6 +552,21 @@ ReadKeyValue(CWallet* pwallet, CDataStream& ssKey, CDataStream& ssValue,
                 strErr = "Error reading wallet database: LoadHDPubKey failed";
                 return false;
             }
+        } else if (strType == "gobject") {
+            uint256 nObjectHash;
+            CGovernanceObject obj;
+            ssKey >> nObjectHash;
+            ssValue >> obj;
+
+            if (obj.GetHash() != nObjectHash) {
+                strErr = "Invalid governance object: Hash mismatch";
+                return false;
+            }
+
+            if (!pwallet->LoadGovernanceObject(obj)) {
+                strErr = "Invalid governance object: LoadGovernanceObject";
+                return false;
+            }
         }
     } catch (...)
     {
