@@ -127,7 +127,7 @@ class DashZMQTest (DashTestFramework):
         rpc_last_block_hash = self.nodes[0].generate(1)[0]
         self.wait_for_chainlocked_block_all_nodes(rpc_last_block_hash)
         height = self.nodes[0].getblockcount()
-        rpc_request_id = uint256_to_string(uint256_from_str(hash256(ser_string(b"clsig") + struct.pack("<I", height))))
+        rpc_request_id = hash256(ser_string(b"clsig") + struct.pack("<I", height))[::-1].hex()
         validate_recovered_sig(rpc_request_id, rpc_last_block_hash)
         # Sign an arbitrary and make sure this leads to valid recovered sig ZMQ messages
         sign_id = uint256_to_string(random.getrandbits(256))
