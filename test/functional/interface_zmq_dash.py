@@ -63,6 +63,7 @@ class DashZMQTest (DashTestFramework):
             self.nodes[0].spork("SPORK_17_QUORUM_DKG_ENABLED", 0)
             self.nodes[0].spork("SPORK_19_CHAINLOCKS_ENABLED", 0)
             self.wait_for_sporks_same()
+            force_finish_mnsync(self.nodes[0])
             # Create a LLMQ for testing
             self.quorum_type = 100  # llmq_test
             self.quorum_hash = self.mine_quorum()
