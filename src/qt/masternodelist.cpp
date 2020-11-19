@@ -36,6 +36,8 @@ public:
     bool operator<(const QTableWidgetItem& other) const
     {
         switch (other.column()) {
+        case MasternodeList::COLUMN_SERVICE:
+            return data(Qt::UserRole).toByteArray() < other.data(Qt::UserRole).toByteArray();
         case MasternodeList::COLUMN_POSE:
         case MasternodeList::COLUMN_REGISTERED:
         case MasternodeList::COLUMN_LAST_PAYMENT:
@@ -236,7 +238,9 @@ void MasternodeList::updateDIP3List()
         }
         // populate list
         // Address, Protocol, Status, Active Seconds, Last Seen, Pub Key
-        QTableWidgetItem* addressItem = new QTableWidgetItem(QString::fromStdString(dmn->pdmnState->addr.ToString()));
+        auto addr_key = dmn->pdmnState->addr.GetKey();
+        QByteArray addr_ba(reinterpret_cast<const char*>(addr_key.data()), addr_key.size());
+        QTableWidgetItem* addressItem = new CMasternodeListWidgetItem(QString::fromStdString(dmn->pdmnState->addr.ToString()), addr_ba);
         QTableWidgetItem* statusItem = new QTableWidgetItem(mnList.IsMNValid(dmn) ? tr("ENABLED") : (mnList.IsMNPoSeBanned(dmn) ? tr("POSE_BANNED") : tr("UNKNOWN")));
         QTableWidgetItem* PoSeScoreItem = new CMasternodeListWidgetItem(QString::number(dmn->pdmnState->nPoSePenalty), dmn->pdmnState->nPoSePenalty);
         QTableWidgetItem* registeredItem = new CMasternodeListWidgetItem(QString::number(dmn->pdmnState->nRegisteredHeight), dmn->pdmnState->nRegisteredHeight);
