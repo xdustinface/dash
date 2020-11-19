@@ -12,6 +12,7 @@
 #include <univalue.h>
 
 #include <QMessageBox>
+#include <QTableWidgetItem>
 #include <QtGui/QClipboard>
 
 int GetOffsetFromUtc()
@@ -24,6 +25,30 @@ int GetOffsetFromUtc()
     return QDateTime::currentDateTime().offsetFromUtc();
 #endif
 }
+
+class CMasternodeListWidgetItem : public QTableWidgetItem
+{
+public:
+    explicit CMasternodeListWidgetItem(const QString& text, const QVariant& data, int type = Type) : QTableWidgetItem(text, type)
+    {
+        setData(Qt::UserRole, data);
+    }
+    bool operator<(const QTableWidgetItem& other) const
+    {
+        switch (other.column()) {
+        case MasternodeList::COLUMN_POSE:
+        case MasternodeList::COLUMN_REGISTERED:
+        case MasternodeList::COLUMN_LAST_PAYMENT:
+        case MasternodeList::COLUMN_NEXT_PAYMENT:
+            return data(Qt::UserRole).toInt() < other.data(Qt::UserRole).toInt();
+        case MasternodeList::COLUMN_OPERATOR_REWARD:
+            return data(Qt::UserRole).toUInt() < other.data(Qt::UserRole).toUInt();
+        default:
+            break;
+        }
+        return QTableWidgetItem::operator<(other);
+    }
+};
 
 MasternodeList::MasternodeList(QWidget* parent) :
     QWidget(parent),
@@ -213,10 +238,17 @@ void MasternodeList::updateDIP3List()
         // Address, Protocol, Status, Active Seconds, Last Seen, Pub Key
         QTableWidgetItem* addressItem = new QTableWidgetItem(QString::fromStdString(dmn->pdmnState->addr.ToString()));
         QTableWidgetItem* statusItem = new QTableWidgetItem(mnList.IsMNValid(dmn) ? tr("ENABLED") : (mnList.IsMNPoSeBanned(dmn) ? tr("POSE_BANNED") : tr("UNKNOWN")));
-        QTableWidgetItem* PoSeScoreItem = new QTableWidgetItem(QString::number(dmn->pdmnState->nPoSePenalty));
-        QTableWidgetItem* registeredItem = new QTableWidgetItem(QString::number(dmn->pdmnState->nRegisteredHeight));
-        QTableWidgetItem* lastPaidItem = new QTableWidgetItem(QString::number(dmn->pdmnState->nLastPaidHeight));
-        QTableWidgetItem* nextPaymentItem = new QTableWidgetItem(nextPayments.count(dmn->proTxHash) ? QString::number(nextPayments[dmn->proTxHash]) : tr("UNKNOWN"));
+        QTableWidgetItem* PoSeScoreItem = new CMasternodeListWidgetItem(QString::number(dmn->pdmnState->nPoSePenalty), dmn->pdmnState->nPoSePenalty);
+        QTableWidgetItem* registeredItem = new CMasternodeListWidgetItem(QString::number(dmn->pdmnState->nRegisteredHeight), dmn->pdmnState->nRegisteredHeight);
+        QTableWidgetItem* lastPaidItem = new CMasternodeListWidgetItem(QString::number(dmn->pdmnState->nLastPaidHeight), dmn->pdmnState->nLastPaidHeight);
+
+        QString strNextPayment = "UNKNOWN";
+        int nNextPayment = 0;
+        if (nextPayments.count(dmn->proTxHash)) {
+            nNextPayment = nextPayments[dmn->proTxHash];
+            strNextPayment = QString::number(nNextPayment);
+        }
+        QTableWidgetItem* nextPaymentItem = new CMasternodeListWidgetItem(strNextPayment, nNextPayment);
 
         CTxDestination payeeDest;
         QString payeeStr = tr("UNKNOWN");
@@ -240,7 +272,7 @@ void MasternodeList::updateDIP3List()
                 operatorRewardStr += tr("but not claimed");
             }
         }
-        QTableWidgetItem* operatorRewardItem = new QTableWidgetItem(operatorRewardStr);
+        QTableWidgetItem* operatorRewardItem = new CMasternodeListWidgetItem(operatorRewardStr, dmn->nOperatorReward);
 
         QString collateralStr = tr("UNKNOWN");
         auto collateralDestIt = mapCollateralDests.find(dmn->proTxHash);
