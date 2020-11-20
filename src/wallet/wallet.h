@@ -1240,7 +1240,7 @@ public:
 
     /** Load a CGovernanceObject into m_gobjects. */
     bool LoadGovernanceObject(const CGovernanceObject& obj);
-    /** Store a CGovernanceObject in the wallet database. */
+    /** Store a CGovernanceObject in the wallet database. This should only be used by governance objects that are created by this wallet via `gobject prepare`. */
     bool WriteGovernanceObject(const CGovernanceObject& obj);
     /** Returns a vector containing pointers to the governance objects in m_gobjects */
     std::vector<const CGovernanceObject*> GetGovernanceObjects();
