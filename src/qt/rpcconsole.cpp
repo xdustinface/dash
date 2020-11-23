@@ -31,6 +31,7 @@
 #include <QButtonGroup>
 #include <QDir>
 #include <QDesktopWidget>
+#include <QFontDatabase>
 #include <QKeyEvent>
 #include <QMenu>
 #include <QMessageBox>
@@ -867,7 +868,7 @@ void RPCConsole::clear(bool clearHistory)
     ui->lineEdit->setFocus();
 
     // Set default style sheet
-    QFontInfo fixedFontInfo(GUIUtil::getFontNormal());
+    QFontInfo fixedFontInfo(QFontDatabase::systemFont(QFontDatabase::FixedFont));
     ui->messagesWidget->document()->setDefaultStyleSheet(
         QString(
                 "table { }"
