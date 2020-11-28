@@ -238,7 +238,7 @@ void gobject_list_prepared_help(CWallet* const pwallet)
                 "Returns a list of governance objects prepared by this wallet with \"gobject prepare\" sorted by their creation time.\n"
                 + HelpRequiringPassphrase(pwallet) + "\n"
                 "\nArguments:\n"
-                "1. count (numeric, optional) Maximal number of objects to return.\n"
+                "1. count (numeric, optional) Maximum number of objects to return.\n"
                 );
 }
 
