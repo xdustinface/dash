@@ -255,8 +255,8 @@ UniValue gobject_list_prepared(const JSONRPCRequest& request)
     EnsureWalletIsUnlocked(pwallet);
 
     int64_t nCount = request.params.size() > 1 ? ParseInt64V(request.params[1], "count") : 10;
-    if (nCount <= 0) {
-        throw JSONRPCError(RPC_INVALID_PARAMETER, "count needs to be greater 0");
+    if (nCount < 0) {
+        throw JSONRPCError(RPC_INVALID_PARAMETER, "Negative count");
     }
     // Get a list of all prepared governance objects stored in the wallet
     LOCK(pwallet->cs_wallet);
@@ -271,10 +271,10 @@ UniValue gobject_list_prepared(const JSONRPCRequest& request)
 
     UniValue jsonArray(UniValue::VARR);
     for (auto& object : vecObjects) {
-        jsonArray.push_back(object->ToJson());
         if (jsonArray.size() >= nCount) {
             break;
         }
+        jsonArray.push_back(object->ToJson());
     }
 
     return jsonArray;

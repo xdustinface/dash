@@ -91,10 +91,11 @@ class DashGovernanceTest (DashTestFramework):
         # Make sure default count is 10 while there are 11 in total
         assert_equal(len(self.nodes[0].gobject("list-prepared")), 10)
         assert_equal(len(self.nodes[0].gobject("list-prepared", 12)), 11)
+        # Make sure it returns 0 objects with count=0
+        assert_equal(len(self.nodes[0].gobject("list-prepared", 0)), 0)
         # And test some invalid count values
-        assert_raises_rpc_error(-8, "count needs to be greater 0", self.nodes[0].gobject, "list-prepared", 0)
-        assert_raises_rpc_error(-8, "count needs to be greater 0", self.nodes[0].gobject, "list-prepared", -1)
-        assert_raises_rpc_error(-8, "count needs to be greater 0", self.nodes[0].gobject, "list-prepared", -1000)
+        assert_raises_rpc_error(-8, "Negative count", self.nodes[0].gobject, "list-prepared", -1)
+        assert_raises_rpc_error(-8, "Negative count", self.nodes[0].gobject, "list-prepared", -1000)
 
 
 if __name__ == '__main__':
