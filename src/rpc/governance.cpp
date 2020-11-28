@@ -238,7 +238,7 @@ void gobject_list_prepared_help(CWallet* const pwallet)
                 "Returns a list of governance objects prepared by this wallet with \"gobject prepare\" sorted by their creation time.\n"
                 + HelpRequiringPassphrase(pwallet) + "\n"
                 "\nArguments:\n"
-                "1. count (numeric, optional) Maximum number of objects to return.\n"
+                "1. count (numeric, optional, default=10) Maximum number of objects to return.\n"
                 );
 }
 
@@ -254,7 +254,7 @@ UniValue gobject_list_prepared(const JSONRPCRequest& request)
 
     EnsureWalletIsUnlocked(pwallet);
 
-    int64_t nCount = request.params.size() > 1 ? ParseInt64V(request.params[1], "count") : std::numeric_limits<int64_t>::max();
+    int64_t nCount = request.params.size() > 1 ? ParseInt64V(request.params[1], "count") : 10;
     if (nCount <= 0) {
         throw JSONRPCError(RPC_INVALID_PARAMETER, "count needs to be greater 0");
     }

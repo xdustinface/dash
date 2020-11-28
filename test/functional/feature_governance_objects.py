@@ -83,6 +83,14 @@ class DashGovernanceTest (DashTestFramework):
         self.restart_node(0)
         rpc_full_list_post_restart = self.nodes[0].gobject("list-prepared")
         assert_equal(rpc_full_list_pre_restart, rpc_full_list_post_restart)
+        # Create more objects so that we have a total of 11
+        self.prepare_object(object_type, uint256_to_string(0), time_start, 0, "More1", 1)
+        self.prepare_object(object_type, uint256_to_string(0), time_start, 0, "More2", 1)
+        self.prepare_object(object_type, uint256_to_string(0), time_start, 0, "More3", 1)
+        self.prepare_object(object_type, uint256_to_string(0), time_start, 0, "More4", 1)
+        # Make sure default count is 10 while there are 11 in total
+        assert_equal(len(self.nodes[0].gobject("list-prepared")), 10)
+        assert_equal(len(self.nodes[0].gobject("list-prepared", 12)), 11)
         # And test some invalid count values
         assert_raises_rpc_error(-8, "count needs to be greater 0", self.nodes[0].gobject, "list-prepared", 0)
         assert_raises_rpc_error(-8, "count needs to be greater 0", self.nodes[0].gobject, "list-prepared", -1)
