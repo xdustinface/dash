@@ -72,7 +72,7 @@ class DashGovernanceTest (DashTestFramework):
         # Create two more with the same time
         self.prepare_object(object_type, uint256_to_string(0), time_start + 60, 1, "SameTime1", 2)
         self.prepare_object(object_type, uint256_to_string(0), time_start + 60, 2, "SameTime2", 2)
-        # Query them with limit=2
+        # Query them with count=2
         rpc_list_prepared = self.nodes[0].gobject("list-prepared", 2)
         # And make sure it does only return 2 of the 7 available
         assert_equal(len(rpc_list_prepared), 2)
@@ -83,10 +83,10 @@ class DashGovernanceTest (DashTestFramework):
         self.restart_node(0)
         rpc_full_list_post_restart = self.nodes[0].gobject("list-prepared")
         assert_equal(rpc_full_list_pre_restart, rpc_full_list_post_restart)
-        # And test some invalid limit values
-        assert_raises_rpc_error(-8, "limit needs to be greater 0", self.nodes[0].gobject, "list-prepared", 0)
-        assert_raises_rpc_error(-8, "limit needs to be greater 0", self.nodes[0].gobject, "list-prepared", -1)
-        assert_raises_rpc_error(-8, "limit needs to be greater 0", self.nodes[0].gobject, "list-prepared", -1000)
+        # And test some invalid count values
+        assert_raises_rpc_error(-8, "count needs to be greater 0", self.nodes[0].gobject, "list-prepared", 0)
+        assert_raises_rpc_error(-8, "count needs to be greater 0", self.nodes[0].gobject, "list-prepared", -1)
+        assert_raises_rpc_error(-8, "count needs to be greater 0", self.nodes[0].gobject, "list-prepared", -1000)
 
 
 if __name__ == '__main__':

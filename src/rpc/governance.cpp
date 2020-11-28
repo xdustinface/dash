@@ -234,11 +234,11 @@ UniValue gobject_prepare(const JSONRPCRequest& request)
 void gobject_list_prepared_help(CWallet* const pwallet)
 {
     throw std::runtime_error(
-                "gobject list-prepared <limit>\n"
+                "gobject list-prepared <count>\n"
                 "Returns a list of governance objects prepared by this wallet with \"gobject prepare\" sorted by their creation time.\n"
                 + HelpRequiringPassphrase(pwallet) + "\n"
                 "\nArguments:\n"
-                "1. limit (numeric, optional) Maximal number of objects to return.\n"
+                "1. count (numeric, optional) Maximal number of objects to return.\n"
                 );
 }
 
@@ -254,9 +254,9 @@ UniValue gobject_list_prepared(const JSONRPCRequest& request)
 
     EnsureWalletIsUnlocked(pwallet);
 
-    int64_t nLimit = request.params.size() > 1 ? ParseInt64V(request.params[1], "limit") : std::numeric_limits<int64_t>::max();
-    if (nLimit <= 0) {
-        throw JSONRPCError(RPC_INVALID_PARAMETER, "limit needs to be greater 0");
+    int64_t nCount = request.params.size() > 1 ? ParseInt64V(request.params[1], "count") : std::numeric_limits<int64_t>::max();
+    if (nCount <= 0) {
+        throw JSONRPCError(RPC_INVALID_PARAMETER, "count needs to be greater 0");
     }
     // Get a list of all prepared governance objects stored in the wallet
     LOCK(pwallet->cs_wallet);
@@ -272,7 +272,7 @@ UniValue gobject_list_prepared(const JSONRPCRequest& request)
     UniValue jsonArray(UniValue::VARR);
     for (auto& object : vecObjects) {
         jsonArray.push_back(object->ToJson());
-        if (jsonArray.size() >= nLimit) {
+        if (jsonArray.size() >= nCount) {
             break;
         }
     }
