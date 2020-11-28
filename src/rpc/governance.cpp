@@ -270,11 +270,9 @@ UniValue gobject_list_prepared(const JSONRPCRequest& request)
     });
 
     UniValue jsonArray(UniValue::VARR);
-    for (auto& object : vecObjects) {
-        if (jsonArray.size() >= nCount) {
-            break;
-        }
-        jsonArray.push_back(object->ToJson());
+    auto it = vecObjects.rbegin() + std::max<int>(0, vecObjects.size() - nCount);
+    while (it != vecObjects.rend()) {
+        jsonArray.push_back((*it++)->ToJson());
     }
 
     return jsonArray;

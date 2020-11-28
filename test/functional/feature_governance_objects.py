@@ -65,7 +65,7 @@ class DashGovernanceTest (DashTestFramework):
         rpc_list_prepared = self.nodes[0].gobject("list-prepared")
         assert_equal(len(rpc_list_prepared), 5)
 
-        expected_order = [p5, p2, p4, p1, p3]
+        expected_order = [p3, p1, p4, p2, p5]
         for i in range(len(expected_order)):
             validate_object(expected_order[i], rpc_list_prepared[i])
 
@@ -76,8 +76,8 @@ class DashGovernanceTest (DashTestFramework):
         rpc_list_prepared = self.nodes[0].gobject("list-prepared", 2)
         # And make sure it does only return 2 of the 7 available
         assert_equal(len(rpc_list_prepared), 2)
-        # Since they have the same time they should be sorted by hex data, in this case, the first should be greater
-        assert_greater_than(rpc_list_prepared[0]["data"]["hex"], rpc_list_prepared[1]["data"]["hex"])
+        # Since they have the same time they should be sorted by hex data, in this case, the second should be greater
+        assert_greater_than(rpc_list_prepared[1]["data"]["hex"], rpc_list_prepared[0]["data"]["hex"])
         # Restart node0 and make sure it still contains all valid proposals after restart
         rpc_full_list_pre_restart = self.nodes[0].gobject("list-prepared")
         self.restart_node(0)
