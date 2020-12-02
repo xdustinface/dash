@@ -17,6 +17,9 @@ namespace llmq
 
 std::vector<CDeterministicMNCPtr> CLLMQUtils::GetAllQuorumMembers(Consensus::LLMQType llmqType, const CBlockIndex* pindexQuorum)
 {
+    if (!IsQuorumTypeEnabledAtBlock(llmqType, pindexQuorum->pprev)) {
+        return {};
+    }
     auto& params = Params().GetConsensus().llmqs.at(llmqType);
     auto allMns = deterministicMNManager->GetListForBlock(pindexQuorum);
     auto modifier = ::SerializeHash(std::make_pair(llmqType, pindexQuorum->GetBlockHash()));
@@ -254,5 +257,41 @@ bool CLLMQUtils::IsQuorumActive(Consensus::LLMQType llmqType, const uint256& quo
     return false;
 }
 
+bool CLLMQUtils::IsQuorumTypeEnabledAtBlock(Consensus::LLMQType llmqType, const CBlockIndex* pindex)
+{
+    const Consensus::Params& consensusParams = Params().GetConsensus();
+    bool f_v17_Active =  VersionBitsState(pindex, consensusParams, Consensus::DEPLOYMENT_V17, versionbitscache) == ThresholdState::ACTIVE;
+
+    switch (llmqType)
+    {
+        case Consensus::LLMQ_50_60:
+        case Consensus::LLMQ_400_60:
+        case Consensus::LLMQ_400_85:
+            break;
+        case Consensus::LLMQ_100_67:
+            if (!f_v17_Active) {
+                return false;
+            }
+            break;
+        case Consensus::LLMQ_TEST:
+        case Consensus::LLMQ_DEVNET:
+            break;
+        default:
+            throw std::runtime_error(strprintf("%s: Unknown LLMQ type %d", __func__, llmqType));
+    }
+
+    return true;
+}
+
+std::map<Consensus::LLMQType, Consensus::LLMQParams> CLLMQUtils::GetEnabledQuorumTypes(const CBlockIndex* pindex)
+{
+    std::map<Consensus::LLMQType, Consensus::LLMQParams> ret;
+    for (const auto& pair : Params().GetConsensus().llmqs) {
+        if (IsQuorumTypeEnabledAtBlock(pair.first, pindex)) {
+            ret.emplace(pair);
+        }
+    }
+    return ret;
+}
 
 } // namespace llmq

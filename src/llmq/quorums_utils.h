@@ -41,6 +41,8 @@ public:
     static void AddQuorumProbeConnections(Consensus::LLMQType llmqType, const CBlockIndex* pindexQuorum, const uint256& myProTxHash);
 
     static bool IsQuorumActive(Consensus::LLMQType llmqType, const uint256& quorumHash);
+    static bool IsQuorumTypeEnabledAtBlock(Consensus::LLMQType llmqType, const CBlockIndex* pindex);
+    static std::map<Consensus::LLMQType, Consensus::LLMQParams> GetEnabledQuorumTypes(const CBlockIndex* pindex);
 
     template<typename NodesContainer, typename Continue, typename Callback>
     static void IterateNodesRandom(NodesContainer& nodeStates, Continue&& cont, Callback&& callback, FastRandomContext& rnd)

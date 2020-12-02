@@ -132,7 +132,8 @@ bool CQuorumBlockProcessor::ProcessBlock(const CBlock& block, const CBlockIndex*
     // The following checks make sure that there is always a (possibly null) commitment while in the mining phase
     // until the first non-null commitment has been mined. After the non-null commitment, no other commitments are
     // allowed, including null commitments.
-    for (const auto& p : Params().GetConsensus().llmqs) {
+    // Note: must only check quorums that were enabled at the _previous_ block height to match mining logic
+    for (const auto& p : CLLMQUtils::GetEnabledQuorumTypes(pindex->pprev)) {
         // skip these checks when replaying blocks after the crash
         if (!chainActive.Tip()) {
             break;
