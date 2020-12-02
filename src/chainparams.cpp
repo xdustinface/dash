@@ -184,6 +184,26 @@ static Consensus::LLMQParams llmq_test = {
         .recoveryMembers = 3,
 };
 
+// this one is for testing only
+static Consensus::LLMQParams llmq_test_new = {
+        .type = Consensus::LLMQ_TEST_NEW,
+        .name = "llmq_test_new",
+        .size = 3,
+        .minSize = 2,
+        .threshold = 2,
+
+        .dkgInterval = 24, // one DKG per hour
+        .dkgPhaseBlocks = 2,
+        .dkgMiningWindowStart = 10, // dkgPhaseBlocks * 5 = after finalization
+        .dkgMiningWindowEnd = 18,
+        .dkgBadVotesThreshold = 2,
+
+        .signingActiveQuorumCount = 2, // just a few ones to allow easier testing
+
+        .keepOldConnections = 3,
+        .recoveryMembers = 3,
+};
+
 // this one is for devnets only
 static Consensus::LLMQParams llmq_devnet = {
         .type = Consensus::LLMQ_DEVNET,
@@ -998,6 +1018,7 @@ public:
 
         // long living quorum params
         consensus.llmqs[Consensus::LLMQ_TEST] = llmq_test;
+        consensus.llmqs[Consensus::LLMQ_TEST_NEW] = llmq_test_new;
         consensus.llmqTypeChainLocks = Consensus::LLMQ_TEST;
         consensus.llmqTypeInstantSend = Consensus::LLMQ_TEST;
         consensus.llmqTypePlatform = Consensus::LLMQ_TEST;

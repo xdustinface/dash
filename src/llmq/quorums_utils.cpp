@@ -269,6 +269,7 @@ bool CLLMQUtils::IsQuorumTypeEnabledAtBlock(Consensus::LLMQType llmqType, const 
         case Consensus::LLMQ_400_85:
             break;
         case Consensus::LLMQ_100_67:
+        case Consensus::LLMQ_TEST_NEW:
             if (!f_v17_Active) {
                 return false;
             }
