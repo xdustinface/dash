@@ -6,7 +6,7 @@ from test_framework.test_framework import BitcoinTestFramework
 from test_framework.util import assert_equal, get_bip9_status
 
 '''
-feature_platform_quorums.py
+feature_v17_quorum.py
 
 Checks block reward reallocation correctness
 
