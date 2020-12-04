@@ -306,7 +306,7 @@ void setupAppearance(QWidget* parent, OptionsModel* model)
         // See if the default value for normal weight is available
         auto it = std::find(vecSupportedWeights.begin(), vecSupportedWeights.end(), defaultFontWeightNormal);
         if (it == vecSupportedWeights.end()) {
-            // If not, use the second lightest available weight as bold weight default or the lightest if there is only one
+            // If not, use the lightest available weight as normal weight
             fontWeightNormal = vecSupportedWeights.front();
         }
 
