@@ -302,13 +302,25 @@ void setupAmountWidget(QLineEdit *widget, QWidget *parent)
 void setupAppearance(QWidget* parent, OptionsModel* model)
 {
     if (!QSettings().value("fAppearanceSetupDone", false).toBool()) {
-        // First make sure SystemDefault has reasonable default values if it does not support the full range of weights.
-        if (fontFamily == FontFamily::SystemDefault && getSupportedWeights().size() < 4) {
-            fontWeightNormal = mapSupportedWeights[FontFamily::SystemDefault].front();
-            fontWeightBold = mapSupportedWeights[FontFamily::SystemDefault].back();
-            QSettings().setValue("fontWeightNormal", weightToArg(fontWeightNormal));
-            QSettings().setValue("fontWeightBold", weightToArg(fontWeightBold));
+        std::vector<QFont::Weight> vecSupportedWeights = getSupportedWeights();
+        // See if the default value for normal weight is available
+        auto it = std::find(vecSupportedWeights.begin(), vecSupportedWeights.end(), defaultFontWeightNormal);
+        if (it == vecSupportedWeights.end()) {
+            // If not, use the second lightest available weight as bold weight default or the lightest if there is only one
+            fontWeightNormal = vecSupportedWeights.front();
         }
+
+        // See if the default value for bold weight is available
+        it = std::find(vecSupportedWeights.begin(), vecSupportedWeights.end(), defaultFontWeightBold);
+        if (it != vecSupportedWeights.end()) {
+            // If not, use the second lightest available weight as bold weight default or also the lightest if there is only one
+            int nBoldOffset = vecSupportedWeights.size() > 1 ? 1 : 0;
+            fontWeightBold = vecSupportedWeights[nBoldOffset];
+        }
+
+        QSettings().setValue("fontWeightNormal", weightToArg(fontWeightNormal));
+        QSettings().setValue("fontWeightBold", weightToArg(fontWeightBold));
+
         // Create the dialog
         QDialog dlg(parent);
         dlg.setObjectName("AppearanceSetup");
