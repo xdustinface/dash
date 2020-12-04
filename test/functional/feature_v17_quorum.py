@@ -8,12 +8,12 @@ from test_framework.util import assert_equal, get_bip9_status
 '''
 feature_v17_quorum.py
 
-Checks block reward reallocation correctness
+Tests the activation of the quorum type LLMQ_100_67 introduced in v17
 
 '''
 
 
-class PlatformQuorumActivationTest(BitcoinTestFramework):
+class QuorumActivationTest_V17(BitcoinTestFramework):
     def set_test_params(self):
         self.num_nodes = 1
 
@@ -31,4 +31,4 @@ class PlatformQuorumActivationTest(BitcoinTestFramework):
 
 
 if __name__ == '__main__':
-    PlatformQuorumActivationTest().main()
+    QuorumActivationTest_V17().main()
