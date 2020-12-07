@@ -297,7 +297,8 @@ class DashZMQTest (DashTestFramework):
         # Validate NO hashtxlock
         time.sleep(1)
         try:
-            data = self.receive(ZMQPublisher.hash_tx_lock, zmq.NOBLOCK)
+            self.receive(ZMQPublisher.hash_tx_lock, zmq.NOBLOCK)
+            assert(False)
         except zmq.ZMQError:
             # this is expected
             pass
