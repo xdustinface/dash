@@ -312,7 +312,7 @@ void setupAppearance(QWidget* parent, OptionsModel* model)
 
         // See if the default value for bold weight is available
         it = std::find(vecSupportedWeights.begin(), vecSupportedWeights.end(), defaultFontWeightBold);
-        if (it != vecSupportedWeights.end()) {
+        if (it == vecSupportedWeights.end()) {
             // If not, use the second lightest available weight as bold weight default or also the lightest if there is only one
             int nBoldOffset = vecSupportedWeights.size() > 1 ? 1 : 0;
             fontWeightBold = vecSupportedWeights[nBoldOffset];
