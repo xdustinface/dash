@@ -304,15 +304,13 @@ void setupAppearance(QWidget* parent, OptionsModel* model)
     if (!QSettings().value("fAppearanceSetupDone", false).toBool()) {
         std::vector<QFont::Weight> vecSupportedWeights = getSupportedWeights();
         // See if the default value for normal weight is available
-        auto it = std::find(vecSupportedWeights.begin(), vecSupportedWeights.end(), defaultFontWeightNormal);
-        if (it == vecSupportedWeights.end()) {
+        if (std::find(vecSupportedWeights.begin(), vecSupportedWeights.end(), defaultFontWeightNormal) == vecSupportedWeights.end()) {
             // If not, use the lightest available weight as normal weight
             fontWeightNormal = vecSupportedWeights.front();
         }
 
         // See if the default value for bold weight is available
-        it = std::find(vecSupportedWeights.begin(), vecSupportedWeights.end(), defaultFontWeightBold);
-        if (it == vecSupportedWeights.end()) {
+        if (std::find(vecSupportedWeights.begin(), vecSupportedWeights.end(), defaultFontWeightBold) == vecSupportedWeights.end()) {
             // If not, use the second lightest available weight as bold weight default or also the lightest if there is only one
             int nBoldOffset = vecSupportedWeights.size() > 1 ? 1 : 0;
             fontWeightBold = vecSupportedWeights[nBoldOffset];
