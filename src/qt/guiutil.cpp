@@ -302,18 +302,18 @@ void setupAmountWidget(QLineEdit *widget, QWidget *parent)
 void setupAppearance(QWidget* parent, OptionsModel* model)
 {
     if (!QSettings().value("fAppearanceSetupDone", false).toBool()) {
-        std::vector<QFont::Weight> vecSupportedWeights = getSupportedWeights();
+        std::vector<QFont::Weight> vecWeights = getSupportedWeights();
         // See if the default value for normal weight is available
-        if (std::find(vecSupportedWeights.begin(), vecSupportedWeights.end(), defaultFontWeightNormal) == vecSupportedWeights.end()) {
+        if (std::find(vecWeights.begin(), vecWeights.end(), defaultFontWeightNormal) == vecWeights.end()) {
             // If not, use the lightest available weight as normal weight
-            fontWeightNormal = vecSupportedWeights.front();
+            fontWeightNormal = vecWeights.front();
         }
 
         // See if the default value for bold weight is available
-        if (std::find(vecSupportedWeights.begin(), vecSupportedWeights.end(), defaultFontWeightBold) == vecSupportedWeights.end()) {
+        if (std::find(vecWeights.begin(), vecWeights.end(), defaultFontWeightBold) == vecWeights.end()) {
             // If not, use the second lightest available weight as bold weight default or also the lightest if there is only one
-            int nBoldOffset = vecSupportedWeights.size() > 1 ? 1 : 0;
-            fontWeightBold = vecSupportedWeights[nBoldOffset];
+            int nBoldOffset = vecWeights.size() > 1 ? 1 : 0;
+            fontWeightBold = vecWeights[nBoldOffset];
         }
 
         QSettings().setValue("fontWeightNormal", weightToArg(fontWeightNormal));
