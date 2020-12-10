@@ -242,6 +242,7 @@ public:
     using CBLSWrapper::operator=;
     using CBLSWrapper::operator==;
     using CBLSWrapper::operator!=;
+    using CBLSWrapper::CBLSWrapper;
 
     CBLSId() {}
 
@@ -258,6 +259,7 @@ public:
     using CBLSWrapper::operator=;
     using CBLSWrapper::operator==;
     using CBLSWrapper::operator!=;
+    using CBLSWrapper::CBLSWrapper;
 
     CBLSSecretKey() {}
 
@@ -282,6 +284,7 @@ public:
     using CBLSWrapper::operator=;
     using CBLSWrapper::operator==;
     using CBLSWrapper::operator!=;
+    using CBLSWrapper::CBLSWrapper;
 
     CBLSPublicKey() {}
 
