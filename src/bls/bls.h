@@ -215,6 +215,25 @@ public:
     }
 };
 
+struct CBLSIdImplicit : public uint256
+{
+    CBLSIdImplicit() {}
+    CBLSIdImplicit(const uint256& id)
+    {
+        memcpy(begin(), id.begin(), sizeof(uint256));
+    }
+    static uint256 FromBytes(const uint8_t* buffer)
+    {
+        uint256 instance;
+        memcpy(instance.begin(), buffer, sizeof(uint256));
+        return instance;
+    }
+    void Serialize(uint8_t* buffer) const
+    {
+        memcpy(buffer, data, sizeof(uint256));
+    }
+};
+
 class CBLSId : public CBLSWrapper<uint256, BLS_CURVE_ID_SIZE, CBLSId>
 {
 public:
