@@ -28,34 +28,6 @@ CBLSId::CBLSId(const uint256& nHash) : CBLSWrapper<CBLSIdImplicit, BLS_CURVE_ID_
     UpdateHash();
 }
 
-void CBLSId::SetInt(int x)
-{
-    impl.SetHex(strprintf("%x", x));
-    fValid = true;
-    UpdateHash();
-}
-
-void CBLSId::SetHash(const uint256& hash)
-{
-    impl = hash;
-    fValid = true;
-    UpdateHash();
-}
-
-CBLSId CBLSId::FromInt(int64_t i)
-{
-    CBLSId id;
-    id.SetInt(i);
-    return id;
-}
-
-CBLSId CBLSId::FromHash(const uint256& hash)
-{
-    CBLSId id;
-    id.SetHash(hash);
-    return id;
-}
-
 void CBLSSecretKey::AggregateInsecure(const CBLSSecretKey& o)
 {
     assert(IsValid() && o.IsValid());
