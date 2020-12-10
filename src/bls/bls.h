@@ -128,8 +128,7 @@ public:
         if (!fValid) {
             memset(buf, 0, SerSize);
         } else {
-            bool ok = InternalGetBuf(buf);
-            assert(ok);
+            impl.Serialize(static_cast<uint8_t*>(buf));
         }
     }
 
