@@ -106,8 +106,10 @@ public:
         if (std::all_of((const char*)buf, (const char*)buf + SerSize, [](char c) { return c == 0; })) {
             Reset();
         } else {
-            fValid = InternalSetBuf(buf);
-            if (!fValid) {
+            try {
+                impl = ImplType::FromBytes((const uint8_t*)buf);
+                fValid = true;
+            } catch (...) {
                 Reset();
             }
         }
