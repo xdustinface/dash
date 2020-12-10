@@ -14,6 +14,20 @@
 #include <assert.h>
 #include <string.h>
 
+CBLSId::CBLSId(const int64_t n) : CBLSWrapper<CBLSIdImplicit, BLS_CURVE_ID_SIZE, CBLSId>()
+{
+    impl.SetHex(strprintf("%x", n));
+    fValid = true;
+    UpdateHash();
+}
+
+CBLSId::CBLSId(const uint256& nHash) : CBLSWrapper<CBLSIdImplicit, BLS_CURVE_ID_SIZE, CBLSId>()
+{
+    impl = nHash;
+    fValid = true;
+    UpdateHash();
+}
+
 void CBLSId::SetInt(int x)
 {
     impl.SetHex(strprintf("%x", x));

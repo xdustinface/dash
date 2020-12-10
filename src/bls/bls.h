@@ -240,7 +240,9 @@ public:
     using CBLSWrapper::operator!=;
 
     CBLSId() {}
-
+    CBLSId(const int64_t n);
+    CBLSId(const uint256& nHash);
+    
     void SetInt(int x);
     void SetHash(const uint256& hash);
 
