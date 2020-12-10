@@ -62,6 +62,10 @@ public:
         static NullHash nullHash;
         cachedHash = nullHash.hash;
     }
+    CBLSWrapper(const std::vector<unsigned char>& vecBytes) : CBLSWrapper<ImplType, _SerSize, C>()
+    {
+        SetBuf(vecBytes);
+    }
 
     CBLSWrapper(const CBLSWrapper& ref) = default;
     CBLSWrapper& operator=(const CBLSWrapper& ref) = default;
