@@ -220,15 +220,15 @@ struct CBLSIdImplicit : public uint256
     {
         memcpy(begin(), id.begin(), sizeof(uint256));
     }
-    static uint256 FromBytes(const uint8_t* buffer)
+    static CBLSIdImplicit FromBytes(const uint8_t* buffer)
     {
-        uint256 instance;
-        memcpy(instance.begin(), buffer, sizeof(uint256));
+        CBLSIdImplicit instance;
+        memcpy(instance.begin(), buffer, sizeof(CBLSIdImplicit));
         return instance;
     }
     void Serialize(uint8_t* buffer) const
     {
-        memcpy(buffer, data, sizeof(uint256));
+        memcpy(buffer, data, sizeof(CBLSIdImplicit));
     }
 };
 
