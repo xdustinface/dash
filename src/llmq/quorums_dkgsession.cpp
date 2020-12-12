@@ -51,8 +51,11 @@ static double GetSimulatedErrorRate(const std::string& type)
     return 0;
 }
 
-static bool ShouldSimulateError(const std::string& type)
+static bool ShouldSimulateError(const Consensus::LLMQType llmqType, const std::string& type)
 {
+    if (llmqType != Consensus::LLMQType::LLMQ_TEST) {
+        return false;
+    }
     double rate = GetSimulatedErrorRate(type);
     return GetRandBool(rate);
 }
@@ -162,7 +165,7 @@ void CDKGSession::SendContributions(CDKGPendingMessages& pendingMessages)
 
     logger.Batch("sending contributions");
 
-    if (ShouldSimulateError("contribution-omit")) {
+    if (ShouldSimulateError(params.type, "contribution-omit")) {
         logger.Batch("omitting");
         return;
     }
@@ -181,7 +184,7 @@ void CDKGSession::SendContributions(CDKGPendingMessages& pendingMessages)
         auto& m = members[i];
         CBLSSecretKey skContrib = skContributions[i];
 
-        if (i != myIdx && ShouldSimulateError("contribution-lie")) {
+        if (i != myIdx && ShouldSimulateError(params.type, "contribution-lie")) {
             logger.Batch("lying for %s", m->dmn->proTxHash.ToString());
             skContrib.MakeNewKey();
         }
@@ -323,7 +326,7 @@ void CDKGSession::ReceiveMessage(const uint256& hash, const CDKGContribution& qc
     if (!qc.contributions->Decrypt(myIdx, *activeMasternodeInfo.blsKeyOperator, skContribution, PROTOCOL_VERSION)) {
         logger.Batch("contribution from %s could not be decrypted", member->dmn->proTxHash.ToString());
         complain = true;
-    } else if (member->idx != myIdx && ShouldSimulateError("complain-lie")) {
+    } else if (member->idx != myIdx && ShouldSimulateError(params.type, "complain-lie")) {
         logger.Batch("lying/complaining for %s", member->dmn->proTxHash.ToString());
         complain = true;
     }
@@ -700,7 +703,7 @@ void CDKGSession::SendJustification(CDKGPendingMessages& pendingMessages, const 
 
         CBLSSecretKey skContribution = skContributions[i];
 
-        if (i != myIdx && ShouldSimulateError("justify-lie")) {
+        if (i != myIdx && ShouldSimulateError(params.type, "justify-lie")) {
             logger.Batch("lying for %s", m->dmn->proTxHash.ToString());
             skContribution.MakeNewKey();
         }
@@ -708,7 +711,7 @@ void CDKGSession::SendJustification(CDKGPendingMessages& pendingMessages, const 
         qj.contributions.emplace_back(i, skContribution);
     }
 
-    if (ShouldSimulateError("justify-omit")) {
+    if (ShouldSimulateError(params.type, "justify-omit")) {
         logger.Batch("omitting");
         return;
     }
@@ -957,7 +960,7 @@ void CDKGSession::SendCommitment(CDKGPendingMessages& pendingMessages)
         return;
     }
 
-    if (ShouldSimulateError("commit-omit")) {
+    if (ShouldSimulateError(params.type, "commit-omit")) {
         logger.Batch("omitting");
         return;
     }
@@ -995,7 +998,7 @@ void CDKGSession::SendCommitment(CDKGPendingMessages& pendingMessages)
     qc.quorumVvecHash = ::SerializeHash(*vvec);
 
     int lieType = -1;
-    if (ShouldSimulateError("commit-lie")) {
+    if (ShouldSimulateError(params.type, "commit-lie")) {
         lieType = GetRandInt(5);
         logger.Batch("lying on commitment. lieType=%d", lieType);
     }
