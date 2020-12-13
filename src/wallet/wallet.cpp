@@ -2132,8 +2132,8 @@ void CWallet::ReacceptWalletTransactions()
     // If transactions aren't being broadcasted, don't let them into local mempool either
     if (!fBroadcastTransactions)
         return;
-    LOCK2(cs_main, mempool.cs);
-    LOCK(cs_wallet);
+    LOCK2(cs_main, cs_wallet);
+    LOCK(mempool.cs);
     std::map<int64_t, CWalletTx*> mapSorted;
 
     // Sort pending wallet transactions based on their initial wallet insertion order
