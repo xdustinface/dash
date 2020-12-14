@@ -25,17 +25,19 @@ struct DKG
 
     BLSVerificationVectorPtr quorumVvec;
 
-    DKG(int quorumSize)
+    DKG(size_t quorumSize)
     {
         members.reserve(quorumSize);
-        ids.resize(quorumSize);
+        ids.reserve(quorumSize);
 
-        for (int i = 0; i < quorumSize; i++) {
-            members.push_back({CBLSId(i + 1), {}, {}});
-            ids[i] = members[i].id;
+        for (size_t i = 0; i < quorumSize; i++) {
+            uint256 id;
+            WriteLE64(id.begin(), i + 1);
+            members.push_back({id, {}, {}});
+            ids.emplace_back(id);
         }
 
-        for (int i = 0; i < quorumSize; i++) {
+        for (size_t i = 0; i < quorumSize; i++) {
             blsWorker.GenerateContributions(quorumSize / 2 + 1, ids, members[i].vvec, members[i].skShares);
         }
 
