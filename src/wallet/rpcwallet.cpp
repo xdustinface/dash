@@ -3655,6 +3655,7 @@ UniValue getaddressinfo(const JSONRPCRequest& request)
             "  \"account\" : \"account\"         (string) The account associated with the address, \"\" is the default account\n"
             "  \"timestamp\" : timestamp,      (number, optional) The creation time of the key if available in seconds since epoch (Jan 1 1970 GMT)\n"
             "  \"hdkeypath\" : \"keypath\"       (string, optional) The HD keypath if the key is HD and available\n"
+            "  \"hdchainid\" : \"<hash160>\"     (string, optional) The Hash160 of the hd chain id\n"
             "}\n"
             "\nExamples:\n"
             + HelpExampleCli("getaddressinfo", "\"XwnLY9Tf7Zsef8gMGL2fhWA9ZmMjt4KPwg\"")
