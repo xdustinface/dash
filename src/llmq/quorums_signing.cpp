@@ -249,8 +249,6 @@ void CRecoveredSigsDb::WriteRecoveredSig(const llmq::CRecoveredSig& recSig)
     db.WriteBatch(batch);
 
     {
-        int64_t t = GetTimeMillis();
-
         LOCK(cs);
         hasSigForIdCache.insert(std::make_pair((Consensus::LLMQType)recSig.llmqType, recSig.id), true);
         hasSigForSessionCache.insert(signHash, true);
