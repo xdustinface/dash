@@ -210,7 +210,7 @@ void CDKGSession::SendContributions(CDKGPendingMessages& pendingMessages)
 }
 
 // only performs cheap verifications, but not the signature of the message. this is checked with batched verification
-bool CDKGSession::PreVerifyMessage(const uint256& hash, const CDKGContribution& qc, bool& retBan) const
+bool CDKGSession::PreVerifyMessage(const CDKGContribution& qc, bool& retBan) const
 {
     CDKGLogger logger(*this, __func__);
 
@@ -532,7 +532,7 @@ void CDKGSession::SendComplaint(CDKGPendingMessages& pendingMessages)
 }
 
 // only performs cheap verifications, but not the signature of the message. this is checked with batched verification
-bool CDKGSession::PreVerifyMessage(const uint256& hash, const CDKGComplaint& qc, bool& retBan) const
+bool CDKGSession::PreVerifyMessage(const CDKGComplaint& qc, bool& retBan) const
 {
     CDKGLogger logger(*this, __func__);
 
@@ -729,7 +729,7 @@ void CDKGSession::SendJustification(CDKGPendingMessages& pendingMessages, const 
 }
 
 // only performs cheap verifications, but not the signature of the message. this is checked with batched verification
-bool CDKGSession::PreVerifyMessage(const uint256& hash, const CDKGJustification& qj, bool& retBan) const
+bool CDKGSession::PreVerifyMessage(const CDKGJustification& qj, bool& retBan) const
 {
     CDKGLogger logger(*this, __func__);
 
@@ -1050,7 +1050,7 @@ void CDKGSession::SendCommitment(CDKGPendingMessages& pendingMessages)
 }
 
 // only performs cheap verifications, but not the signature of the message. this is checked with batched verification
-bool CDKGSession::PreVerifyMessage(const uint256& hash, const CDKGPrematureCommitment& qc, bool& retBan) const
+bool CDKGSession::PreVerifyMessage(const CDKGPrematureCommitment& qc, bool& retBan) const
 {
     CDKGLogger logger(*this, __func__);
 
