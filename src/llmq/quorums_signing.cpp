@@ -784,8 +784,6 @@ void CSigningManager::UnregisterRecoveredSigsListener(CRecoveredSigsListener* l)
 
 bool CSigningManager::AsyncSignIfMember(Consensus::LLMQType llmqType, const uint256& id, const uint256& msgHash, bool allowReSign)
 {
-    auto& params = Params().GetConsensus().llmqs.at(llmqType);
-
     if (!fMasternodeMode || activeMasternodeInfo.proTxHash.IsNull()) {
         return false;
     }

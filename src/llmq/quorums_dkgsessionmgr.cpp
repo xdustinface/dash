@@ -48,8 +48,6 @@ void CDKGSessionManager::StopThreads()
 
 void CDKGSessionManager::UpdatedBlockTip(const CBlockIndex* pindexNew, bool fInitialDownload)
 {
-    const auto& consensus = Params().GetConsensus();
-
     CleanupCache();
 
     if (fInitialDownload)

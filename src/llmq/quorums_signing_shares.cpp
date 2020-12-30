@@ -715,8 +715,6 @@ void CSigSharesManager::ProcessPendingSigSharesFromNode(NodeId nodeId,
         const std::unordered_map<std::pair<Consensus::LLMQType, uint256>, CQuorumCPtr, StaticSaltedHasher>& quorums,
         CConnman& connman)
 {
-    auto& nodeState = nodeStates[nodeId];
-
     cxxtimer::Timer t(true);
     for (auto& sigShare : sigShares) {
         auto quorumKey = std::make_pair((Consensus::LLMQType)sigShare.llmqType, sigShare.quorumHash);
@@ -793,8 +791,6 @@ void CSigSharesManager::TryRecoverSig(const CQuorumCPtr& quorum, const uint256& 
     std::vector<CBLSId> idsForRecovery;
     {
         LOCK(cs);
-
-        auto k = std::make_pair(quorum->params.type, id);
 
         auto signHash = CLLMQUtils::BuildSignHash(quorum->params.type, quorum->qc.quorumHash, id, msgHash);
         auto sigShares = this->sigShares.GetAllForSignHash(signHash);

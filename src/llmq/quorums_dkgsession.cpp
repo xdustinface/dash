@@ -214,8 +214,6 @@ bool CDKGSession::PreVerifyMessage(const CDKGContribution& qc, bool& retBan) con
 {
     CDKGLogger logger(*this, __func__);
 
-    cxxtimer::Timer t1(true);
-
     retBan = false;
 
     if (qc.quorumHash != pindexQuorum->GetBlockHash()) {
@@ -1053,8 +1051,6 @@ void CDKGSession::SendCommitment(CDKGPendingMessages& pendingMessages)
 bool CDKGSession::PreVerifyMessage(const CDKGPrematureCommitment& qc, bool& retBan) const
 {
     CDKGLogger logger(*this, __func__);
-
-    cxxtimer::Timer t1(true);
 
     retBan = false;
 
