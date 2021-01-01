@@ -208,6 +208,7 @@ void CDKGSessionManager::WriteVerifiedSkContribution(Consensus::LLMQType llmqTyp
 
 bool CDKGSessionManager::GetVerifiedContributions(Consensus::LLMQType llmqType, const CBlockIndex* pindexQuorum, const std::vector<bool>& validMembers, std::vector<uint16_t>& memberIndexesRet, std::vector<BLSVerificationVectorPtr>& vvecsRet, BLSSecretKeyVector& skContributionsRet)
 {
+    LOCK(contributionsCacheCs);
     auto members = CLLMQUtils::GetAllQuorumMembers(llmqType, pindexQuorum);
 
     memberIndexesRet.clear();
@@ -218,7 +219,6 @@ bool CDKGSessionManager::GetVerifiedContributions(Consensus::LLMQType llmqType, 
     skContributionsRet.reserve(members.size());
     for (size_t i = 0; i < members.size(); i++) {
         if (validMembers[i]) {
-            LOCK(contributionsCacheCs);
             const uint256& proTxHash = members[i]->proTxHash;
             ContributionsCacheKey cacheKey = {llmqType, pindexQuorum->GetBlockHash(), proTxHash};
             auto it = contributionsCache.find(cacheKey);
