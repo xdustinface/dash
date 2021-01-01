@@ -246,11 +246,12 @@ bool CDKGSessionManager::GetVerifiedContribution(Consensus::LLMQType llmqType, c
     BLSVerificationVector vvec;
     BLSVerificationVectorPtr vvecPtr;
     CBLSSecretKey skContribution;
-    if (llmqDb.Read(std::make_tuple(DB_VVEC, llmqType, pindexQuorum->GetBlockHash(), proTxHash), vvec)) {
-        vvecPtr = std::make_shared<BLSVerificationVector>(std::move(vvec));
+    if (!llmqDb.Read(std::make_tuple(DB_VVEC, llmqType, pindexQuorum->GetBlockHash(), proTxHash), vvec)) {
+        return false;
     }
     llmqDb.Read(std::make_tuple(DB_SKCONTRIB, llmqType, pindexQuorum->GetBlockHash(), proTxHash), skContribution);
 
+    vvecPtr = std::make_shared<BLSVerificationVector>(std::move(vvec));
     it = contributionsCache.emplace(cacheKey, ContributionsCacheEntry{GetTimeMillis(), vvecPtr, skContribution}).first;
 
     vvecRet = it->second.vvec;
