@@ -218,15 +218,26 @@ bool CDKGSessionManager::GetVerifiedContributions(Consensus::LLMQType llmqType, 
     skContributionsRet.reserve(members.size());
     for (size_t i = 0; i < members.size(); i++) {
         if (validMembers[i]) {
-            BLSVerificationVectorPtr vvec;
-            CBLSSecretKey skContribution;
-            if (!GetVerifiedContribution(llmqType, pindexQuorum, members[i]->proTxHash, vvec, skContribution)) {
-                return false;
+            LOCK(contributionsCacheCs);
+            const uint256& proTxHash = members[i]->proTxHash;
+            ContributionsCacheKey cacheKey = {llmqType, pindexQuorum->GetBlockHash(), proTxHash};
+            auto it = contributionsCache.find(cacheKey);
+            if (it == contributionsCache.end()) {
+                BLSVerificationVector vvec;
+                BLSVerificationVectorPtr vvecPtr;
+                CBLSSecretKey skContribution;
+                if (!llmqDb.Read(std::make_tuple(DB_VVEC, llmqType, pindexQuorum->GetBlockHash(), proTxHash), vvec)) {
+                    return false;
+                }
+                llmqDb.Read(std::make_tuple(DB_SKCONTRIB, llmqType, pindexQuorum->GetBlockHash(), proTxHash), skContribution);
+
+                vvecPtr = std::make_shared<BLSVerificationVector>(std::move(vvec));
+                it = contributionsCache.emplace(cacheKey, ContributionsCacheEntry{GetTimeMillis(), vvecPtr, skContribution}).first;
             }
 
             memberIndexesRet.emplace_back(i);
-            vvecsRet.emplace_back(vvec);
-            skContributionsRet.emplace_back(skContribution);
+            vvecsRet.emplace_back(it->second.vvec);
+            skContributionsRet.emplace_back(it->second.skContribution);
         }
     }
     return true;
