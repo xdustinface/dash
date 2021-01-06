@@ -37,13 +37,6 @@ static std::map<std::string, std::unique_ptr<RPCTimerBase> > deadlineTimers;
 // Any commands submitted by this user will have their commands filtered based on the mapPlatformRestrictions
 static const std::string defaultPlatformUser = "platform-user";
 
-static const std::multimap<std::string, std::set<std::string>> mapPlatformRestrictions{
-    {"getbestblockhash", {}},
-    {"getblockhash", {}},
-    {"getblockcount", {}},
-    {"getbestchainlock", {}},
-};
-
 static struct CRPCSignals
 {
     boost::signals2::signal<void ()> Started;
@@ -267,6 +260,16 @@ std::string CRPCTable::help(const std::string& strCommand, const std::string& st
         strRet = strprintf("help: unknown command: %s\n", strCommand);
     strRet = strRet.substr(0,strRet.size()-1);
     return strRet;
+}
+
+void CRPCTable::InitPlatformRestrictions()
+{
+    mapPlatformRestrictions = {
+        {"getbestblockhash", {}},
+        {"getblockhash", {}},
+        {"getblockcount", {}},
+        {"getbestchainlock", {}},
+    };
 }
 
 UniValue help(const JSONRPCRequest& jsonRequest)
