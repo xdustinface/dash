@@ -34,10 +34,10 @@ static RPCTimerInterface* timerInterface = nullptr;
 /* Map of name to timer. */
 static std::map<std::string, std::unique_ptr<RPCTimerBase> > deadlineTimers;
 
-// Any commands submitted by this user will have their commands filtered based on the platformAllowedCommands
+// Any commands submitted by this user will have their commands filtered based on the mapPlatformRestrictions
 static const std::string defaultPlatformUser = "platform-user";
 
-static const std::map<std::string, std::set<std::string>> platformAllowedCommands{
+static const std::map<std::string, std::set<std::string>> mapPlatformRestrictions{
     {"getbestblockhash", {}},
     {"getblockhash", {}},
     {"getblockcount", {}},
@@ -563,9 +563,9 @@ UniValue CRPCTable::execute(const JSONRPCRequest &request) const
     // Before executing the RPC Command, filter commands from platform rpc user
     if (fMasternodeMode && request.authUser == gArgs.GetArg("-platform-user", defaultPlatformUser)) {
 
-        auto it = platformAllowedCommands.find(request.strMethod);
-        // If the requested method is not available in platformAllowedCommands
-        if (it == platformAllowedCommands.end()) {
+        auto it = mapPlatformRestrictions.find(request.strMethod);
+        // If the requested method is not available in mapPlatformRestrictions
+        if (it == mapPlatformRestrictions.end()) {
             throw JSONRPCError(RPC_PLATFORM_RESTRICTION, strprintf("Method \"%s\" prohibited", request.strMethod));
         }
 
