@@ -37,7 +37,7 @@ static std::map<std::string, std::unique_ptr<RPCTimerBase> > deadlineTimers;
 // Any commands submitted by this user will have their commands filtered based on the mapPlatformRestrictions
 static const std::string defaultPlatformUser = "platform-user";
 
-static const std::map<std::string, std::set<std::string>> mapPlatformRestrictions{
+static const std::multimap<std::string, std::set<std::string>> mapPlatformRestrictions{
     {"getbestblockhash", {}},
     {"getblockhash", {}},
     {"getblockcount", {}},
@@ -563,16 +563,21 @@ UniValue CRPCTable::execute(const JSONRPCRequest &request) const
     // Before executing the RPC Command, filter commands from platform rpc user
     if (fMasternodeMode && request.authUser == gArgs.GetArg("-platform-user", defaultPlatformUser)) {
 
-        auto it = mapPlatformRestrictions.find(request.strMethod);
+        auto it = mapPlatformRestrictions.equal_range(request.strMethod);
+
         // If the requested method is not available in mapPlatformRestrictions
-        if (it == mapPlatformRestrictions.end()) {
+        if (it.first == it.second) {
             throw JSONRPCError(RPC_PLATFORM_RESTRICTION, strprintf("Method \"%s\" prohibited", request.strMethod));
         }
 
-        const std::string strFirstParam = !request.params.empty() ? request.params[0].getValStr() : "";
-        // If there are any parameter restrictions for the requested method make sure the first paramter is allowed
-        if (!it->second.empty() && it->second.count(strFirstParam) == 0) {
-            throw JSONRPCError(RPC_PLATFORM_RESTRICTION, strprintf("Parameter \"%s\" prohibited for method \"%s\"", strFirstParam, request.strMethod));
+        // Try if any of the mapPlatformRestrictions entries matches the current request
+        for (auto itRequest = it.first; itRequest != it.second; ++itRequest) {
+
+            const std::string strFirstParam = !request.params.empty() ? request.params[0].getValStr() : "";
+            // If there are any parameter restrictions for the requested method make sure the first paramter is allowed
+            if (!itRequest->second.empty() && itRequest->second.count(strFirstParam) == 0) {
+                throw JSONRPCError(RPC_PLATFORM_RESTRICTION, strprintf("Parameter \"%s\" prohibited for method \"%s\"", strFirstParam, request.strMethod));
+            }
         }
     }
 
