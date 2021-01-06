@@ -12,7 +12,6 @@
 
 #include <list>
 #include <map>
-#include <set>
 #include <stdint.h>
 #include <string>
 
@@ -143,7 +142,7 @@ class CRPCTable
 {
 private:
     std::map<std::string, const CRPCCommand*> mapCommands;
-    std::multimap<std::string, std::set<std::string>> mapPlatformRestrictions;
+    std::multimap<std::string, std::vector<UniValue>> mapPlatformRestrictions;
 public:
     CRPCTable();
     const CRPCCommand* operator[](const std::string& name) const;

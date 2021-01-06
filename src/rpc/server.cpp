@@ -573,14 +573,42 @@ UniValue CRPCTable::execute(const JSONRPCRequest &request) const
             throw JSONRPCError(RPC_PLATFORM_RESTRICTION, strprintf("Method \"%s\" prohibited", request.strMethod));
         }
 
+        bool fValidRequest{false};
         // Try if any of the mapPlatformRestrictions entries matches the current request
         for (auto itRequest = it.first; itRequest != it.second; ++itRequest) {
 
-            const std::string strFirstParam = !request.params.empty() ? request.params[0].getValStr() : "";
-            // If there are any parameter restrictions for the requested method make sure the first paramter is allowed
-            if (!itRequest->second.empty() && itRequest->second.count(strFirstParam) == 0) {
-                throw JSONRPCError(RPC_PLATFORM_RESTRICTION, strprintf("Parameter \"%s\" prohibited for method \"%s\"", strFirstParam, request.strMethod));
+            auto& vecParams = itRequest->second;
+            size_t nRestrictedParamsCount = vecParams.size();
+
+            if (nRestrictedParamsCount > 0) {
+                if (request.params.empty()) {
+                    throw JSONRPCError(RPC_PLATFORM_RESTRICTION, strprintf("Method \"%s\" has parameter restrictions.", request.strMethod));
+                }
+
+                if (request.params.size() < nRestrictedParamsCount) {
+                    continue;
+                }
+
+                bool fMatch{true};
+                for (size_t i = 0; i < nRestrictedParamsCount; ++i) {
+                    if (request.params[i].type() != itRequest->second[i].type() || request.params[i].getValStr() != itRequest->second[i].getValStr()) {
+                        LogPrint(BCLog::RPC, "CRPCTable::%s: Method \"%s\" requires parameter %d to be %s with type %d\n", __func__, request.strMethod, i, itRequest->second[i].getValStr(), itRequest->second[i].type());
+                        fMatch = false;
+                    }
+                }
+
+                if (fMatch) {
+                    fValidRequest = true;
+                    break;
+                }
+            } else {
+                fValidRequest = true;
+                break;
             }
+        }
+
+        if (!fValidRequest) {
+            throw JSONRPCError(RPC_PLATFORM_RESTRICTION, "Request doesn't comply with the parameter restrictions.");
         }
     }
 
