@@ -52,7 +52,13 @@ class HTTPBasicsTest(BitcoinTestFramework):
                 assert_equal(resp.status, expexted_status)
             conn.close()
 
-        whitelisted = ["getbestblockhash", "getblockhash", "getblockcount", "getbestchainlock", "quorum"]
+        whitelisted = ["getbestblockhash",
+                       "getblockhash",
+                       "getblockcount",
+                       "getbestchainlock",
+                       "quorum",
+                       "verifyislock"]
+
         help_output = self.nodes[0].help().split('\n')
         nonwhitelisted = set()
 
@@ -82,6 +88,7 @@ class HTTPBasicsTest(BitcoinTestFramework):
                                 "0000000000000000000000000000000000000000000000000000000000000001"],
                                 rpcuser_authpair_platform, 200)
         test_command("quorum", ["verify"], rpcuser_authpair_platform, 500)
+        test_command("verifyislock", [], rpcuser_authpair_platform, 500)
 
         self.log.info('Try using some invalid combinations for platform-user')
         test_command("quorum", [], rpcuser_authpair_platform, 403)
