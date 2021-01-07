@@ -155,14 +155,14 @@ public:
 
 private:
     void ProcessMessageRecoveredSig(CNode* pfrom, const CRecoveredSig& recoveredSig);
-    static bool PreVerifyRecoveredSig(NodeId nodeId, const CRecoveredSig& recoveredSig, bool& retBan);
+    static bool PreVerifyRecoveredSig(const CRecoveredSig& recoveredSig, bool& retBan);
 
     void CollectPendingRecoveredSigsToVerify(size_t maxUniqueSessions,
             std::unordered_map<NodeId, std::list<CRecoveredSig>>& retSigShares,
             std::unordered_map<std::pair<Consensus::LLMQType, uint256>, CQuorumCPtr, StaticSaltedHasher>& retQuorums);
     void ProcessPendingReconstructedRecoveredSigs();
     bool ProcessPendingRecoveredSigs(); // called from the worker thread of CSigSharesManager
-    void ProcessRecoveredSig(NodeId nodeId, const CRecoveredSig& recoveredSig);
+    void ProcessRecoveredSig(const CRecoveredSig& recoveredSig);
     void Cleanup(); // called from the worker thread of CSigSharesManager
 
 public:
