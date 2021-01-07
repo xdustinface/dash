@@ -470,16 +470,16 @@ bool CSigningManager::GetRecoveredSigForGetData(const uint256& hash, CRecoveredS
     return true;
 }
 
-void CSigningManager::ProcessMessage(CNode* pfrom, const std::string& strCommand, CDataStream& vRecv, CConnman& connman)
+void CSigningManager::ProcessMessage(CNode* pfrom, const std::string& strCommand, CDataStream& vRecv)
 {
     if (strCommand == NetMsgType::QSIGREC) {
         CRecoveredSig recoveredSig;
         vRecv >> recoveredSig;
-        ProcessMessageRecoveredSig(pfrom, recoveredSig, connman);
+        ProcessMessageRecoveredSig(pfrom, recoveredSig);
     }
 }
 
-void CSigningManager::ProcessMessageRecoveredSig(CNode* pfrom, const CRecoveredSig& recoveredSig, CConnman& connman)
+void CSigningManager::ProcessMessageRecoveredSig(CNode* pfrom, const CRecoveredSig& recoveredSig)
 {
     {
         LOCK(cs_main);
@@ -612,11 +612,11 @@ void CSigningManager::ProcessPendingReconstructedRecoveredSigs()
         m = std::move(pendingReconstructedRecoveredSigs);
     }
     for (auto& p : m) {
-        ProcessRecoveredSig(-1, p.second.first, p.second.second, *g_connman);
+        ProcessRecoveredSig(-1, p.second.first, p.second.second);
     }
 }
 
-bool CSigningManager::ProcessPendingRecoveredSigs(CConnman& connman)
+bool CSigningManager::ProcessPendingRecoveredSigs()
 {
     std::unordered_map<NodeId, std::list<CRecoveredSig>> recSigsByNode;
     std::unordered_map<std::pair<Consensus::LLMQType, uint256>, CQuorumCPtr, StaticSaltedHasher> quorums;
@@ -674,7 +674,7 @@ bool CSigningManager::ProcessPendingRecoveredSigs(CConnman& connman)
             }
 
             const auto& quorum = quorums.at(std::make_pair((Consensus::LLMQType)recSig.llmqType, recSig.quorumHash));
-            ProcessRecoveredSig(nodeId, recSig, quorum, connman);
+            ProcessRecoveredSig(nodeId, recSig, quorum);
         }
     }
 
@@ -682,7 +682,7 @@ bool CSigningManager::ProcessPendingRecoveredSigs(CConnman& connman)
 }
 
 // signature must be verified already
-void CSigningManager::ProcessRecoveredSig(NodeId nodeId, const CRecoveredSig& recoveredSig, const CQuorumCPtr& quorum, CConnman& connman)
+void CSigningManager::ProcessRecoveredSig(NodeId nodeId, const CRecoveredSig& recoveredSig, const CQuorumCPtr& quorum)
 {
     auto llmqType = (Consensus::LLMQType)recoveredSig.llmqType;
 

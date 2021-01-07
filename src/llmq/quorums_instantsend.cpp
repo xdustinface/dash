@@ -664,7 +664,7 @@ void CInstantSendManager::HandleNewInstantSendLockRecoveredSig(const llmq::CReco
     ProcessInstantSendLock(-1, ::SerializeHash(islock), islock);
 }
 
-void CInstantSendManager::ProcessMessage(CNode* pfrom, const std::string& strCommand, CDataStream& vRecv, CConnman& connman)
+void CInstantSendManager::ProcessMessage(CNode* pfrom, const std::string& strCommand, CDataStream& vRecv)
 {
     if (!IsInstantSendEnabled()) {
         return;
@@ -673,11 +673,11 @@ void CInstantSendManager::ProcessMessage(CNode* pfrom, const std::string& strCom
     if (strCommand == NetMsgType::ISLOCK) {
         CInstantSendLock islock;
         vRecv >> islock;
-        ProcessMessageInstantSendLock(pfrom, islock, connman);
+        ProcessMessageInstantSendLock(pfrom, islock);
     }
 }
 
-void CInstantSendManager::ProcessMessageInstantSendLock(CNode* pfrom, const llmq::CInstantSendLock& islock, CConnman& connman)
+void CInstantSendManager::ProcessMessageInstantSendLock(CNode* pfrom, const llmq::CInstantSendLock& islock)
 {
     auto hash = ::SerializeHash(islock);
 

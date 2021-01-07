@@ -228,7 +228,7 @@ void CSigSharesManager::InterruptWorkerThread()
     workInterrupt();
 }
 
-void CSigSharesManager::ProcessMessage(CNode* pfrom, const std::string& strCommand, CDataStream& vRecv, CConnman& connman)
+void CSigSharesManager::ProcessMessage(CNode* pfrom, const std::string& strCommand, CDataStream& vRecv)
 {
     // non-masternodes are not interested in sigshares
     if (!fMasternodeMode || activeMasternodeInfo.proTxHash.IsNull()) {
@@ -247,7 +247,7 @@ void CSigSharesManager::ProcessMessage(CNode* pfrom, const std::string& strComma
             }
 
             for (auto& sigShare : sigShares) {
-                ProcessMessageSigShare(pfrom->GetId(), sigShare, connman);
+                ProcessMessageSigShare(pfrom->GetId(), sigShare);
             }
         }
     }
@@ -261,7 +261,7 @@ void CSigSharesManager::ProcessMessage(CNode* pfrom, const std::string& strComma
             return;
         }
         for (auto& ann : msgs) {
-            if (!ProcessMessageSigSesAnn(pfrom, ann, connman)) {
+            if (!ProcessMessageSigSesAnn(pfrom, ann)) {
                 BanNode(pfrom->GetId());
                 return;
             }
@@ -275,7 +275,7 @@ void CSigSharesManager::ProcessMessage(CNode* pfrom, const std::string& strComma
             return;
         }
         for (auto& inv : msgs) {
-            if (!ProcessMessageSigSharesInv(pfrom, inv, connman)) {
+            if (!ProcessMessageSigSharesInv(pfrom, inv)) {
                 BanNode(pfrom->GetId());
                 return;
             }
@@ -289,7 +289,7 @@ void CSigSharesManager::ProcessMessage(CNode* pfrom, const std::string& strComma
             return;
         }
         for (auto& inv : msgs) {
-            if (!ProcessMessageGetSigShares(pfrom, inv, connman)) {
+            if (!ProcessMessageGetSigShares(pfrom, inv)) {
                 BanNode(pfrom->GetId());
                 return;
             }
@@ -307,7 +307,7 @@ void CSigSharesManager::ProcessMessage(CNode* pfrom, const std::string& strComma
             return;
         }
         for (auto& bs : msgs) {
-            if (!ProcessMessageBatchedSigShares(pfrom, bs, connman)) {
+            if (!ProcessMessageBatchedSigShares(pfrom, bs)) {
                 BanNode(pfrom->GetId());
                 return;
             }
@@ -315,7 +315,7 @@ void CSigSharesManager::ProcessMessage(CNode* pfrom, const std::string& strComma
     }
 }
 
-bool CSigSharesManager::ProcessMessageSigSesAnn(CNode* pfrom, const CSigSesAnn& ann, CConnman& connman)
+bool CSigSharesManager::ProcessMessageSigSesAnn(CNode* pfrom, const CSigSesAnn& ann)
 {
     auto llmqType = (Consensus::LLMQType)ann.llmqType;
     if (!Params().GetConsensus().llmqs.count(llmqType)) {
@@ -359,7 +359,7 @@ bool CSigSharesManager::VerifySigSharesInv(NodeId from, Consensus::LLMQType llmq
     return true;
 }
 
-bool CSigSharesManager::ProcessMessageSigSharesInv(CNode* pfrom, const CSigSharesInv& inv, CConnman& connman)
+bool CSigSharesManager::ProcessMessageSigSharesInv(CNode* pfrom, const CSigSharesInv& inv)
 {
     CSigSharesNodeState::SessionInfo sessionInfo;
     if (!GetSessionInfoByRecvId(pfrom->GetId(), inv.sessionId, sessionInfo)) {
@@ -396,7 +396,7 @@ bool CSigSharesManager::ProcessMessageSigSharesInv(CNode* pfrom, const CSigShare
     return true;
 }
 
-bool CSigSharesManager::ProcessMessageGetSigShares(CNode* pfrom, const CSigSharesInv& inv, CConnman& connman)
+bool CSigSharesManager::ProcessMessageGetSigShares(CNode* pfrom, const CSigSharesInv& inv)
 {
     CSigSharesNodeState::SessionInfo sessionInfo;
     if (!GetSessionInfoByRecvId(pfrom->GetId(), inv.sessionId, sessionInfo)) {
@@ -426,7 +426,7 @@ bool CSigSharesManager::ProcessMessageGetSigShares(CNode* pfrom, const CSigShare
     return true;
 }
 
-bool CSigSharesManager::ProcessMessageBatchedSigShares(CNode* pfrom, const CBatchedSigShares& batchedSigShares, CConnman& connman)
+bool CSigSharesManager::ProcessMessageBatchedSigShares(CNode* pfrom, const CBatchedSigShares& batchedSigShares)
 {
     CSigSharesNodeState::SessionInfo sessionInfo;
     if (!GetSessionInfoByRecvId(pfrom->GetId(), batchedSigShares.sessionId, sessionInfo)) {
@@ -481,7 +481,7 @@ bool CSigSharesManager::ProcessMessageBatchedSigShares(CNode* pfrom, const CBatc
     return true;
 }
 
-void CSigSharesManager::ProcessMessageSigShare(NodeId fromId, const CSigShare& sigShare, CConnman& connman)
+void CSigSharesManager::ProcessMessageSigShare(NodeId fromId, const CSigShare& sigShare)
 {
     auto quorum = quorumManager->GetQuorum(sigShare.llmqType, sigShare.quorumHash);
     if (!quorum) {
@@ -777,11 +777,11 @@ void CSigSharesManager::ProcessSigShare(NodeId nodeId, const CSigShare& sigShare
     }
 
     if (canTryRecovery) {
-        TryRecoverSig(quorum, sigShare.id, sigShare.msgHash, connman);
+        TryRecoverSig(quorum, sigShare.id, sigShare.msgHash);
     }
 }
 
-void CSigSharesManager::TryRecoverSig(const CQuorumCPtr& quorum, const uint256& id, const uint256& msgHash, CConnman& connman)
+void CSigSharesManager::TryRecoverSig(const CQuorumCPtr& quorum, const uint256& id, const uint256& msgHash)
 {
     if (quorumSigningManager->HasRecoveredSigForId(quorum->params.type, id)) {
         return;
@@ -846,7 +846,7 @@ void CSigSharesManager::TryRecoverSig(const CQuorumCPtr& quorum, const uint256& 
         }
     }
 
-    quorumSigningManager->ProcessRecoveredSig(-1, rs, quorum, connman);
+    quorumSigningManager->ProcessRecoveredSig(-1, rs, quorum);
 }
 
 CDeterministicMNCPtr CSigSharesManager::SelectMemberForRecovery(const CQuorumCPtr& quorum, const uint256 &id, int attempt)
@@ -1507,7 +1507,7 @@ void CSigSharesManager::WorkThreadMain()
         bool didWork = false;
 
         RemoveBannedNodeStates();
-        didWork |= quorumSigningManager->ProcessPendingRecoveredSigs(*g_connman);
+        didWork |= quorumSigningManager->ProcessPendingRecoveredSigs();
         didWork |= ProcessPendingSigShares(*g_connman);
         didWork |= SignPendingSigShares();
 
