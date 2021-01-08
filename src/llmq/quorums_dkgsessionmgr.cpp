@@ -245,6 +245,36 @@ bool CDKGSessionManager::GetVerifiedContributions(Consensus::LLMQType llmqType, 
     return true;
 }
 
+bool CDKGSessionManager::GetEncryptedContributions(Consensus::LLMQType llmqType, const CBlockIndex* pindexQuorum, const std::vector<bool>& validMembers, const uint256& nProTxHash, std::vector<CBLSIESEncryptedObject<CBLSSecretKey>>& vecRet)
+{
+    auto members = CLLMQUtils::GetAllQuorumMembers(llmqType, pindexQuorum);
+
+    vecRet.clear();
+    vecRet.reserve(members.size());
+
+    size_t nRequestedMemberIdx{std::numeric_limits<size_t>::max()};
+    for (size_t i = 0; i < members.size(); i++) {
+        if (members[i]->proTxHash == nProTxHash) {
+            nRequestedMemberIdx = i;
+            break;
+        }
+    }
+    if (nRequestedMemberIdx == std::numeric_limits<size_t>::max()) {
+        return false;
+    }
+
+    for (size_t i = 0; i < members.size(); i++) {
+        if (validMembers[i]) {
+            CBLSIESMultiRecipientObjects<CBLSSecretKey> encryptedContributions;
+            if (!llmqDb.Read(std::make_tuple(DB_ENC_CONTRIB, llmqType, pindexQuorum->GetBlockHash(), members[i]->proTxHash), encryptedContributions)) {
+                return false;
+            }
+            vecRet.emplace_back(encryptedContributions.Get(nRequestedMemberIdx));
+        }
+    }
+    return true;
+}
+
 void CDKGSessionManager::CleanupCache()
 {
     LOCK(contributionsCacheCs);
