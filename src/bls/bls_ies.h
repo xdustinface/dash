@@ -158,6 +158,15 @@ public:
             return false;
         }
     }
+
+    CBLSIESEncryptedObject<Object> Get(const size_t idx)
+    {
+        uint256 iv = ivSeed;
+        for (size_t i = 0; i < idx; i++) {
+            iv = ::SerializeHash(iv);
+        }
+        return {ephemeralPubKey, iv, blobs[idx]};
+    }
 };
 
 #endif // DASH_CRYPTO_BLS_IES_H
