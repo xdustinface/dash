@@ -34,7 +34,7 @@ bool CBLSIESEncryptedBlob::Encrypt(const CBLSPublicKey& peerPubKey, const void* 
     CBLSSecretKey ephemeralSecretKey;
     ephemeralSecretKey.MakeNewKey();
     ephemeralPubKey = ephemeralSecretKey.GetPublicKey();
-    GetStrongRandBytes(iv, sizeof(iv));
+    GetStrongRandBytes(iv.begin(), iv.size());
 
     CBLSPublicKey pk;
     if (!pk.DHKeyExchange(ephemeralSecretKey, peerPubKey)) {
@@ -45,7 +45,7 @@ bool CBLSIESEncryptedBlob::Encrypt(const CBLSPublicKey& peerPubKey, const void* 
     pk.GetBuf(symKey);
     symKey.resize(32);
 
-    return EncryptBlob(plainTextData, dataSize, data, symKey.data(), iv);
+    return EncryptBlob(plainTextData, dataSize, data, symKey.data(), iv.begin());
 }
 
 bool CBLSIESEncryptedBlob::Decrypt(const CBLSSecretKey& secretKey, CDataStream& decryptedDataRet) const
@@ -59,7 +59,12 @@ bool CBLSIESEncryptedBlob::Decrypt(const CBLSSecretKey& secretKey, CDataStream& 
     pk.GetBuf(symKey);
     symKey.resize(32);
 
-    return DecryptBlob(data.data(), data.size(), decryptedDataRet, symKey.data(), iv);
+    return DecryptBlob(data.data(), data.size(), decryptedDataRet, symKey.data(), iv.begin());
+}
+
+bool CBLSIESEncryptedBlob::IsValid() const
+{
+    return ephemeralPubKey.IsValid() && !iv.IsNull() && data.size() > 0;
 }
 
 

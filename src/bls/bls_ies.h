@@ -12,10 +12,8 @@ class CBLSIESEncryptedBlob
 {
 public:
     CBLSPublicKey ephemeralPubKey;
-    unsigned char iv[16];
+    uint256 iv;
     std::vector<unsigned char> data;
-
-    bool valid{false};
 
 public:
     ADD_SERIALIZE_METHODS
@@ -23,22 +21,15 @@ public:
     template <typename Stream, typename Operation>
     inline void SerializationOp(Stream& s, Operation ser_action)
     {
-        if (!ser_action.ForRead()) {
-            assert(valid);
-        } else {
-            valid = false;
-        }
         READWRITE(ephemeralPubKey);
         READWRITE(iv);
         READWRITE(data);
-        if (ser_action.ForRead()) {
-            valid = true;
-        }
-    };
+    }
 
 public:
     bool Encrypt(const CBLSPublicKey& peerPubKey, const void* data, size_t dataSize);
     bool Decrypt(const CBLSSecretKey& secretKey, CDataStream& decryptedDataRet) const;
+    bool IsValid() const;
 };
 
 template <typename Object>
