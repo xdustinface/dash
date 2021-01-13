@@ -39,6 +39,72 @@ static uint256 MakeQuorumKey(const CQuorum& q)
     return hw.GetHash();
 }
 
+class CQuorumDataRequest
+{
+    Consensus::LLMQType llmqType;
+    uint256 quorumHash;
+    uint16_t nDataMask;
+    uint256 proTxHash;
+
+    int64_t nTime;
+    static const int64_t nExpirySeconds{300};
+
+    bool fProcessed;
+
+public:
+    CQuorumDataRequest() : nTime(GetAdjustedTime()) {}
+    CQuorumDataRequest(const Consensus::LLMQType llmqTypeIn, const uint256& quorumHashIn, const uint16_t nDataMaskIn, const uint256& proTxHashIn = uint256()) :
+        llmqType(llmqTypeIn),
+        quorumHash(quorumHashIn),
+        nDataMask(nDataMaskIn),
+        proTxHash(proTxHashIn),
+        nTime(GetAdjustedTime()),
+        fProcessed(false) {}
+
+    ADD_SERIALIZE_METHODS
+
+    template <typename Stream, typename Operation>
+    inline void SerializationOp(Stream& s, Operation ser_action)
+    {
+        READWRITE(llmqType);
+        READWRITE(quorumHash);
+        READWRITE(nDataMask);
+        READWRITE(proTxHash);
+    }
+
+    const Consensus::LLMQType GetLLMQType() const { return llmqType; }
+    const uint256& GetQuorumHash() const { return quorumHash; }
+    const uint16_t GetDataMask() const { return nDataMask; }
+    const uint256& GetProTxHash() const { return proTxHash; }
+
+    bool IsExpired() const
+    {
+        return (GetAdjustedTime() - nTime) >= nExpirySeconds;
+    }
+
+    bool IsProcessed() const
+    {
+        return fProcessed;
+    }
+
+    void SetProcessed()
+    {
+        fProcessed = true;
+    }
+
+    bool operator==(const CQuorumDataRequest& other)
+    {
+        return llmqType == other.llmqType &&
+               quorumHash == other.quorumHash &&
+               nDataMask == other.nDataMask &&
+               proTxHash == other.proTxHash;
+    }
+    bool operator!=(const CQuorumDataRequest& other)
+    {
+        return !(*this == other);
+    }
+};
+
 CQuorum::~CQuorum()
 {
     // most likely the thread is already done
