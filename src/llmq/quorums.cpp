@@ -124,6 +124,39 @@ void CQuorum::Init(const CFinalCommitment& _qc, const CBlockIndex* _pindexQuorum
     minedBlockHash = _minedBlockHash;
 }
 
+bool CQuorum::SetVerificationVector(const BLSVerificationVector& quorumVecIn)
+{
+    auto nHashIn = ::SerializeHash(quorumVecIn);
+    if (nHashIn != qc.quorumVvecHash) {
+        return false;
+    }
+
+    if (quorumVvec == nullptr) {
+        quorumVvec = std::make_shared<BLSVerificationVector>(quorumVecIn);
+    }
+
+    //CQuorum::StartCachePopulatorThread(std::shared_ptr<CQuorum>(this));
+
+    return true;
+}
+
+bool CQuorum::SetSecretKeyShare(const CBLSSecretKey& secretKeyShare)
+{
+    if (!secretKeyShare.IsValid()) {
+        return false;
+    }
+
+    CBLSPublicKey publicKeyShareExpected = GetPubKeyShare(GetMemberIndex(activeMasternodeInfo.proTxHash));
+
+    if (secretKeyShare.GetPublicKey() != publicKeyShareExpected) {
+        return false;
+    }
+
+    skShare = secretKeyShare;
+
+    return true;
+}
+
 bool CQuorum::IsMember(const uint256& proTxHash) const
 {
     for (auto& dmn : members) {
