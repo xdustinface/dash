@@ -101,6 +101,8 @@ public:
 
     static bool HasQuorum(Consensus::LLMQType llmqType, const uint256& quorumHash);
 
+    bool RequestQuorumData(CNode* pFrom, Consensus::LLMQType llmqType, const uint256& quorumHash, uint16_t nDataMask, const uint256& proTxHash = uint256());
+
     // all these methods will lock cs_main for a short period of time
     CQuorumCPtr GetQuorum(Consensus::LLMQType llmqType, const uint256& quorumHash);
     std::vector<CQuorumCPtr> ScanQuorums(Consensus::LLMQType llmqType, size_t maxCount);

@@ -390,6 +390,34 @@ bool CQuorumManager::HasQuorum(Consensus::LLMQType llmqType, const uint256& quor
     return quorumBlockProcessor->HasMinedCommitment(llmqType, quorumHash);
 }
 
+bool CQuorumManager::RequestQuorumData(CNode* pFrom, Consensus::LLMQType llmqType, const uint256& quorumHash, uint16_t nDataMask, const uint256& proTxHash)
+{
+    LOCK(cs_requests);
+
+    if (pFrom == nullptr || pFrom->verifiedProRegTxHash.IsNull()) {
+        return false;
+    }
+
+    if (Params().GetConsensus().llmqs.count(llmqType) == 0) {
+        return false;
+    }
+
+    if (GetQuorum(llmqType, quorumHash) == nullptr) {
+        return false;
+    }
+
+    auto key = std::make_pair(pFrom->verifiedProRegTxHash, true);
+    auto it = mapQuorumDataRequests.emplace(key, CQuorumDataRequest(llmqType, quorumHash, nDataMask, proTxHash));
+    if (!it.second && !it.first->second.IsExpired()) {
+        return false;
+    }
+
+    CNetMsgMaker msgMaker(pFrom->GetSendVersion());
+    g_connman->PushMessage(pFrom, msgMaker.Make(NetMsgType::QGETDATA, it.first->second));
+
+    return true;
+}
+
 std::vector<CQuorumCPtr> CQuorumManager::ScanQuorums(Consensus::LLMQType llmqType, size_t maxCount)
 {
     const CBlockIndex* pindex;
