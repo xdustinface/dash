@@ -197,6 +197,8 @@ public:
 
     void UpdatedBlockTip(const CBlockIndex *pindexNew, bool fInitialDownload) const;
 
+    void ProcessMessage(CNode* pfrom, const std::string& strCommand, CDataStream& vRecv);
+
     static bool HasQuorum(Consensus::LLMQType llmqType, const uint256& quorumHash);
 
     // all these methods will lock cs_main for a short period of time
