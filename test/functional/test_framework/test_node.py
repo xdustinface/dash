@@ -301,7 +301,7 @@ class TestNode():
         # wait for p2p connections to disappear from getpeerinfo()
         def check_peers():
             for p in self.getpeerinfo():
-                if p['subver'] == MY_SUBVERSION.decode():
+                if MY_SUBVERSION.decode() in p['subver']:
                     return False
             return True
         wait_until(check_peers, timeout=5)

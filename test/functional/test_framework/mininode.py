@@ -63,6 +63,8 @@ MESSAGEMAP = {
     b"notfound": None,
     b"qfcommit": None,
     b"qsendrecsigs": None,
+    b"qgetdata": msg_qgetdata,
+    b"qdata": msg_qdata,
     b"senddsq": None,
     b"spork": None,
 }
@@ -228,7 +230,7 @@ class P2PConnection(asyncore.dispatcher):
         if not self.is_connected:
             raise IOError('Not connected')
         self._log_message("send", message)
-        tmsg = self._build_message(message)
+        tmsg = self.build_message(message)
         with mininode_lock:
             if len(self.sendbuf) == 0:
                 try:
@@ -241,7 +243,7 @@ class P2PConnection(asyncore.dispatcher):
 
     # Class utility methods
 
-    def _build_message(self, message):
+    def build_message(self, message):
         """Build a serialized P2P message"""
         command = message.command
         data = message.serialize()
@@ -303,7 +305,7 @@ class P2PInterface(P2PConnection):
             vt.addrFrom.port = 0
             if self.network == "devnet" and self.devnet_name is not None:
                 vt.strSubVer = MY_SUBVERSION_DEVNET % self.devnet_name.encode()
-            self.sendbuf = self._build_message(vt)  # Will be sent right after handle_connect
+            self.sendbuf = self.build_message(vt)  # Will be sent right after handle_connect
 
     # Message receiving methods
 
@@ -363,6 +365,9 @@ class P2PInterface(P2PConnection):
     def on_mnlistdiff(self, message): pass
     def on_clsig(self, message): pass
     def on_islock(self, message): pass
+
+    def on_qgetdata(self, message): pass
+    def on_qdata(self, message): pass
 
     def on_verack(self, message):
         self.verack_received = True

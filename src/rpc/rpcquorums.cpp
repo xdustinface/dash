@@ -548,6 +548,44 @@ UniValue quorum_dkgsimerror(const JSONRPCRequest& request)
     return UniValue();
 }
 
+void quorum_getdata_help()
+{
+    throw std::runtime_error(
+        "quorum getdata nodeId llmqType \"quorumHash\" dataMask \"proTxHash\"\n"
+        "This allows to trigger sending a QGETDATA messages to a connected peer.\n"
+        "\nArguments:\n"
+        "1. nodeId          (integer, required) The internal nodeId of the peer to receive the QGETDATA message.\n"
+        "2. llmqType        (integer, required) The quorum type the data will be request from.\n"
+        "3. \"quorumHash\"    (string, required) The quorum hash the data will be request from.\n"
+        "4. dataMask        (integer, required) Defined which data will be requested.\n"
+        "                                       Possible values: 1 - Request quorum verification vector\n"
+        "                                                        2 - Request encrypted contributions for member defined by \"proTxHash\"\n"
+        "                                                        3 - Request both, 1 and 2\n"
+        "5. \"proTxHash\"     (string, optional) The proTxHash the contributions will be requested for. Must be member of the provided LLMQ.\n"
+        );
+}
+
+UniValue quorum_getdata(const JSONRPCRequest& request)
+{
+    if (request.fHelp || (request.params.size() != 6)) {
+        quorum_getdata_help();
+    }
+
+    NodeId nodeId = ParseInt64V(request.params[1], "nodeId");
+    Consensus::LLMQType llmqType = static_cast<Consensus::LLMQType>(ParseInt32V(request.params[2], "llmqType"));
+    uint256 quorumHash = ParseHashV(request.params[3], "quorumHash");
+    uint16_t nDataMask = static_cast<uint16_t>(ParseInt32V(request.params[4], "dataMask"));
+    uint256 proTxHash = ParseHashV(request.params[5], "proTxHash");
+    const CBlockIndex* pQuorumIndex{nullptr};
+    {
+        LOCK(cs_main);
+        pQuorumIndex = LookupBlockIndex(quorumHash);
+    }
+    return g_connman->ForNode(nodeId, [&](CNode* pNode) {
+        return llmq::quorumManager->RequestQuorumData(pNode, llmqType, pQuorumIndex, nDataMask, proTxHash);
+    });
+}
+
 
 [[ noreturn ]] void quorum_help()
 {
@@ -597,6 +635,8 @@ UniValue quorum(const JSONRPCRequest& request)
         return quorum_selectquorum(request);
     } else if (command == "dkgsimerror") {
         return quorum_dkgsimerror(request);
+    } else if (command == "getdata") {
+        return quorum_getdata(request);
     } else {
         quorum_help();
     }

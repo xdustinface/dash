@@ -67,6 +67,7 @@ BASE_SCRIPTS= [
     'rpc_fundrawtransaction.py',
     'rpc_fundrawtransaction_hd.py',
     'wallet_multiwallet.py --usecli',
+    'p2p_quorum_data.py',
     # vv Tests less than 2m vv
     'p2p_instantsend.py',
     'wallet_basic.py',
@@ -156,6 +157,7 @@ BASE_SCRIPTS= [
     'feature_shutdown.py',
     'rpc_privatesend.py',
     'rpc_masternode.py',
+    'rpc_mnauth.py',
     'rpc_verifyislock.py',
     'p2p_fingerprint.py',
     'rpc_platform_filter.py',

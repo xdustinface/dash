@@ -262,6 +262,7 @@ private:
     std::vector<BLSVerificationVectorPtr> receivedVvecs;
     // these are not necessarily verified yet. Only trust in what was written to the DB
     BLSSecretKeyVector receivedSkContributions;
+    std::vector<std::shared_ptr<CBLSIESMultiRecipientObjects<CBLSSecretKey>>> vecEncryptedContributions;
 
     uint256 myProTxHash;
     CBLSId myId;
