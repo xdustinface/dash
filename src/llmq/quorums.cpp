@@ -107,6 +107,9 @@ public:
     }
 };
 
+static CCriticalSection cs_requests;
+static std::map<std::pair<uint256, bool>, CQuorumDataRequest> mapQuorumDataRequests;
+
 CQuorum::~CQuorum()
 {
     // most likely the thread is already done
@@ -270,6 +273,17 @@ void CQuorumManager::UpdatedBlockTip(const CBlockIndex* pindexNew, bool fInitial
 
     for (auto& p : Params().GetConsensus().llmqs) {
         EnsureQuorumConnections(p.first, pindexNew);
+    }
+
+    // Cleanup expired data requests
+    LOCK(cs_requests);
+    auto it = mapQuorumDataRequests.begin();
+    while (it != mapQuorumDataRequests.end()) {
+        if (it->second.IsExpired()) {
+            it = mapQuorumDataRequests.erase(it);
+        } else {
+            ++it;
+        }
     }
 }
 
@@ -517,6 +531,19 @@ void CQuorumManager::ProcessMessage(CNode* pFrom, const std::string& strCommand,
             g_connman->PushMessage(pFrom, msgMaker.Make(NetMsgType::QDATA, ssResponse));
         };
 
+        {
+            LOCK(cs_requests);
+            auto key = std::make_pair(pFrom->verifiedProRegTxHash, false);
+            auto it = mapQuorumDataRequests.find(key);
+            if (it == mapQuorumDataRequests.end()) {
+                it = mapQuorumDataRequests.emplace(key, request).first;
+            } else if(it->second.IsExpired()) {
+                it->second = request;
+            } else {
+                error("Request limit exceeded", true, 25);
+            }
+        }
+
         if (Params().GetConsensus().llmqs.count(request.GetLLMQType()) == 0) {
             sendQDATA(llmq::QuorumData::QUORUM_TYPE_INVALID);
             return;
@@ -579,6 +606,29 @@ void CQuorumManager::ProcessMessage(CNode* pFrom, const std::string& strCommand,
 
         vRecv >> request;
         vRecv >> nError;
+
+        {
+            LOCK(cs_requests);
+
+            auto it = mapQuorumDataRequests.find(std::make_pair(pFrom->verifiedProRegTxHash, true));
+
+            if (it == mapQuorumDataRequests.end()) {
+                error("Not requested");
+                return;
+            }
+
+            if (it->second.IsProcessed()) {
+                error("Already received");
+                return;
+            }
+
+            if (request != it->second) {
+                error("Not like requested");
+                return;
+            }
+
+            it->second.SetProcessed();
+        }
 
         const CBlockIndex* pQuorumIndex = LookupBlockIndex(request.GetQuorumHash());
         if (pQuorumIndex == nullptr) {
