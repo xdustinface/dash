@@ -40,6 +40,14 @@ public:
     {
     }
 
+    CBLSIESEncryptedObject(const CBLSPublicKey& ephemeralPubKeyIn, const uint256& ivIn, const std::vector<unsigned char>& dataIn) :
+        CBLSIESEncryptedBlob()
+    {
+        ephemeralPubKey = ephemeralPubKeyIn;
+        iv = ivIn;
+        data = dataIn;
+    }
+
     bool Encrypt(const CBLSPublicKey& peerPubKey, const Object& obj, int nVersion)
     {
         try {
