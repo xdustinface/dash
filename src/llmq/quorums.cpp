@@ -53,6 +53,24 @@ void CQuorum::Init(const CFinalCommitment& _qc, const CBlockIndex* _pindexQuorum
     minedBlockHash = _minedBlockHash;
 }
 
+bool CQuorum::SetVerificationVector(const BLSVerificationVector& quorumVecIn)
+{
+    if (::SerializeHash(quorumVecIn) != qc.quorumVvecHash) {
+        return false;
+    }
+    quorumVvec = std::make_shared<BLSVerificationVector>(quorumVecIn);
+    return true;
+}
+
+bool CQuorum::SetSecretKeyShare(const CBLSSecretKey& secretKeyShare)
+{
+    if (!secretKeyShare.IsValid() || (secretKeyShare.GetPublicKey() != GetPubKeyShare(GetMemberIndex(activeMasternodeInfo.proTxHash)))) {
+        return false;
+    }
+    skShare = secretKeyShare;
+    return true;
+}
+
 bool CQuorum::IsMember(const uint256& proTxHash) const
 {
     for (auto& dmn : members) {
