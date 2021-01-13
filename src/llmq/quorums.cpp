@@ -43,11 +43,6 @@ CQuorum::~CQuorum()
 {
     // most likely the thread is already done
     stopCachePopulatorThread = true;
-    // watch out to not join the thread when we're called from inside the thread, which might happen on shutdown. This
-    // is because on shutdown the thread is the last owner of the shared CQuorum instance and thus the destroyer of it.
-    if (cachePopulatorThread.joinable() && cachePopulatorThread.get_id() != std::this_thread::get_id()) {
-        cachePopulatorThread.join();
-    }
 }
 
 void CQuorum::Init(const CFinalCommitment& _qc, const CBlockIndex* _pindexQuorum, const uint256& _minedBlockHash, const std::vector<CDeterministicMNCPtr>& _members)
@@ -152,6 +147,7 @@ void CQuorum::StartCachePopulatorThread(std::shared_ptr<CQuorum> _this)
         }
         LogPrint(BCLog::LLMQ, "CQuorum::StartCachePopulatorThread -- done. time=%d\n", t.count());
     });
+    _this->cachePopulatorThread.detach();
 }
 
 CQuorumManager::CQuorumManager(CEvoDB& _evoDb, CBLSWorker& _blsWorker, CDKGSessionManager& _dkgManager) :
