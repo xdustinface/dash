@@ -510,6 +510,38 @@ UniValue quorum_dkgsimerror(const JSONRPCRequest& request)
     return UniValue();
 }
 
+void quorum_getdata_help()
+{
+    throw std::runtime_error(
+        "quorum getdata nodeId llmqType \"quorumHash\" dataMask \"proTxHash\"\n"
+        "This enables simulation of errors and malicious behaviour in the DKG. Do NOT use this on mainnet\n"
+        "as you will get yourself very likely PoSe banned for this.\n"
+        "\nArguments:\n"
+        "1. nodeId          (integer, required) .\n"
+        "2. llmqType        (integer, required) .\n"
+        "3. \"quorumHash\"    (string, required) .\n"
+        "4. dataMask        (integer, required) .\n"
+        "5. \"proTxHash\"     (string, optional) .\n"
+        );
+}
+
+UniValue quorum_getdata(const JSONRPCRequest& request)
+{
+    if (request.fHelp || (request.params.size() != 6)) {
+        quorum_getdata_help();
+    }
+
+    NodeId nodeId = ParseInt64V(request.params[1], "nodeId");
+    Consensus::LLMQType llmqType = static_cast<Consensus::LLMQType>(ParseInt32V(request.params[2], "llmqType"));
+    uint256 quorumHash = ParseHashV(request.params[3], "quorumHash");
+    uint16_t nDataMask = static_cast<uint16_t>(ParseInt32V(request.params[4], "dataMask"));
+    uint256 proTxHash = ParseHashV(request.params[5], "proTxHash");
+
+    return g_connman->ForNode(nodeId, [&](CNode* pNode){
+        return llmq::quorumManager->RequestQuorumData(pNode, llmqType, quorumHash, nDataMask, proTxHash);
+    });
+}
+
 
 [[ noreturn ]] void quorum_help()
 {
@@ -559,6 +591,8 @@ UniValue quorum(const JSONRPCRequest& request)
         return quorum_selectquorum(request);
     } else if (command == "dkgsimerror") {
         return quorum_dkgsimerror(request);
+    } else if (command == "getdata") {
+        return quorum_getdata(request);
     } else {
         quorum_help();
     }
