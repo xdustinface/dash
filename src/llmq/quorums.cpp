@@ -500,6 +500,11 @@ void CQuorumManager::ProcessMessage(CNode* pFrom, const std::string& strCommand,
 
     if (strCommand == NetMsgType::QGETDATA) {
 
+        if (!fMasternodeMode || pFrom == nullptr || pFrom->verifiedProRegTxHash.IsNull()) {
+            error("Not a masternode");
+            return;
+        }
+
         CQuorumDataRequest request;
         vRecv >> request;
 
@@ -563,6 +568,11 @@ void CQuorumManager::ProcessMessage(CNode* pFrom, const std::string& strCommand,
     }
 
     if (strCommand == NetMsgType::QDATA) {
+
+        if (!fMasternodeMode || pFrom == nullptr || pFrom->verifiedProRegTxHash.IsNull()) {
+            error("Not a masternode");
+            return;
+        }
 
         CQuorumDataRequest request;
         uint8_t nError;
