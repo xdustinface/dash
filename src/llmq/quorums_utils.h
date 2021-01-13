@@ -17,6 +17,22 @@ class VersionBitsCache;
 namespace llmq
 {
 
+namespace QuorumData {
+enum RequestFlags : uint16_t {
+    QUORUM_VERIFICATION_VECTOR = 0x0001,
+    ENCRYPTED_CONTRIBUTIONS = 0x0002,
+};
+enum ErrorFlags : uint8_t {
+    NO_ERROR,
+    QUORUM_TYPE_INVALID,
+    QUORUM_BLOCK_NOT_FOUND,
+    QUORUM_NOT_FOUND,
+    MASTERNODE_IS_NO_MEMBER,
+    QUORUM_VERIFICATION_VECTOR_MISSING,
+    ENCRYPTED_CONTRIBUTIONS_MISSING,
+};
+} // namespace QuorumData
+
 // Use a separate cache instance instead of versionbitscache to avoid locking cs_main
 // and dealing with all kinds of deadlocks.
 extern CCriticalSection cs_llmq_vbc;

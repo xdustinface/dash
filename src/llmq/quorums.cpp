@@ -15,6 +15,8 @@
 #include <chainparams.h>
 #include <init.h>
 #include <masternode/masternode-sync.h>
+#include <net_processing.h>
+#include <netmessagemaker.h>
 #include <univalue.h>
 #include <validation.h>
 
@@ -483,6 +485,150 @@ CQuorumCPtr CQuorumManager::GetQuorum(Consensus::LLMQType llmqType, const CBlock
     quorumsCache.emplace(std::make_pair(llmqType, quorumHash), quorum);
 
     return quorum;
+}
+
+void CQuorumManager::ProcessMessage(CNode* pFrom, const std::string& strCommand, CDataStream& vRecv)
+{
+    auto strFunc = __func__;
+    auto error = [&](const std::string strError, bool fIncreaseScore = true, int nScore = 10) {
+        LogPrint(BCLog::LLMQ, "CQuorumManager::%s -- %s: %s, from peer=%d\n", strFunc, strCommand, strError, pFrom->GetId());
+        if (fIncreaseScore) {
+            LOCK(cs_main);
+            Misbehaving(pFrom->GetId(), nScore);
+        }
+    };
+
+    if (strCommand == NetMsgType::QGETDATA) {
+
+        CQuorumDataRequest request;
+        vRecv >> request;
+
+        auto sendQDATA = [&](uint8_t nError, const CDataStream& body = CDataStream(SER_NETWORK, PROTOCOL_VERSION)) {
+            CDataStream ssResponse(SER_NETWORK, pFrom->GetSendVersion());
+            ssResponse << request;
+            ssResponse << nError;
+            ssResponse << body;
+            CNetMsgMaker msgMaker(pFrom->GetSendVersion());
+            g_connman->PushMessage(pFrom, msgMaker.Make(NetMsgType::QDATA, ssResponse));
+        };
+
+        if (Params().GetConsensus().llmqs.count(request.GetLLMQType()) == 0) {
+            sendQDATA(llmq::QuorumData::QUORUM_TYPE_INVALID);
+            return;
+        }
+
+        const CBlockIndex* pQuorumIndex = LookupBlockIndex(request.GetQuorumHash());
+        if (pQuorumIndex == nullptr) {
+            sendQDATA(llmq::QuorumData::QUORUM_BLOCK_NOT_FOUND);
+            return;
+        }
+
+        const CQuorumCPtr pQuorum = GetQuorum(request.GetLLMQType(), pQuorumIndex);
+        if (pQuorum == nullptr) {
+            sendQDATA(llmq::QuorumData::QUORUM_NOT_FOUND);
+            return;
+        }
+
+        CDataStream ssData(SER_NETWORK, pFrom->GetSendVersion());
+
+        if (request.GetDataMask() & llmq::QuorumData::QUORUM_VERIFICATION_VECTOR) {
+
+            if (!pQuorum->quorumVvec) {
+                sendQDATA(llmq::QuorumData::QUORUM_VERIFICATION_VECTOR_MISSING);
+                return;
+            }
+
+            ssData << *pQuorum->quorumVvec;
+        }
+
+        if (request.GetDataMask() & llmq::QuorumData::ENCRYPTED_CONTRIBUTIONS) {
+
+            int memberIdx = pQuorum->GetMemberIndex(request.GetProTxHash());
+            if (memberIdx == -1) {
+                sendQDATA(llmq::QuorumData::MASTERNODE_IS_NO_MEMBER);
+                return;
+            }
+
+            std::vector<CBLSIESEncryptedObject<CBLSSecretKey>> vecEncrypted;
+            if (!quorumDKGSessionManager->GetEncryptedContributions(request.GetLLMQType(), pQuorumIndex, pQuorum->qc.validMembers, request.GetProTxHash(), vecEncrypted)) {
+                sendQDATA(llmq::QuorumData::ENCRYPTED_CONTRIBUTIONS_MISSING);
+                return;
+            }
+
+            ssData << vecEncrypted;
+        }
+
+        sendQDATA(llmq::QuorumData::NO_ERROR, ssData);
+        return;
+    }
+
+    if (strCommand == NetMsgType::QDATA) {
+
+        CQuorumDataRequest request;
+        uint8_t nError;
+
+        vRecv >> request;
+        vRecv >> nError;
+
+        const CBlockIndex* pQuorumIndex = LookupBlockIndex(request.GetQuorumHash());
+        if (pQuorumIndex == nullptr) {
+            error("Quorum block not found");
+            return;
+        }
+
+        LOCK(quorumsCacheCs);
+        auto itQuorum = quorumsCache.find(std::make_pair(request.GetLLMQType(), request.GetQuorumHash()));
+        if (itQuorum == quorumsCache.end()) {
+            error("Quorum not found");
+            return;
+        }
+        CQuorumPtr pQuorum = itQuorum->second;
+
+        if (request.GetDataMask() & llmq::QuorumData::QUORUM_VERIFICATION_VECTOR) {
+
+            BLSVerificationVector verficationVector;
+            vRecv >> verficationVector;
+
+            if (!pQuorum->SetVerificationVector(verficationVector)) {
+                error("Invalid quorum verification vector");
+                return;
+            }
+        }
+
+        if (request.GetDataMask() & llmq::QuorumData::ENCRYPTED_CONTRIBUTIONS) {
+
+            if (pQuorum->quorumVvec->size() != pQuorum->params.threshold) {
+                error("No valid quorum verification vector available", false);
+                return;
+            }
+
+            int memberIdx = pQuorum->GetMemberIndex(request.GetProTxHash());
+            if (memberIdx == -1) {
+                error("Not a member of the quorum");
+                return;
+            }
+
+            std::vector<CBLSIESEncryptedObject<CBLSSecretKey>> vecEncrypted;
+            vRecv >> vecEncrypted;
+
+            BLSSecretKeyVector vecSecretKeys;
+            vecSecretKeys.resize(vecEncrypted.size());
+            for (size_t i = 0; i < vecEncrypted.size(); ++i) {
+                if (!vecEncrypted[i].Decrypt(*activeMasternodeInfo.blsKeyOperator, vecSecretKeys[i], PROTOCOL_VERSION)) {
+                    error("Failed to decrypt");
+                    return;
+                }
+            }
+
+            CBLSSecretKey secretKeyShare = blsWorker.AggregateSecretKeys(vecSecretKeys);
+            if (!pQuorum->SetSecretKeyShare(secretKeyShare)) {
+                error("Invalid secret key share received");
+                return;
+            }
+        }
+        pQuorum->WriteContributions(evoDb);
+        return;
+    }
 }
 
 } // namespace llmq

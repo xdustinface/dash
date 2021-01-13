@@ -95,6 +95,8 @@ private:
 public:
     CQuorumManager(CEvoDB& _evoDb, CBLSWorker& _blsWorker, CDKGSessionManager& _dkgManager);
 
+    void ProcessMessage(CNode* pfrom, const std::string& strCommand, CDataStream& vRecv);
+
     void UpdatedBlockTip(const CBlockIndex *pindexNew, bool fInitialDownload);
 
     static bool HasQuorum(Consensus::LLMQType llmqType, const uint256& quorumHash);
