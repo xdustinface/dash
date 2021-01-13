@@ -63,6 +63,8 @@ MESSAGEMAP = {
     b"notfound": None,
     b"qfcommit": None,
     b"qsendrecsigs": None,
+    b"qgetdata": msg_qgetdata,
+    b"qdata": msg_qdata,
     b"senddsq": None,
     b"spork": None,
 }
@@ -363,6 +365,9 @@ class P2PInterface(P2PConnection):
     def on_mnlistdiff(self, message): pass
     def on_clsig(self, message): pass
     def on_islock(self, message): pass
+
+    def on_qgetdata(self, message): pass
+    def on_qdata(self, message): pass
 
     def on_verack(self, message):
         self.verack_received = True
