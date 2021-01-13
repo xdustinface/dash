@@ -160,6 +160,11 @@ public:
             return false;
         }
     }
+
+    CBLSIESEncryptedObject<Object> Get(const size_t idx)
+    {
+        return {ephemeralPubKey, ivSeed, blobs[idx]};
+    }
 };
 
 #endif // DASH_CRYPTO_BLS_IES_H
