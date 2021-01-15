@@ -203,11 +203,20 @@ void CQuorumManager::EnsureQuorumConnections(Consensus::LLMQType llmqType, const
     }
 }
 
-bool CQuorumManager::BuildQuorumFromCommitment(const CFinalCommitment& qc, const CBlockIndex* pindexQuorum, const uint256& minedBlockHash, std::shared_ptr<CQuorum>& quorum) const
+CQuorumPtr CQuorumManager::BuildQuorumFromCommitment(const Consensus::LLMQType llmqType, const CBlockIndex* pindexQuorum) const
 {
+    AssertLockHeld(quorumsCacheCs);
     assert(pindexQuorum);
+
+    CFinalCommitment qc;
+    const uint256& quorumHash{pindexQuorum->GetBlockHash()};
+    uint256 minedBlockHash;
+    if (!quorumBlockProcessor->GetMinedCommitment(llmqType, quorumHash, qc, minedBlockHash)) {
+        return nullptr;
+    }
     assert(qc.quorumHash == pindexQuorum->GetBlockHash());
 
+    auto quorum = std::make_shared<CQuorum>(llmq::GetLLMQParams(llmqType), blsWorker);
     auto members = CLLMQUtils::GetAllQuorumMembers((Consensus::LLMQType)qc.llmqType, pindexQuorum);
 
     quorum->Init(qc, pindexQuorum, minedBlockHash, members);
@@ -231,7 +240,9 @@ bool CQuorumManager::BuildQuorumFromCommitment(const CFinalCommitment& qc, const
         CQuorum::StartCachePopulatorThread(quorum);
     }
 
-    return true;
+    quorumsCache.emplace(std::make_pair(llmqType, quorumHash), quorum);
+
+    return quorum;
 }
 
 bool CQuorumManager::BuildQuorumContributions(const CFinalCommitment& fqc, std::shared_ptr<CQuorum>& quorum) const
@@ -367,23 +378,7 @@ CQuorumCPtr CQuorumManager::GetQuorum(Consensus::LLMQType llmqType, const CBlock
         return it->second;
     }
 
-    CFinalCommitment qc;
-    uint256 minedBlockHash;
-    if (!quorumBlockProcessor->GetMinedCommitment(llmqType, quorumHash, qc, minedBlockHash)) {
-        return nullptr;
-    }
-
-    auto& params = Params().GetConsensus().llmqs.at(llmqType);
-
-    auto quorum = std::make_shared<CQuorum>(params, blsWorker);
-
-    if (!BuildQuorumFromCommitment(qc, pindexQuorum, minedBlockHash, quorum)) {
-        return nullptr;
-    }
-
-    quorumsCache.emplace(std::make_pair(llmqType, quorumHash), quorum);
-
-    return quorum;
+    return BuildQuorumFromCommitment(llmqType, pindexQuorum);
 }
 
 } // namespace llmq

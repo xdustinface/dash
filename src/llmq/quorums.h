@@ -85,8 +85,8 @@ private:
     CBLSWorker& blsWorker;
     CDKGSessionManager& dkgManager;
 
-    CCriticalSection quorumsCacheCs;
-    std::map<std::pair<Consensus::LLMQType, uint256>, CQuorumPtr> quorumsCache;
+    mutable CCriticalSection quorumsCacheCs;
+    mutable std::map<std::pair<Consensus::LLMQType, uint256>, CQuorumPtr> quorumsCache;
     unordered_lru_cache<std::pair<Consensus::LLMQType, uint256>, std::vector<CQuorumCPtr>, StaticSaltedHasher, 32> scanQuorumsCache;
 
 public:
@@ -107,7 +107,7 @@ private:
     // all private methods here are cs_main-free
     void EnsureQuorumConnections(Consensus::LLMQType llmqType, const CBlockIndex *pindexNew);
 
-    bool BuildQuorumFromCommitment(const CFinalCommitment& qc, const CBlockIndex* pindexQuorum, const uint256& minedBlockHash, std::shared_ptr<CQuorum>& quorum) const;
+    CQuorumPtr BuildQuorumFromCommitment(Consensus::LLMQType llmqType, const CBlockIndex* pindexQuorum) const;
     bool BuildQuorumContributions(const CFinalCommitment& fqc, std::shared_ptr<CQuorum>& quorum) const;
 
     CQuorumCPtr GetQuorum(Consensus::LLMQType llmqType, const CBlockIndex* pindex);
