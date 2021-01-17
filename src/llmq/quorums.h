@@ -149,11 +149,13 @@ private:
     // Recovery of public key shares is very slow, so we start a background thread that pre-populates a cache so that
     // the public key shares are ready when needed later
     mutable CBLSWorkerCache blsCache;
-    std::atomic<bool> stopCachePopulatorThread;
+    std::atomic<bool> stopQuorumThreads;
     std::thread cachePopulatorThread;
+    CThreadInterrupt interruptQuorumDataReceived;
+    std::atomic<bool> fQuorumDataRecoveryThreadRunning{false};
 
 public:
-    CQuorum(const Consensus::LLMQParams& _params, CBLSWorker& _blsWorker) : params(_params), blsCache(_blsWorker), stopCachePopulatorThread(false) {}
+    CQuorum(const Consensus::LLMQParams& _params, CBLSWorker& _blsWorker);
     ~CQuorum();
     void Init(const CFinalCommitment& _qc, const CBlockIndex* _pindexQuorum, const uint256& _minedBlockHash, const std::vector<CDeterministicMNCPtr>& _members);
 
@@ -171,6 +173,11 @@ private:
     void WriteContributions(CEvoDB& evoDb);
     bool ReadContributions(CEvoDB& evoDb);
     static void StartCachePopulatorThread(std::shared_ptr<CQuorum> _this);
+    static void StartQuorumDataRecoveryThread(std::shared_ptr<CQuorum> _this, const CBlockIndex* pIndex, uint16_t nDataMask);
+    /// Returns the start offset for the masternode with the given proTxHash. This offset is applied when picking data recovery members of a quorum's
+    /// memberlist and is calculated based on a list of all member of all active quorums for the given llmqType in a way that each member
+    /// should receive the same number of request if all active llmqType members requests data from one llmqType quorum.
+    size_t GetQuorumRecoveryStartOffset(const CBlockIndex* pIndex) const;
 };
 typedef std::shared_ptr<CQuorum> CQuorumPtr;
 typedef std::shared_ptr<const CQuorum> CQuorumCPtr;
@@ -194,6 +201,8 @@ private:
 
 public:
     CQuorumManager(CEvoDB& _evoDb, CBLSWorker& _blsWorker, CDKGSessionManager& _dkgManager);
+
+    void TriggerQuorumDataRecoveryThreads(const CBlockIndex* pIndex) const;
 
     void UpdatedBlockTip(const CBlockIndex *pindexNew, bool fInitialDownload) const;
 
