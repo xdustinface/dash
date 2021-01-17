@@ -36,11 +36,17 @@ CSporkManager::CSporkManager()
     }
 }
 
-bool CSporkManager::SporkValueIsActive(SporkId nSporkID, int64_t &nActiveValueRet) const
+bool CSporkManager::SporkValueIsActive(SporkId nSporkID, int64_t &nActiveValueRet)
 {
     LOCK(cs);
 
     if (!mapSporksActive.count(nSporkID)) return false;
+
+    auto it = mapSporksCachedValues.find(nSporkID);
+    if (it != mapSporksCachedValues.end()) {
+        nActiveValueRet = it->second;
+        return true;
+    }
 
     // calc how many values we have and how many signers vote for every value
     std::unordered_map<int64_t, int> mapValueCounts;
@@ -50,6 +56,7 @@ bool CSporkManager::SporkValueIsActive(SporkId nSporkID, int64_t &nActiveValueRe
             // nMinSporkKeys is always more than the half of the max spork keys number,
             // so there is only one such value and we can stop here
             nActiveValueRet = pair.second.nValue;
+            mapSporksCachedValues[nSporkID] = nActiveValueRet;
             return true;
         }
     }
@@ -168,6 +175,9 @@ void CSporkManager::ProcessSpork(CNode* pfrom, const std::string& strCommand, CD
             LOCK(cs); // make sure to not lock this together with cs_main
             mapSporksByHash[hash] = spork;
             mapSporksActive[spork.nSporkID][keyIDSigner] = spork;
+            // Clear cached values on new spork being processed
+            mapSporksCachedActive.erase(spork.nSporkID);
+            mapSporksCachedValues.erase(spork.nSporkID);
         }
         spork.Relay(connman);
 
@@ -203,6 +213,9 @@ bool CSporkManager::UpdateSpork(SporkId nSporkID, int64_t nValue, CConnman& conn
         LOCK(cs);
         mapSporksByHash[spork.GetHash()] = spork;
         mapSporksActive[nSporkID][keyIDSigner] = spork;
+        // Clear cached values on new spork being processed
+        mapSporksCachedActive.erase(spork.nSporkID);
+        mapSporksCachedValues.erase(spork.nSporkID);
     }
 
     spork.Relay(connman);
@@ -211,8 +224,20 @@ bool CSporkManager::UpdateSpork(SporkId nSporkID, int64_t nValue, CConnman& conn
 
 bool CSporkManager::IsSporkActive(SporkId nSporkID)
 {
+    // If nSporkID is cached, and the cached value is true, then return early true
+    auto it = mapSporksCachedActive.find(nSporkID);
+    if (it != mapSporksCachedActive.end() && it->second) {
+        return true;
+    }
+
     int64_t nSporkValue = GetSporkValue(nSporkID);
-    return nSporkValue < GetAdjustedTime();
+    // Get time is somewhat costly it looks like
+    bool ret = nSporkValue < GetAdjustedTime();
+    // Only cache true values
+    if (ret) {
+        mapSporksCachedActive[nSporkID] = ret;
+    }
+    return ret;
 }
 
 int64_t CSporkManager::GetSporkValue(SporkId nSporkID)
