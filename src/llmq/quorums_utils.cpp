@@ -313,6 +313,28 @@ std::vector<Consensus::LLMQType> CLLMQUtils::GetEnabledQuorumTypes(const CBlockI
     return ret;
 }
 
+std::set<Consensus::LLMQType> CLLMQUtils::GetEnabledQuorumVvecRequests()
+{
+    std::set<Consensus::LLMQType> setQuorumVvecRequests;
+    for (const std::string& strLLMQType : gArgs.GetArgs("-llmq-requests-qvvec")) {
+        Consensus::LLMQType llmqType = Consensus::LLMQ_NONE;
+        for (const auto& p : Params().GetConsensus().llmqs) {
+            if (p.second.name == strLLMQType) {
+                llmqType = p.first;
+                break;
+            }
+        }
+        if (llmqType == Consensus::LLMQ_NONE) {
+            throw std::invalid_argument(strprintf("Invalid llmqType in -llmq-requests-qvvec: %s", strLLMQType));
+        }
+        if (setQuorumVvecRequests.count(llmqType) > 0) {
+            throw std::invalid_argument(strprintf("Duplicated llmqType in -llmq-requests-qvvec: %s", strLLMQType));
+        }
+        setQuorumVvecRequests.emplace(llmqType);
+    }
+    return setQuorumVvecRequests;
+}
+
 const Consensus::LLMQParams& GetLLMQParams(Consensus::LLMQType llmqType)
 {
     return Params().GetConsensus().llmqs.at(llmqType);

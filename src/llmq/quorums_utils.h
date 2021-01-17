@@ -52,6 +52,8 @@ public:
     static bool IsQuorumTypeEnabled(Consensus::LLMQType llmqType, const CBlockIndex* pindex);
     static std::vector<Consensus::LLMQType> GetEnabledQuorumTypes(const CBlockIndex* pindex);
 
+    static std::set<Consensus::LLMQType> GetEnabledQuorumVvecRequests();
+
     template<typename NodesContainer, typename Continue, typename Callback>
     static void IterateNodesRandom(NodesContainer& nodeStates, Continue&& cont, Callback&& callback, FastRandomContext& rnd)
     {
