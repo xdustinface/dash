@@ -227,6 +227,8 @@ bool CQuorumBlockProcessor::ProcessCommitment(int nHeight, const uint256& blockH
     {
         LOCK(minableCommitmentsCs);
         hasMinedCommitmentCache.erase(cacheKey);
+        minableCommitmentsByQuorum.erase(cacheKey);
+        minableCommitments.erase(::SerializeHash(qc));
     }
 
     LogPrint(BCLog::LLMQ, "CQuorumBlockProcessor::%s -- processed commitment from block. type=%d, quorumHash=%s, signers=%s, validMembers=%d, quorumPublicKey=%s\n", __func__,
