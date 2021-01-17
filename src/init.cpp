@@ -62,8 +62,10 @@
 #include <walletinitinterface.h>
 
 #include <evo/deterministicmns.h>
+#include <llmq/quorums.h>
 #include <llmq/quorums_init.h>
 #include <llmq/quorums_blockprocessor.h>
+#include <llmq/quorums_utils.h>
 
 #include <statsd_client.h>
 
@@ -1591,6 +1593,20 @@ bool AppInitParameterInteraction()
         }
     } else if (gArgs.IsArgSet("-llmqtestparams")) {
         return InitError("LLMQ test params can only be overridden on regtest.");
+    }
+
+    int nDataRecovery = gArgs.GetArg("-llmq-quorum-data-recovery", llmq::DEFAULT_ENABLE_QUORUM_DATA_RECOVERY);
+    if ((nDataRecovery < 0) || (nDataRecovery > 1)) {
+        return InitError("Invalid value for -llmq-quorum-data-recovery, 1: Enabled, 0: Disabled");
+    }
+
+    try {
+        if (llmq::CLLMQUtils::GetEnabledQuorumVvecRequests().size() > 0 &&
+            !llmq::quorumManager->QuorumDataRecoveryEnabled()) {
+            InitWarning("-llmq-requests-qvvec set but recovery thread is disabled due to -llmq-quorum-data-recovery=0");
+        }
+    } catch (const std::invalid_argument& e) {
+        return InitError(e.what());
     }
 
     if (gArgs.IsArgSet("-maxorphantx")) {
