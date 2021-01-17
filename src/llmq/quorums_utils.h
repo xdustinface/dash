@@ -57,6 +57,9 @@ public:
     /// Returns the state of `-llmq-data-recovery`
     static bool QuorumDataRecoveryEnabled();
 
+    /// Returns the values given by `-llmq-qvvec-sync`
+    static std::set<Consensus::LLMQType> GetEnabledQuorumVvecSyncTypes();
+
     template<typename NodesContainer, typename Continue, typename Callback>
     static void IterateNodesRandom(NodesContainer& nodeStates, Continue&& cont, Callback&& callback, FastRandomContext& rnd)
     {

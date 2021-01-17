@@ -341,11 +341,22 @@ void CQuorumManager::TriggerQuorumDataRecoveryThreads(const CBlockIndex* pIndex)
         return;
     }
 
+    const std::set<Consensus::LLMQType> setQuorumVvecSyncTypes = CLLMQUtils::GetEnabledQuorumVvecSyncTypes();
+
     LogPrint(BCLog::LLMQ, "CQuorumManager::%s -- Process block %s\n", __func__, pIndex->GetBlockHash().ToString());
 
     for (auto& llmq : Params().GetConsensus().llmqs) {
         // Process signingActiveQuorumCount + 1 quorums for all available llmqTypes
         const auto vecQuorums = ScanQuorums(llmq.first, pIndex, llmq.second.signingActiveQuorumCount + 1);
+
+        // First check if we are member of any quorum of this type
+        bool fWeAreQuorumTypeMember{false};
+        for (const auto& pQuorum : vecQuorums) {
+            if (pQuorum->IsValidMember(activeMasternodeInfo.proTxHash)) {
+                fWeAreQuorumTypeMember = true;
+                break;
+            }
+        }
 
         for (const auto& pQuorum : vecQuorums) {
             // If there is already a thread running for this specific quorum skip it
@@ -355,8 +366,9 @@ void CQuorumManager::TriggerQuorumDataRecoveryThreads(const CBlockIndex* pIndex)
 
             uint16_t nDataMask{0};
             const bool fWeAreQuorumMember = pQuorum->IsValidMember(activeMasternodeInfo.proTxHash);
+            const bool fTypeRequestsEnabled = setQuorumVvecSyncTypes.count(pQuorum->qc.llmqType) > 0;
 
-            if (fWeAreQuorumMember && pQuorum->quorumVvec == nullptr) {
+            if ((fWeAreQuorumMember || (fWeAreQuorumTypeMember && fTypeRequestsEnabled)) && pQuorum->quorumVvec == nullptr) {
                 nDataMask |= llmq::CQuorumDataRequest::QUORUM_VERIFICATION_VECTOR;
             }
 
