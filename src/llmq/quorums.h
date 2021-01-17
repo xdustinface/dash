@@ -86,7 +86,7 @@ private:
     CDKGSessionManager& dkgManager;
 
     mutable CCriticalSection quorumsCacheCs;
-    mutable std::map<std::pair<Consensus::LLMQType, uint256>, CQuorumPtr> quorumsCache;
+    mutable std::map<Consensus::LLMQType, unordered_lru_cache<uint256, CQuorumCPtr, StaticSaltedHasher>> mapQuorumsCache;
     mutable unordered_lru_cache<std::pair<Consensus::LLMQType, uint256>, std::vector<CQuorumCPtr>, StaticSaltedHasher, 32> scanQuorumsCache;
 
 public:

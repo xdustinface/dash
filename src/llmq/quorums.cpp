@@ -155,6 +155,7 @@ CQuorumManager::CQuorumManager(CEvoDB& _evoDb, CBLSWorker& _blsWorker, CDKGSessi
     blsWorker(_blsWorker),
     dkgManager(_dkgManager)
 {
+    CLLMQUtils::InitQuorumsCache(mapQuorumsCache);
 }
 
 void CQuorumManager::UpdatedBlockTip(const CBlockIndex* pindexNew, bool fInitialDownload) const
@@ -236,7 +237,7 @@ CQuorumPtr CQuorumManager::BuildQuorumFromCommitment(const Consensus::LLMQType l
         CQuorum::StartCachePopulatorThread(quorum);
     }
 
-    quorumsCache.emplace(std::make_pair(llmqType, quorumHash), quorum);
+    mapQuorumsCache[llmqType].emplace(quorumHash, quorum);
 
     return quorum;
 }
@@ -372,10 +373,9 @@ CQuorumCPtr CQuorumManager::GetQuorum(Consensus::LLMQType llmqType, const CBlock
     }
 
     LOCK(quorumsCacheCs);
-
-    auto it = quorumsCache.find(std::make_pair(llmqType, quorumHash));
-    if (it != quorumsCache.end()) {
-        return it->second;
+    CQuorumCPtr pQuorum;
+    if (mapQuorumsCache[llmqType].get(quorumHash, pQuorum)) {
+        return pQuorum;
     }
 
     return BuildQuorumFromCommitment(llmqType, pindexQuorum);
