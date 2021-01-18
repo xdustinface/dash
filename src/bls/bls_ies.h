@@ -42,8 +42,7 @@ public:
     {
     }
 
-    CBLSIESEncryptedObject(const CBLSPublicKey& ephemeralPubKeyIn, const uint256& ivSeedIn, const std::vector<unsigned char>& dataIn) :
-        CBLSIESEncryptedBlob()
+    CBLSIESEncryptedObject(const CBLSPublicKey& ephemeralPubKeyIn, const uint256& ivSeedIn, const std::vector<unsigned char>& dataIn)
     {
         ephemeralPubKey = ephemeralPubKeyIn;
         ivSeed = ivSeedIn;
