@@ -542,6 +542,8 @@ class DashTestFramework(BitcoinTestFramework):
         self.llmq_size = 3
         self.llmq_threshold = 2
 
+        # This is nRequestTimeout in dash-q-getdata thread
+        self.quorum_data_request_timeout_seconds = 10
         # This is nExpirySeconds in CQuorumDataRequest
         self.quorum_data_request_expiry_seconds = 300
 
@@ -1104,6 +1106,8 @@ class DashTestFramework(BitcoinTestFramework):
                 if self.mocktime % 2:
                     self.bump_mocktime(self.quorum_data_request_expiry_seconds + 1)
                     self.nodes[0].generate(1)
+                else:
+                    self.bump_mocktime(self.quorum_data_request_timeout_seconds + 1)
 
             for test_mn in mns:
                 valid += self.test_mn_quorum_data(test_mn, quorum_type_in, quorum_hash_in, expect_secret)
