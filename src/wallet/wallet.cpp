@@ -3407,26 +3407,6 @@ bool CWallet::SelectDenominatedAmounts(CAmount nValueMax, std::set<CAmount>& set
     return nValueTotal >= CPrivateSend::GetSmallestDenomination();
 }
 
-bool CWallet::GetCollateralTxDSIn(CTxDSIn& txdsinRet, CAmount& nValueRet) const
-{
-    LOCK2(cs_main, cs_wallet);
-
-    std::vector<COutput> vCoins;
-
-    CCoinControl coin_control;
-    coin_control.nCoinType = CoinType::ONLY_PRIVATESEND_COLLATERAL;
-    AvailableCoins(vCoins, true, &coin_control);
-
-    if (vCoins.empty()) {
-        return false;
-    }
-
-    const auto& out = vCoins.at((int)GetRandInt(vCoins.size()));
-    txdsinRet = CTxDSIn(CTxIn(out.tx->tx->GetHash(), out.i), out.tx->tx->vout[out.i].scriptPubKey);
-    nValueRet = out.tx->tx->vout[out.i].nValue;
-    return true;
-}
-
 bool CWallet::GetMasternodeOutpointAndKeys(COutPoint& outpointRet, CPubKey& pubKeyRet, CKey& keyRet, const std::string& strTxHash, const std::string& strOutputIndex)
 {
     LOCK2(cs_main, cs_wallet);
@@ -3517,43 +3497,48 @@ bool CWallet::HasCollateralInputs(bool fOnlyConfirmed) const
     return !vCoins.empty();
 }
 
-bool CWallet::CreateCollateralTransaction(CMutableTransaction& txCollateral, std::string& strReason)
+bool CWallet::CreatePrivateSendCollateralTransaction(CMutableTransaction& txCollateral, std::string& strReason)
 {
     LOCK2(cs_main, cs_wallet);
 
-    txCollateral.vin.clear();
-    txCollateral.vout.clear();
+    std::vector<COutput> vCoins;
+    CCoinControl coin_control;
+    coin_control.nCoinType = CoinType::ONLY_PRIVATESEND_COLLATERAL;
 
-    CReserveKey reservekey(this);
-    CAmount nValue = 0;
-    CTxDSIn txdsinCollateral;
+    AvailableCoins(vCoins, true, &coin_control);
 
-    if (!GetCollateralTxDSIn(txdsinCollateral, nValue)) {
+    if (vCoins.empty()) {
         strReason = "PrivateSend requires a collateral transaction and could not locate an acceptable input!";
         return false;
     }
 
-    txCollateral.vin.push_back(txdsinCollateral);
+    const auto& output = vCoins.at(GetRandInt(vCoins.size()));
+    const CTxOut txout = output.tx->tx->vout[output.i];
+
+    txCollateral.vin.clear();
+    txCollateral.vin.emplace_back(output.tx->GetHash(), output.i);
+    txCollateral.vout.clear();
 
     // pay collateral charge in fees
     // NOTE: no need for protobump patch here,
     // CPrivateSend::IsCollateralAmount in GetCollateralTxDSIn should already take care of this
-    if (nValue >= CPrivateSend::GetCollateralAmount() * 2) {
+    if (txout.nValue >= CPrivateSend::GetCollateralAmount() * 2) {
         // make our change address
         CScript scriptChange;
         CPubKey vchPubKey;
+        CReserveKey reservekey(this);
         bool success = reservekey.GetReservedKey(vchPubKey, true);
         assert(success); // should never fail, as we just unlocked
         scriptChange = GetScriptForDestination(vchPubKey.GetID());
         reservekey.KeepKey();
         // return change
-        txCollateral.vout.push_back(CTxOut(nValue - CPrivateSend::GetCollateralAmount(), scriptChange));
-    } else { // nValue < CPrivateSend::GetCollateralAmount() * 2
+        txCollateral.vout.push_back(CTxOut(txout.nValue - CPrivateSend::GetCollateralAmount(), scriptChange));
+    } else { // txout.nValue < CPrivateSend::GetCollateralAmount() * 2
         // create dummy data output only and pay everything as a fee
         txCollateral.vout.push_back(CTxOut(0, CScript() << OP_RETURN));
     }
 
-    if (!SignSignature(*this, txdsinCollateral.prevPubKey, txCollateral, 0, nValue, SIGHASH_ALL)) {
+    if (!SignSignature(*this, txout.scriptPubKey, txCollateral, 0, txout.nValue, SIGHASH_ALL)) {
         strReason = "Unable to sign collateral transaction!";
         return false;
     }
