@@ -318,6 +318,43 @@ bool CQuorumManager::HasQuorum(Consensus::LLMQType llmqType, const uint256& quor
     return quorumBlockProcessor->HasMinedCommitment(llmqType, quorumHash);
 }
 
+bool CQuorumManager::RequestQuorumData(CNode* pFrom, Consensus::LLMQType llmqType, const CBlockIndex* pQuorumIndex, uint16_t nDataMask, const uint256& proTxHash)
+{
+    if (pFrom->nVersion < LLMQ_DATA_MESSAGES_VERSION) {
+        LogPrint(BCLog::LLMQ, "CQuorumManager::%s -- Version must be %d or greater.\n", __func__, LLMQ_DATA_MESSAGES_VERSION);
+        return false;
+    }
+    if (pFrom == nullptr || pFrom->verifiedProRegTxHash.IsNull()) {
+        LogPrint(BCLog::LLMQ, "CQuorumManager::%s -- pFrom is no masternode\n", __func__);
+        return false;
+    }
+    if (Params().GetConsensus().llmqs.count(llmqType) == 0) {
+        LogPrint(BCLog::LLMQ, "CQuorumManager::%s -- Invalid llmqType: %d\n", __func__, llmqType);
+        return false;
+    }
+    if (pQuorumIndex == nullptr) {
+        LogPrint(BCLog::LLMQ, "CQuorumManager::%s -- Invalid pQuorumIndex: nullptr\n", __func__);
+        return false;
+    }
+    if (GetQuorum(llmqType, pQuorumIndex) == nullptr) {
+        LogPrint(BCLog::LLMQ, "CQuorumManager::%s -- Quorum not found: %s, %d\n", __func__, pQuorumIndex->GetBlockHash().ToString(), llmqType);
+        return false;
+    }
+
+    LOCK(cs_data_requests);
+    auto key = std::make_pair(pFrom->verifiedProRegTxHash, true);
+    auto it = mapQuorumDataRequests.emplace(key, CQuorumDataRequest(llmqType, pQuorumIndex->GetBlockHash(), nDataMask, proTxHash));
+    if (!it.second && !it.first->second.IsExpired()) {
+        LogPrint(BCLog::LLMQ, "CQuorumManager::%s -- Already requested\n", __func__);
+        return false;
+    }
+
+    CNetMsgMaker msgMaker(pFrom->GetSendVersion());
+    g_connman->PushMessage(pFrom, msgMaker.Make(NetMsgType::QGETDATA, it.first->second));
+
+    return true;
+}
+
 std::vector<CQuorumCPtr> CQuorumManager::ScanQuorums(Consensus::LLMQType llmqType, size_t nCountRequested) const
 {
     const CBlockIndex* pindex;
