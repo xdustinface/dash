@@ -301,6 +301,28 @@ class QuorumDataMessagesTest(DashTestFramework):
         wait_until(lambda: not p2p_mn3_2.is_connected, timeout=10)
         mn3.node.disconnect_p2ps()
         network_thread_join()
+        # Test that QWATCH connections are also allowed to query data but all QWATCH connections share
+        # one request limit slot
+        p2p_mn3_1 = p2p_connection(mn3.node, subversion=version_m3_1)
+        p2p_mn3_2 = p2p_connection(mn3.node, subversion=version_m3_2)
+        network_thread_start()
+        p2p_mn3_1.wait_for_verack()
+        p2p_mn3_2.wait_for_verack()
+        id_p2p_mn3_1 = get_mininode_id(mn3.node, version_m3_1)
+        id_p2p_mn3_2 = get_mininode_id(mn3.node, version_m3_2)
+        assert (id_p2p_mn3_1 != id_p2p_mn3_2)
+        # Send QWATCH for both connections
+        p2p_mn3_1.send_message(msg_qwatch())
+        p2p_mn3_2.send_message(msg_qwatch())
+        # Now send alternating and make sure they share the same request limit
+        p2p_mn3_1.test_qgetdata(qgetdata_all, 0, self.llmq_threshold, self.llmq_size)
+        wait_for_banscore(mn3.node, id_p2p_mn3_1, 0)
+        p2p_mn3_2.test_qgetdata(qgetdata_all, 0, self.llmq_threshold, self.llmq_size)
+        wait_for_banscore(mn3.node, id_p2p_mn3_2, 25)
+        p2p_mn3_1.test_qgetdata(qgetdata_all, 0, self.llmq_threshold, self.llmq_size)
+        wait_for_banscore(mn3.node, id_p2p_mn3_1, 25)
+        mn3.node.disconnect_p2ps()
+        network_thread_join()
         # Test ban score increase for invalid/unexpected QDATA
         p2p_mn1 = p2p_connection(mn1.node)
         network_thread_start()

@@ -1598,6 +1598,22 @@ class msg_qsigshare():
         return "msg_qsigshare(sigShares=%d)" % (len(self.sig_shares))
 
 
+class msg_qwatch():
+    command = b"qwatch"
+
+    def __init__(self):
+        pass
+
+    def deserialize(self, f):
+        pass
+
+    def serialize(self):
+        return b""
+
+    def __repr__(self):
+        return "msg_qwatch()"
+
+
 class msg_qgetdata():
     command = b"qgetdata"
 
