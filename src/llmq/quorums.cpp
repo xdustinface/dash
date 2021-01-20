@@ -339,9 +339,9 @@ std::vector<CQuorumCPtr> CQuorumManager::ScanQuorums(Consensus::LLMQType llmqTyp
         assert(quorum != nullptr);
         vecResultQuorums.emplace_back(quorum);
     }
-    size_t nCountResult{vecResultQuorums.size()};
 
-    if (!fCacheExists) {
+    size_t nCountResult{vecResultQuorums.size()};
+    if (nCountResult > 0 && !fCacheExists) {
         LOCK(quorumsCacheCs);
         // Don't cache more than cache.max_size() elements
         auto& cache = scanQuorumsCache[llmqType];
