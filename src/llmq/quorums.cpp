@@ -304,20 +304,20 @@ std::vector<CQuorumCPtr> CQuorumManager::ScanQuorums(Consensus::LLMQType llmqTyp
     auto cacheKey = std::make_pair(llmqType, pindexStart->GetBlockHash());
     const size_t cacheMaxSize = params.signingActiveQuorumCount + 1;
 
-    bool storeCache = false;
+    bool fCacheExists{false};
     size_t nScanCommitments = maxCount;
     std::vector<CQuorumCPtr> result;
 
     if (maxCount <= cacheMaxSize) {
         LOCK(quorumsCacheCs);
-        if (scanQuorumsCache.get(cacheKey, result)) {
+        fCacheExists = scanQuorumsCache.get(cacheKey, result);
+        if (fCacheExists) {
             if (result.size() > maxCount) {
                 result.resize(maxCount);
             }
             return result;
         }
         nScanCommitments = cacheMaxSize;
-        storeCache = true;
     }
 
     auto quorumIndexes = quorumBlockProcessor->GetMinedCommitmentsUntilBlock(params.type, pindexStart, nScanCommitments);
@@ -330,7 +330,7 @@ std::vector<CQuorumCPtr> CQuorumManager::ScanQuorums(Consensus::LLMQType llmqTyp
         result.emplace_back(quorum);
     }
 
-    if (storeCache) {
+    if (!fCacheExists) {
         LOCK(quorumsCacheCs);
         scanQuorumsCache.insert(cacheKey, result);
     }
