@@ -304,6 +304,8 @@ std::vector<CQuorumCPtr> CQuorumManager::ScanQuorums(Consensus::LLMQType llmqTyp
     auto cacheKey = std::make_pair(llmqType, pindexStart->GetBlockHash());
     const size_t cacheMaxSize = params.signingActiveQuorumCount + 1;
 
+    bool storeCache = false;
+    size_t maxCount2 = maxCount;
     std::vector<CQuorumCPtr> result;
 
     if (maxCount <= cacheMaxSize) {
@@ -314,11 +316,6 @@ std::vector<CQuorumCPtr> CQuorumManager::ScanQuorums(Consensus::LLMQType llmqTyp
             }
             return result;
         }
-    }
-
-    bool storeCache = false;
-    size_t maxCount2 = maxCount;
-    if (maxCount2 <= cacheMaxSize) {
         maxCount2 = cacheMaxSize;
         storeCache = true;
     }
