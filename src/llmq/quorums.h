@@ -87,7 +87,7 @@ private:
 
     mutable CCriticalSection quorumsCacheCs;
     mutable std::map<Consensus::LLMQType, unordered_lru_cache<uint256, CQuorumCPtr, StaticSaltedHasher>> mapQuorumsCache;
-    mutable unordered_lru_cache<std::pair<Consensus::LLMQType, uint256>, std::vector<CQuorumCPtr>, StaticSaltedHasher, 32> scanQuorumsCache;
+    mutable std::map<Consensus::LLMQType, unordered_lru_cache<uint256, std::vector<CQuorumCPtr>, StaticSaltedHasher>> scanQuorumsCache;
 
 public:
     CQuorumManager(CEvoDB& _evoDb, CBLSWorker& _blsWorker, CDKGSessionManager& _dkgManager);
