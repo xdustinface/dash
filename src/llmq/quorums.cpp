@@ -283,17 +283,17 @@ bool CQuorumManager::HasQuorum(Consensus::LLMQType llmqType, const uint256& quor
     return quorumBlockProcessor->HasMinedCommitment(llmqType, quorumHash);
 }
 
-std::vector<CQuorumCPtr> CQuorumManager::ScanQuorums(Consensus::LLMQType llmqType, size_t maxCount) const
+std::vector<CQuorumCPtr> CQuorumManager::ScanQuorums(Consensus::LLMQType llmqType, size_t nCountRequested) const
 {
     const CBlockIndex* pindex;
     {
         LOCK(cs_main);
         pindex = chainActive.Tip();
     }
-    return ScanQuorums(llmqType, pindex, maxCount);
+    return ScanQuorums(llmqType, pindex, nCountRequested);
 }
 
-std::vector<CQuorumCPtr> CQuorumManager::ScanQuorums(Consensus::LLMQType llmqType, const CBlockIndex* pindexStart, size_t maxCount) const
+std::vector<CQuorumCPtr> CQuorumManager::ScanQuorums(Consensus::LLMQType llmqType, const CBlockIndex* pindexStart, size_t nCountRequested) const
 {
     if (pindexStart == nullptr) {
         return {};
@@ -305,15 +305,15 @@ std::vector<CQuorumCPtr> CQuorumManager::ScanQuorums(Consensus::LLMQType llmqTyp
     const size_t cacheMaxSize = params.signingActiveQuorumCount + 1;
 
     bool fCacheExists{false};
-    size_t nScanCommitments = maxCount;
+    size_t nScanCommitments = nCountRequested;
     std::vector<CQuorumCPtr> result;
 
-    if (maxCount <= cacheMaxSize) {
+    if (nCountRequested <= cacheMaxSize) {
         LOCK(quorumsCacheCs);
         fCacheExists = scanQuorumsCache.get(cacheKey, result);
         if (fCacheExists) {
-            if (result.size() > maxCount) {
-                result.resize(maxCount);
+            if (result.size() > nCountRequested) {
+                result.resize(nCountRequested);
             }
             return result;
         }
@@ -335,8 +335,8 @@ std::vector<CQuorumCPtr> CQuorumManager::ScanQuorums(Consensus::LLMQType llmqTyp
         scanQuorumsCache.insert(cacheKey, result);
     }
 
-    if (result.size() > maxCount) {
-        result.resize(maxCount);
+    if (result.size() > nCountRequested) {
+        result.resize(nCountRequested);
     }
 
     return result;
