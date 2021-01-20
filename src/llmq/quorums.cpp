@@ -300,7 +300,6 @@ std::vector<CQuorumCPtr> CQuorumManager::ScanQuorums(Consensus::LLMQType llmqTyp
         return {};
     }
 
-    auto& params = Params().GetConsensus().llmqs.at(llmqType);
     bool fCacheExists{false};
     void* pIndexScanCommitments{(void*)pindexStart};
     size_t nScanCommitments{nCountRequested};
@@ -331,12 +330,12 @@ std::vector<CQuorumCPtr> CQuorumManager::ScanQuorums(Consensus::LLMQType llmqTyp
         }
     }
     // Get the block indexes of the mined commitments to build the required quorums from
-    auto quorumIndexes = quorumBlockProcessor->GetMinedCommitmentsUntilBlock(params.type, (const CBlockIndex*)pIndexScanCommitments, nScanCommitments);
+    auto quorumIndexes = quorumBlockProcessor->GetMinedCommitmentsUntilBlock(llmqType, (const CBlockIndex*)pIndexScanCommitments, nScanCommitments);
     vecResultQuorums.reserve(vecResultQuorums.size() + quorumIndexes.size());
 
     for (auto& quorumIndex : quorumIndexes) {
         assert(quorumIndex);
-        auto quorum = GetQuorum(params.type, quorumIndex);
+        auto quorum = GetQuorum(llmqType, quorumIndex);
         assert(quorum != nullptr);
         vecResultQuorums.emplace_back(quorum);
     }
