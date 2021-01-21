@@ -81,7 +81,7 @@ UniValue getpeerinfo(const JSONRPCRequest& request)
             "    \"addrlocal\":\"ip:port\",   (string) Local address as reported by the peer\n"
             "    \"services\":\"xxxxxxxxxxxxxxxx\",   (string) The services offered\n"
             "    \"verified_proregtx_hash\": h, (hex) Only present when the peer is a masternode and succesfully\n"
-            "                               autheticated via MNAUTH. In this case, this field contains the\n"
+            "                               authenticated via MNAUTH. In this case, this field contains the\n"
             "                               protx hash of the masternode\n"
             "    \"verified_pubkey_hash\":   h, (hex) Only present when the peer is a masternode and succesfully\n"
             "                               authenticated via MNAUTH. In this case, this field contains the\n"
