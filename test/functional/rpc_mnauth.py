@@ -52,5 +52,6 @@ class FakeMNAUTHTest(DashTestFramework):
                                                          null_hash)
         assert(not masternode.node.mnauth(-1, protx_hash, public_key))
 
+
 if __name__ == '__main__':
     FakeMNAUTHTest().main()
