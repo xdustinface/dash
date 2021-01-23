@@ -427,7 +427,7 @@ UniValue mnauth(const JSONRPCRequest& request)
     if (request.fHelp || (request.params.size() != 3))
         throw std::runtime_error(
             "mnauth nodeId \"proTxHash\" \"publicKey\"\n"
-            "\nFake a MNAUTH for a connected node in regression test (-regtest only).\n"
+            "\nOverride MNAUTH processing results for the specified node with a user provided data (-regtest only).\n"
             "\nArguments:\n"
             "1. nodeId          (integer, required) Internal peer id of the node the mock data gets added to.\n"
             "2. \"proTxHash\"     (string, required) The authenticated proTxHash as hex string.\n"
