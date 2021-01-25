@@ -65,6 +65,7 @@ MESSAGEMAP = {
     b"qsendrecsigs": None,
     b"qgetdata": msg_qgetdata,
     b"qdata": msg_qdata,
+    b"qwatch" : None,
     b"senddsq": None,
     b"spork": None,
 }
@@ -378,6 +379,7 @@ class P2PInterface(P2PConnection):
 
     def on_qgetdata(self, message): pass
     def on_qdata(self, message): pass
+    def on_qwatch(self, message): pass
 
     def on_verack(self, message):
         self.verack_received = True
