@@ -545,8 +545,8 @@ class DashTestFramework(BitcoinTestFramework):
         self.llmq_size = 3
         self.llmq_threshold = 2
 
-        # This is nExpirySeconds in CQuorumDataRequest
-        self.quorum_data_request_expiry_seconds = 300
+        # This is EXPIRATION_TIMEOUT in CQuorumDataRequest
+        self.quorum_data_request_expiration_timeout = 300
 
     def set_dash_dip8_activation(self, activate_after_block):
         self.dip8_activation_height = activate_after_block
@@ -1105,7 +1105,7 @@ class DashTestFramework(BitcoinTestFramework):
             valid = 0
             if recover:
                 if self.mocktime % 2:
-                    self.bump_mocktime(self.quorum_data_request_expiry_seconds + 1)
+                    self.bump_mocktime(self.quorum_data_request_expire_timeout + 1)
                     self.nodes[0].generate(1)
 
             for test_mn in mns:

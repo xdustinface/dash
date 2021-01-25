@@ -128,7 +128,7 @@ class QuorumDataMessagesTest(DashTestFramework):
             wait_for_banscore(mn3.node, id_p2p_mn3_1, expected_banscore_1)
             wait_for_banscore(mn3.node, id_p2p_mn3_2, expected_banscore_2)
 
-        def force_request_expire(bump_seconds=self.quorum_data_request_expiry_seconds + 1):
+        def force_request_expire(bump_seconds=self.quorum_data_request_expiration_timeout + 1):
             self.bump_mocktime(bump_seconds)
             if node0.getblockcount() % 2:  # Test with/without expired request cleanup
                 node0.generate(1)
