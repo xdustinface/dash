@@ -551,8 +551,8 @@ UniValue quorum_dkgsimerror(const JSONRPCRequest& request)
 void quorum_getdata_help()
 {
     throw std::runtime_error(
-        "quorum getdata nodeId llmqType \"quorumHash\" dataMask \"proTxHash\"\n"
-        "This allows to trigger sending a QGETDATA messages to a connected peer.\n"
+        "quorum getdata nodeId llmqType \"quorumHash\" dataMask ( \"proTxHash\" )\n"
+        "Send a QGETDATA message to the specified peer.\n"
         "\nArguments:\n"
         "1. nodeId          (integer, required) The internal nodeId of the peer to receive the QGETDATA message.\n"
         "2. llmqType        (integer, required) The quorum type the data will be request from.\n"

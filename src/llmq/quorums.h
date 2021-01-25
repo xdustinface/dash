@@ -54,7 +54,7 @@ private:
     int64_t nTime;
     bool fProcessed;
 
-    static const int64_t nExpirySeconds{300};
+    static const int64_t EXPIRATION_TIMEOUT{300};
 
 public:
 
@@ -98,7 +98,7 @@ public:
 
     bool IsExpired() const
     {
-        return (GetTime() - nTime) >= nExpirySeconds;
+        return (GetTime() - nTime) >= EXPIRATION_TIMEOUT;
     }
     bool IsProcessed() const
     {

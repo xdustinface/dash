@@ -1091,7 +1091,7 @@ class DashTestFramework(BitcoinTestFramework):
         quorum_info = test_mn.node.quorum("info", quorum_type_in, quorum_hash_in, expect_secret)
         if expect_secret and "secretKeyShare" not in quorum_info:
             return False
-        if "members" not in quorum_info or len(quorum_info["members"]) <= 0:
+        if "members" not in quorum_info or len(quorum_info["members"]) == 0:
             return False
         pubkey_count = 0
         valid_count = 0

@@ -13,6 +13,14 @@ p2p_quorum_data.py
 Tests QGETDATA/QDATA functionality
 '''
 
+# Possible error values of QDATA
+QUORUM_TYPE_INVALID = 1
+QUORUM_BLOCK_NOT_FOUND = 2
+QUORUM_NOT_FOUND = 3
+MASTERNODE_IS_NO_MEMBER = 4
+QUORUM_VERIFICATION_VECTOR_MISSING = 5
+ENCRYPTED_CONTRIBUTIONS_MISSING = 6
+
 
 def assert_qdata(qdata, qgetdata, error, len_vvec=0, len_contributions=0):
     assert qdata is not None and qgetdata is not None
@@ -190,13 +198,6 @@ class QuorumDataMessagesTest(DashTestFramework):
         qgetdata_invalid_block = msg_qgetdata(protx_hash_int, 100, 0x01, protx_hash_int)
         qgetdata_invalid_quorum = msg_qgetdata(int(mn1.node.getblockhash(0), 16), 100, 0x01, protx_hash_int)
         qgetdata_invalid_no_member = msg_qgetdata(quorum_hash_int, 100, 0x02, quorum_hash_int)
-        # Possible error values of QDATA
-        QUORUM_TYPE_INVALID = 1
-        QUORUM_BLOCK_NOT_FOUND = 2
-        QUORUM_NOT_FOUND = 3
-        MASTERNODE_IS_NO_MEMBER = 4
-        QUORUM_VERIFICATION_VECTOR_MISSING = 5
-        ENCRYPTED_CONTRIBUTIONS_MISSING = 6
         # Test all invalid messages
         mn1.node.disconnect_p2ps()
         network_thread_join()

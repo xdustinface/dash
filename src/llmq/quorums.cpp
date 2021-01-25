@@ -325,7 +325,7 @@ bool CQuorumManager::RequestQuorumData(CNode* pFrom, Consensus::LLMQType llmqTyp
         return false;
     }
     if (pFrom == nullptr || (pFrom->verifiedProRegTxHash.IsNull() && !pFrom->qwatch)) {
-        LogPrint(BCLog::LLMQ, "CQuorumManager::%s -- pFrom is not neither a verified masternode nor qwatch connection\n", __func__);
+        LogPrint(BCLog::LLMQ, "CQuorumManager::%s -- pFrom is neither a verified masternode nor a qwatch connection\n", __func__);
         return false;
     }
     if (Params().GetConsensus().llmqs.count(llmqType) == 0) {
