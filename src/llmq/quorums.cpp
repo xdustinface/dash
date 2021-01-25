@@ -591,12 +591,10 @@ void CQuorumManager::ProcessMessage(CNode* pFrom, const std::string& strCommand,
         CQuorumPtr pQuorum;
         {
             LOCK(quorumsCacheCs);
-            auto itQuorum = quorumsCache.find(std::make_pair(request.GetLLMQType(), request.GetQuorumHash()));
-            if (itQuorum == quorumsCache.end()) {
+            if (!mapQuorumsCache[request.GetLLMQType()].get(request.GetQuorumHash(), pQuorum)) {
                 error("Quorum not found", false); // Don't bump score because we asked for it
                 return;
             }
-            pQuorum = itQuorum->second;
         }
 
         if (request.GetDataMask() & CQuorumDataRequest::QUORUM_VERIFICATION_VECTOR) {
