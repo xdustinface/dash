@@ -272,7 +272,7 @@ CQuorumPtr CQuorumManager::BuildQuorumFromCommitment(const Consensus::LLMQType l
         CQuorum::StartCachePopulatorThread(quorum);
     }
 
-    mapQuorumsCache[llmqType].emplace(quorumHash, quorum);
+    mapQuorumsCache[llmqType].insert(quorumHash, quorum);
 
     return quorum;
 }
@@ -452,7 +452,7 @@ CQuorumCPtr CQuorumManager::GetQuorum(Consensus::LLMQType llmqType, const CBlock
     }
 
     LOCK(quorumsCacheCs);
-    CQuorumCPtr pQuorum;
+    CQuorumPtr pQuorum;
     if (mapQuorumsCache[llmqType].get(quorumHash, pQuorum)) {
         return pQuorum;
     }
