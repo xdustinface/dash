@@ -575,7 +575,19 @@ UniValue quorum_getdata(const JSONRPCRequest& request)
     Consensus::LLMQType llmqType = static_cast<Consensus::LLMQType>(ParseInt32V(request.params[2], "llmqType"));
     uint256 quorumHash = ParseHashV(request.params[3], "quorumHash");
     uint16_t nDataMask = static_cast<uint16_t>(ParseInt32V(request.params[4], "dataMask"));
-    uint256 proTxHash = ParseHashV(request.params[5], "proTxHash");
+    uint256 proTxHash;
+
+    if (nDataMask & llmq::CQuorumDataRequest::ENCRYPTED_CONTRIBUTIONS) {
+        if (!request.params[5].isNull()) {
+            proTxHash = ParseHashV(request.params[5], "proTxHash");
+            if (proTxHash.IsNull()) {
+                throw JSONRPCError(RPC_INVALID_PARAMETER, "proTxHash invalid");
+            }
+        } else {
+            throw JSONRPCError(RPC_INVALID_PARAMETER, "proTxHash missing");
+        }
+    }
+
     const CBlockIndex* pQuorumIndex{nullptr};
     {
         LOCK(cs_main);
