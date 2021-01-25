@@ -41,8 +41,10 @@ def wait_for_banscore(node, peer_id, expexted_score):
         return None
     wait_until(lambda: get_score() == expexted_score, timeout=6, sleep=2)
 
+
 def p2p_connection(node, uacomment=None):
     return node.add_p2p_connection(QuorumDataInterface(), uacomment=uacomment)
+
 
 def get_mininode_id(node, uacomment=None):
     tries = 0
