@@ -321,6 +321,20 @@ class QuorumDataMessagesTest(DashTestFramework):
         wait_for_banscore(mn3.node, id_p2p_mn3_1, 25)
         mn3.node.disconnect_p2ps()
         network_thread_join()
+        # Test -watchquorums support
+        for extra_args in [[], ["-watchquorums"]]:
+            self.restart_node(0, self.extra_args[0] + extra_args)
+            p2p_node0 = p2p_connection(node0)
+            network_thread_start()
+            p2p_node0.wait_for_verack()
+            id_p2p_node0 = get_mininode_id(node0)
+            mnauth(node0, id_p2p_node0, fake_mnauth_1[0], fake_mnauth_1[1])
+            assert(node0.quorum("getdata", id_p2p_node0, 100, quorum_hash, 0x03, mn1.proTxHash))
+            p2p_node0.wait_for_qgetdata()
+            p2p_node0.send_message(p2p_mn2.get_qdata())
+            wait_for_banscore(node0, id_p2p_node0, (1 - len(extra_args)) * 10)
+            node0.disconnect_p2ps()
+            network_thread_join()
         # Test ban score increase for invalid/unexpected QDATA
         p2p_mn1 = p2p_connection(mn1.node)
         network_thread_start()
