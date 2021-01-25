@@ -381,6 +381,8 @@ class QuorumDataMessagesTest(DashTestFramework):
         qdata_invalid_contribution.enc_contributions.pop()
         p2p_mn1.send_message(qdata_invalid_contribution)
         wait_for_banscore(mn1.node, id_p2p_mn1, 50)
+        mn1.node.disconnect_p2ps()
+        network_thread_join()
 
 
 if __name__ == '__main__':
