@@ -58,14 +58,14 @@ private:
 
 public:
 
-    CQuorumDataRequest() : nTime(GetAdjustedTime()) {}
+    CQuorumDataRequest() : nTime(GetTime()) {}
     CQuorumDataRequest(const Consensus::LLMQType llmqTypeIn, const uint256& quorumHashIn, const uint16_t nDataMaskIn, const uint256& proTxHashIn = uint256()) :
         llmqType(llmqTypeIn),
         quorumHash(quorumHashIn),
         nDataMask(nDataMaskIn),
         proTxHash(proTxHashIn),
         nError(UNDEFINED),
-        nTime(GetAdjustedTime()),
+        nTime(GetTime()),
         fProcessed(false) {}
 
     ADD_SERIALIZE_METHODS
@@ -98,7 +98,7 @@ public:
 
     bool IsExpired() const
     {
-        return (GetAdjustedTime() - nTime) >= nExpirySeconds;
+        return (GetTime() - nTime) >= nExpirySeconds;
     }
     bool IsProcessed() const
     {
