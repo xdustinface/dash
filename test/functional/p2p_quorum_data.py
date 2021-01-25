@@ -33,23 +33,20 @@ def wait_for_banscore(node, peer_id, expexted_score):
         return None
     wait_until(lambda: get_score() == expexted_score, timeout=6, sleep=2)
 
+def p2p_connection(node, uacomment=None):
+    return node.add_p2p_connection(QuorumDataInterface(), uacomment=uacomment)
 
-def p2p_connection(node, subversion=MY_SUBVERSION):
-    connection = node.add_p2p_connection(QuorumDataInterface(), send_version=False)
-    version_message = msg_version()
-    version_message.strSubVer = subversion
-    connection.sendbuf = connection.build_message(version_message)
-    return connection
-
-
-def get_mininode_id(node, subversion=MY_SUBVERSION):
+def get_mininode_id(node, uacomment=None):
     tries = 0
     node_id = None
     while tries < 10 and node_id is None:
         for p in node.getpeerinfo():
-            if p["subver"] == subversion.decode():
-                node_id = p["id"]
-                break
+            for p2p in node.p2ps:
+                if uacomment is not None and p2p.uacomment != uacomment:
+                    continue
+                if p["subver"] == p2p.strSubVer.decode():
+                    node_id = p["id"]
+                    break
         tries += 1
         time.sleep(1)
     assert(node_id is not None)
@@ -273,15 +270,15 @@ class QuorumDataMessagesTest(DashTestFramework):
         network_thread_join()
         # Requesting one QDATA with mn1 and mn2 from mn3 should not result in banscore increase
         # for either of both.
-        version_m3_1 = MY_SUBVERSION + b"MN3_1"
-        version_m3_2 = MY_SUBVERSION + b"MN3_2"
-        p2p_mn3_1 = p2p_connection(mn3.node, subversion=version_m3_1)
-        p2p_mn3_2 = p2p_connection(mn3.node, subversion=version_m3_2)
+        uacomment_m3_1 = "MN3_1"
+        uacomment_m3_2 = "MN3_2"
+        p2p_mn3_1 = p2p_connection(mn3.node, uacomment_m3_1)
+        p2p_mn3_2 = p2p_connection(mn3.node, uacomment_m3_2)
         network_thread_start()
         p2p_mn3_1.wait_for_verack()
         p2p_mn3_2.wait_for_verack()
-        id_p2p_mn3_1 = get_mininode_id(mn3.node, version_m3_1)
-        id_p2p_mn3_2 = get_mininode_id(mn3.node, version_m3_2)
+        id_p2p_mn3_1 = get_mininode_id(mn3.node, uacomment_m3_1)
+        id_p2p_mn3_2 = get_mininode_id(mn3.node, uacomment_m3_2)
         assert(id_p2p_mn3_1 != id_p2p_mn3_2)
         mnauth(mn3.node, id_p2p_mn3_1, fake_mnauth_1[0], fake_mnauth_1[1])
         mnauth(mn3.node, id_p2p_mn3_2, fake_mnauth_2[0], fake_mnauth_2[1])
@@ -303,13 +300,13 @@ class QuorumDataMessagesTest(DashTestFramework):
         network_thread_join()
         # Test that QWATCH connections are also allowed to query data but all QWATCH connections share
         # one request limit slot
-        p2p_mn3_1 = p2p_connection(mn3.node, subversion=version_m3_1)
-        p2p_mn3_2 = p2p_connection(mn3.node, subversion=version_m3_2)
+        p2p_mn3_1 = p2p_connection(mn3.node, uacomment_m3_1)
+        p2p_mn3_2 = p2p_connection(mn3.node, uacomment_m3_2)
         network_thread_start()
         p2p_mn3_1.wait_for_verack()
         p2p_mn3_2.wait_for_verack()
-        id_p2p_mn3_1 = get_mininode_id(mn3.node, version_m3_1)
-        id_p2p_mn3_2 = get_mininode_id(mn3.node, version_m3_2)
+        id_p2p_mn3_1 = get_mininode_id(mn3.node, uacomment_m3_1)
+        id_p2p_mn3_2 = get_mininode_id(mn3.node, uacomment_m3_2)
         assert (id_p2p_mn3_1 != id_p2p_mn3_2)
         # Send QWATCH for both connections
         p2p_mn3_1.send_message(msg_qwatch())
