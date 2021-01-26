@@ -567,7 +567,7 @@ void quorum_getdata_help()
 
 UniValue quorum_getdata(const JSONRPCRequest& request)
 {
-    if (request.fHelp || (request.params.size() != 6)) {
+    if (request.fHelp || (request.params.size() < 5 || request.params.size() > 6)) {
         quorum_getdata_help();
     }
 
