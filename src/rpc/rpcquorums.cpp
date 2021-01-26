@@ -559,7 +559,7 @@ void quorum_getdata_help()
         "3. \"quorumHash\"    (string, required) The quorum hash related to the quorum data being requested.\n"
         "4. dataMask        (integer, required) Specify what data to request.\n"
         "                                       Possible values: 1 - Request quorum verification vector\n"
-        "                                                        2 - Request encrypted contributions for member defined by \"proTxHash\"\n"
+        "                                                        2 - Request encrypted contributions for member defined by \"proTxHash\". \"proTxHash\" must be specified if this option is used.\n"
         "                                                        3 - Request both, 1 and 2\n"
         "5. \"proTxHash\"     (string, optional) The proTxHash the contributions will be requested for. Must be member of the specified LLMQ.\n"
         );
