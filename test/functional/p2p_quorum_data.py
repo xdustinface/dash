@@ -47,13 +47,13 @@ def assert_qdata(qdata, qgetdata, error, len_vvec=0, len_contributions=0):
     assert_equal(len(qdata.enc_contributions), len_contributions)
 
 
-def wait_for_banscore(node, peer_id, expexted_score):
+def wait_for_banscore(node, peer_id, expected_score):
     def get_score():
         for peer in node.getpeerinfo():
             if peer["id"] == peer_id:
                 return peer["banscore"]
         return None
-    wait_until(lambda: get_score() == expexted_score, timeout=6, sleep=2)
+    wait_until(lambda: get_score() == expected_score, timeout=6, sleep=2)
 
 
 def p2p_connection(node, uacomment=None):
