@@ -554,14 +554,14 @@ void quorum_getdata_help()
         "quorum getdata nodeId llmqType \"quorumHash\" dataMask ( \"proTxHash\" )\n"
         "Send a QGETDATA message to the specified peer.\n"
         "\nArguments:\n"
-        "1. nodeId          (integer, required) The internal nodeId of the peer to receive the QGETDATA message.\n"
-        "2. llmqType        (integer, required) The quorum type the data will be request from.\n"
-        "3. \"quorumHash\"    (string, required) The quorum hash the data will be request from.\n"
-        "4. dataMask        (integer, required) Defined which data will be requested.\n"
+        "1. nodeId          (integer, required) The internal nodeId of the peer to request quorum data from.\n"
+        "2. llmqType        (integer, required) The quorum type related to the quorum data being requested.\n"
+        "3. \"quorumHash\"    (string, required) The quorum hash related to the quorum data being requested.\n"
+        "4. dataMask        (integer, required) Specify what data to request.\n"
         "                                       Possible values: 1 - Request quorum verification vector\n"
         "                                                        2 - Request encrypted contributions for member defined by \"proTxHash\"\n"
         "                                                        3 - Request both, 1 and 2\n"
-        "5. \"proTxHash\"     (string, optional) The proTxHash the contributions will be requested for. Must be member of the provided LLMQ.\n"
+        "5. \"proTxHash\"     (string, optional) The proTxHash the contributions will be requested for. Must be member of the specified LLMQ.\n"
         );
 }
 
