@@ -286,8 +286,8 @@ class QuorumDataMessagesTest(DashTestFramework):
         wait_for_banscore(mn1.node, id_p2p_mn1, 25)
         mn1.node.disconnect_p2ps()
         network_thread_join()
-        # Requesting one QDATA with mn1 and mn2 from mn3 should not result in banscore increase
-        # for either of both.
+        # Requesting one QDATA with mn1 and mn2 from mn3 should not result in
+        # banscore increase for either of both.
         uacomment_m3_1 = "MN3_1"
         uacomment_m3_2 = "MN3_2"
         p2p_mn3_1 = p2p_connection(mn3.node, uacomment_m3_1)
@@ -316,8 +316,8 @@ class QuorumDataMessagesTest(DashTestFramework):
         wait_until(lambda: not p2p_mn3_2.is_connected, timeout=10)
         mn3.node.disconnect_p2ps()
         network_thread_join()
-        # Test that QWATCH connections are also allowed to query data but all QWATCH connections share
-        # one request limit slot
+        # Test that QWATCH connections are also allowed to query data but all
+        # QWATCH connections share one request limit slot
         p2p_mn3_1 = p2p_connection(mn3.node, uacomment_m3_1)
         p2p_mn3_2 = p2p_connection(mn3.node, uacomment_m3_2)
         network_thread_start()
