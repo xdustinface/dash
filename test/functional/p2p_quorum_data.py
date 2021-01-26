@@ -73,12 +73,12 @@ def get_mininode_id(node, uacomment=None):
                     break
         tries += 1
         time.sleep(1)
-    assert(node_id is not None)
+    assert node_id is not None
     return node_id
 
 
 def mnauth(node, node_id, protx_hash, operator_pubkey):
-    assert(node.mnauth(node_id, protx_hash, operator_pubkey))
+    assert node.mnauth(node_id, protx_hash, operator_pubkey)
     mnauth_peer_id = None
     for peer in node.getpeerinfo():
         if "verified_proregtx_hash" in peer and peer["verified_proregtx_hash"] == protx_hash:
@@ -106,7 +106,7 @@ class QuorumDataInterface(P2PInterface):
         wait_until(test_function, timeout=timeout, lock=mininode_lock, do_assert=message_expected)
         self.message_count["qgetdata"] = 0
         if not message_expected:
-            assert (not self.message_count["qgetdata"])
+            assert not self.message_count["qgetdata"]
 
     def get_qdata(self):
         return self.last_message["qdata"]
@@ -117,7 +117,7 @@ class QuorumDataInterface(P2PInterface):
         wait_until(test_function, timeout=timeout, lock=mininode_lock, do_assert=message_expected)
         self.message_count["qdata"] = 0
         if not message_expected:
-            assert (not self.message_count["qdata"])
+            assert not self.message_count["qdata"]
 
 
 class QuorumDataMessagesTest(DashTestFramework):
@@ -239,8 +239,8 @@ class QuorumDataMessagesTest(DashTestFramework):
         p2p_mn2.wait_for_verack()
         id_p2p_mn1 = get_mininode_id(mn1.node)
         id_p2p_mn2 = get_mininode_id(mn2.node)
-        assert(id_p2p_mn1 is not None)
-        assert(id_p2p_mn2 is not None)
+        assert id_p2p_mn1 is not None
+        assert id_p2p_mn2 is not None
         mnauth(mn1.node, id_p2p_mn1, fake_mnauth_1[0], fake_mnauth_1[1])
         mnauth(mn2.node, id_p2p_mn2, fake_mnauth_2[0], fake_mnauth_2[1])
         # Validate the DKG data is missing
@@ -257,7 +257,7 @@ class QuorumDataMessagesTest(DashTestFramework):
         # Get the required DKG data for mn1
         p2p_mn2.test_qgetdata(qgetdata_all, 0, self.llmq_threshold, self.llmq_size)
         # Trigger mn1 - QGETDATA -> p2p_mn1
-        assert(mn1.node.quorum("getdata", id_p2p_mn1, 100, quorum_hash, 0x03, mn1.proTxHash))
+        assert mn1.node.quorum("getdata", id_p2p_mn1, 100, quorum_hash, 0x03, mn1.proTxHash)
         # Wait until mn1 sent the QGETDATA to p2p_mn1
         p2p_mn1.wait_for_qgetdata()
         # Send the QDATA received from mn2 to mn1
@@ -297,7 +297,7 @@ class QuorumDataMessagesTest(DashTestFramework):
         p2p_mn3_2.wait_for_verack()
         id_p2p_mn3_1 = get_mininode_id(mn3.node, uacomment_m3_1)
         id_p2p_mn3_2 = get_mininode_id(mn3.node, uacomment_m3_2)
-        assert(id_p2p_mn3_1 != id_p2p_mn3_2)
+        assert id_p2p_mn3_1 != id_p2p_mn3_2
         mnauth(mn3.node, id_p2p_mn3_1, fake_mnauth_1[0], fake_mnauth_1[1])
         mnauth(mn3.node, id_p2p_mn3_2, fake_mnauth_2[0], fake_mnauth_2[1])
         # Now try some {mn1, mn2} - QGETDATA -> mn3 combinations to make sure request limit works connection based
@@ -325,7 +325,7 @@ class QuorumDataMessagesTest(DashTestFramework):
         p2p_mn3_2.wait_for_verack()
         id_p2p_mn3_1 = get_mininode_id(mn3.node, uacomment_m3_1)
         id_p2p_mn3_2 = get_mininode_id(mn3.node, uacomment_m3_2)
-        assert (id_p2p_mn3_1 != id_p2p_mn3_2)
+        assert id_p2p_mn3_1 != id_p2p_mn3_2
         # Send QWATCH for both connections
         p2p_mn3_1.send_message(msg_qwatch())
         p2p_mn3_2.send_message(msg_qwatch())
@@ -346,7 +346,7 @@ class QuorumDataMessagesTest(DashTestFramework):
             p2p_node0.wait_for_verack()
             id_p2p_node0 = get_mininode_id(node0)
             mnauth(node0, id_p2p_node0, fake_mnauth_1[0], fake_mnauth_1[1])
-            assert(node0.quorum("getdata", id_p2p_node0, 100, quorum_hash, 0x03, mn1.proTxHash))
+            assert node0.quorum("getdata", id_p2p_node0, 100, quorum_hash, 0x03, mn1.proTxHash)
             p2p_node0.wait_for_qgetdata()
             p2p_node0.send_message(p2p_mn2.get_qdata())
             wait_for_banscore(node0, id_p2p_node0, (1 - len(extra_args)) * 10)
@@ -366,7 +366,7 @@ class QuorumDataMessagesTest(DashTestFramework):
         wait_for_banscore(mn1.node, id_p2p_mn1, 10)
         # - Already received
         force_request_expire()
-        assert(mn1.node.quorum("getdata", id_p2p_mn1, 100, quorum_hash, 0x03, mn1.proTxHash))
+        assert mn1.node.quorum("getdata", id_p2p_mn1, 100, quorum_hash, 0x03, mn1.proTxHash)
         p2p_mn1.wait_for_qgetdata()
         p2p_mn1.send_message(qdata_valid)
         time.sleep(1)
@@ -374,7 +374,7 @@ class QuorumDataMessagesTest(DashTestFramework):
         wait_for_banscore(mn1.node, id_p2p_mn1, 20)
         # - Not like requested
         force_request_expire()
-        assert(mn1.node.quorum("getdata", id_p2p_mn1, 100, quorum_hash, 0x03, mn1.proTxHash))
+        assert mn1.node.quorum("getdata", id_p2p_mn1, 100, quorum_hash, 0x03, mn1.proTxHash)
         p2p_mn1.wait_for_qgetdata()
         qdata_invalid_request = qdata_valid
         qdata_invalid_request.data_mask = 2
@@ -382,7 +382,7 @@ class QuorumDataMessagesTest(DashTestFramework):
         wait_for_banscore(mn1.node, id_p2p_mn1, 30)
         # - Invalid verification vector
         force_request_expire()
-        assert(mn1.node.quorum("getdata", id_p2p_mn1, 100, quorum_hash, 0x03, mn1.proTxHash))
+        assert mn1.node.quorum("getdata", id_p2p_mn1, 100, quorum_hash, 0x03, mn1.proTxHash)
         p2p_mn1.wait_for_qgetdata()
         qdata_invalid_vvec = qdata_valid
         qdata_invalid_vvec.quorum_vvec.pop()
@@ -390,7 +390,7 @@ class QuorumDataMessagesTest(DashTestFramework):
         wait_for_banscore(mn1.node, id_p2p_mn1, 40)
         # - Invalid contributions
         force_request_expire()
-        assert(mn1.node.quorum("getdata", id_p2p_mn1, 100, quorum_hash, 0x03, mn1.proTxHash))
+        assert mn1.node.quorum("getdata", id_p2p_mn1, 100, quorum_hash, 0x03, mn1.proTxHash)
         p2p_mn1.wait_for_qgetdata()
         qdata_invalid_contribution = qdata_valid
         qdata_invalid_contribution.enc_contributions.pop()
