@@ -5,7 +5,7 @@
 
 from test_framework.mininode import *
 from test_framework.test_framework import DashTestFramework
-from test_framework.util import force_finish_mnsync, assert_equal, connect_nodes
+from test_framework.util import assert_raises_rpc_error, force_finish_mnsync, assert_equal, connect_nodes
 
 '''
 p2p_quorum_data.py
@@ -383,6 +383,12 @@ class QuorumDataMessagesTest(DashTestFramework):
         wait_for_banscore(mn1.node, id_p2p_mn1, 50)
         mn1.node.disconnect_p2ps()
         network_thread_join()
+        # Test optional proTxHash of `quorum getdata`
+        assert_raises_rpc_error(-8, "proTxHash missing",
+                                mn1.node.quorum, "getdata", 0, 100, quorum_hash, 0x02)
+        assert_raises_rpc_error(-8, "proTxHash invalid",
+                                mn1.node.quorum, "getdata", 0, 100, quorum_hash, 0x03,
+                                "0000000000000000000000000000000000000000000000000000000000000000")
 
 
 if __name__ == '__main__':
