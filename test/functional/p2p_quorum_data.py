@@ -3,9 +3,23 @@
 # Distributed under the MIT software license, see the accompanying
 # file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-from test_framework.mininode import *
+import time
+
+from test_framework.messages import msg_qgetdata, msg_qwatch
+from test_framework.mininode import (
+    mininode_lock,
+    network_thread_start,
+    network_thread_join,
+    P2PInterface,
+)
 from test_framework.test_framework import DashTestFramework
-from test_framework.util import assert_raises_rpc_error, force_finish_mnsync, assert_equal, connect_nodes
+from test_framework.util import (
+    assert_equal,
+    assert_raises_rpc_error,
+    connect_nodes,
+    force_finish_mnsync,
+    wait_until,
+)
 
 '''
 p2p_quorum_data.py
