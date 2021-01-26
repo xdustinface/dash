@@ -524,6 +524,7 @@ void CQuorumManager::ProcessMessage(CNode* pFrom, const std::string& strCommand,
 
         CDataStream ssResponseData(SER_NETWORK, pFrom->GetSendVersion());
 
+        // Check if request wants QUORUM_VERIFICATION_VECTOR data
         if (request.GetDataMask() & CQuorumDataRequest::QUORUM_VERIFICATION_VECTOR) {
 
             if (!pQuorum->quorumVvec) {
@@ -534,6 +535,7 @@ void CQuorumManager::ProcessMessage(CNode* pFrom, const std::string& strCommand,
             ssResponseData << *pQuorum->quorumVvec;
         }
 
+        // Check if request wants ENCRYPTED_CONTRIBUTIONS data
         if (request.GetDataMask() & CQuorumDataRequest::ENCRYPTED_CONTRIBUTIONS) {
 
             int memberIdx = pQuorum->GetMemberIndex(request.GetProTxHash());
@@ -598,6 +600,7 @@ void CQuorumManager::ProcessMessage(CNode* pFrom, const std::string& strCommand,
             }
         }
 
+        // Check if request has QUORUM_VERIFICATION_VECTOR data
         if (request.GetDataMask() & CQuorumDataRequest::QUORUM_VERIFICATION_VECTOR) {
 
             BLSVerificationVector verficationVector;
@@ -611,6 +614,7 @@ void CQuorumManager::ProcessMessage(CNode* pFrom, const std::string& strCommand,
             }
         }
 
+        // Check if request has ENCRYPTED_CONTRIBUTIONS data
         if (request.GetDataMask() & CQuorumDataRequest::ENCRYPTED_CONTRIBUTIONS) {
 
             if (pQuorum->quorumVvec->size() != pQuorum->params.threshold) {

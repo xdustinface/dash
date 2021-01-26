@@ -577,6 +577,7 @@ UniValue quorum_getdata(const JSONRPCRequest& request)
     uint16_t nDataMask = static_cast<uint16_t>(ParseInt32V(request.params[4], "dataMask"));
     uint256 proTxHash;
 
+    // Check if request wants ENCRYPTED_CONTRIBUTIONS data
     if (nDataMask & llmq::CQuorumDataRequest::ENCRYPTED_CONTRIBUTIONS) {
         if (!request.params[5].isNull()) {
             proTxHash = ParseHashV(request.params[5], "proTxHash");
