@@ -1036,6 +1036,7 @@ class CBLSIESEncryptedSecretKey:
         r += self.data
         return r
 
+
 # Objects that correspond to messages on the wire
 class msg_version():
     command = b"version"

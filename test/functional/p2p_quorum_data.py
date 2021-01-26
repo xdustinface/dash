@@ -86,6 +86,7 @@ def mnauth(node, node_id, protx_hash, operator_pubkey):
             mnauth_peer_id = peer["id"]
     assert_equal(mnauth_peer_id, node_id)
 
+
 class QuorumDataInterface(P2PInterface):
     def __init__(self):
         super().__init__()
