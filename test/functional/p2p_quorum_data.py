@@ -35,6 +35,16 @@ MASTERNODE_IS_NO_MEMBER = 4
 QUORUM_VERIFICATION_VECTOR_MISSING = 5
 ENCRYPTED_CONTRIBUTIONS_MISSING = 6
 
+# Used to overwrite MNAUTH for mininode connections
+fake_mnauth_1 = ["cecf37bf0ec05d2d22cb8227f88074bb882b94cd2081ba318a5a444b1b15b9fd",
+                 "087ba00bf61135f3860c4944a0debabe186ef82628fbe4ceaed1ad51d672c58dde14ea4b321efe0b89257a40322bc972"]
+fake_mnauth_2 = ["6ad7ed7a2d6c2c1db30fc364114602b36b2730a9aa96d8f11f1871a9cee37378",
+                 "122463411a86362966a5161805f24cf6a0eef08a586b8e00c4f0ad0b084c5bb3f5c9a60ee5ffc78db2313897e3ab2223"]
+
+# Used to distinguish mininode connections
+uacomment_m3_1 = "MN3_1"
+uacomment_m3_2 = "MN3_2"
+
 
 def assert_qdata(qdata, qgetdata, error, len_vvec=0, len_contributions=0):
     assert qdata is not None and qgetdata is not None
@@ -434,11 +444,6 @@ class QuorumDataMessagesTest(DashTestFramework):
         mn2 = self.mninfo[1]
         mn3 = self.mninfo[2]
 
-        fake_mnauth_1 = ["cecf37bf0ec05d2d22cb8227f88074bb882b94cd2081ba318a5a444b1b15b9fd",
-                         "087ba00bf61135f3860c4944a0debabe186ef82628fbe4ceaed1ad51d672c58dde14ea4b321efe0b89257a40322bc972"]
-        fake_mnauth_2 = ["6ad7ed7a2d6c2c1db30fc364114602b36b2730a9aa96d8f11f1871a9cee37378",
-                         "122463411a86362966a5161805f24cf6a0eef08a586b8e00c4f0ad0b084c5bb3f5c9a60ee5ffc78db2313897e3ab2223"]
-
         # Convert the hex values into integer values
         quorum_hash_int = int(quorum_hash, 16)
         protx_hash_int = int(mn1.proTxHash, 16)
@@ -447,9 +452,6 @@ class QuorumDataMessagesTest(DashTestFramework):
         qgetdata_vvec = msg_qgetdata(quorum_hash_int, 100, 0x01, protx_hash_int)
         qgetdata_contributions = msg_qgetdata(quorum_hash_int, 100, 0x02, protx_hash_int)
         qgetdata_all = msg_qgetdata(quorum_hash_int, 100, 0x03, protx_hash_int)
-
-        uacomment_m3_1 = "MN3_1"
-        uacomment_m3_2 = "MN3_2"
 
         test_basics()
         test_request_limit()
