@@ -300,7 +300,7 @@ class QuorumDataMessagesTest(DashTestFramework):
             self.wait_for_quorum_data([mn1], 100, quorum_hash, recover=False)
 
         # Test request limiting / banscore increase
-        def test_ratelimiting_banscore():
+        def test_request_limit():
 
             def test_send_from_two_to_one(send_1, expected_banscore_1, send_2, expected_banscore_2, clear_requests=False):
                 if clear_requests:
@@ -452,7 +452,7 @@ class QuorumDataMessagesTest(DashTestFramework):
         uacomment_m3_2 = "MN3_2"
 
         test_basics()
-        test_ratelimiting_banscore()
+        test_request_limit()
         test_qwatch_connections()
         test_watchquorums()
         test_rpc_quorum_getdata_proTxHash()
