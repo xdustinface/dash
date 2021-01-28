@@ -339,12 +339,7 @@ class QuorumDataMessagesTest(DashTestFramework):
         # QWATCH connections share one request limit slot
         def test_qwatch_connections():
             self.log.info("Test QWATCH connections")
-
-            # Restart mns to clear previous ratelimiting
-            self.restart_mn(mn1)
-            self.restart_mn(mn2)
-            self.restart_mn(mn3)
-
+            force_request_expire()
             p2p_mn3_1 = p2p_connection(mn3.node, uacomment_m3_1)
             p2p_mn3_2 = p2p_connection(mn3.node, uacomment_m3_2)
             network_thread_start()
