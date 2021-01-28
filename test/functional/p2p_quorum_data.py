@@ -414,7 +414,7 @@ class QuorumDataMessagesTest(DashTestFramework):
                 mn2.node.disconnect_p2ps()
                 network_thread_join()
 
-        def test_rpc_quorum_getdata_proTxHash():
+        def test_rpc_quorum_getdata_protx_hash():
             self.log.info("Test optional proTxHash of `quorum getdata`")
             assert_raises_rpc_error(-8, "proTxHash missing",
                                     mn1.node.quorum, "getdata", 0, 100, quorum_hash, 0x02)
@@ -455,7 +455,7 @@ class QuorumDataMessagesTest(DashTestFramework):
         test_request_limit()
         test_qwatch_connections()
         test_watchquorums()
-        test_rpc_quorum_getdata_proTxHash()
+        test_rpc_quorum_getdata_protx_hash()
 
 
 if __name__ == '__main__':
