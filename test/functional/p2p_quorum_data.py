@@ -63,7 +63,7 @@ def wait_for_banscore(node, peer_id, expected_score):
             if peer["id"] == peer_id:
                 return peer["banscore"]
         return None
-    wait_until(lambda: get_score() == expected_score, timeout=6, sleep=2)
+    wait_until(lambda: get_score() == expected_score, timeout=6)
 
 
 def p2p_connection(node, uacomment=None):
@@ -73,7 +73,7 @@ def p2p_connection(node, uacomment=None):
 def get_mininode_id(node, uacomment=None):
     tries = 0
     node_id = None
-    while tries < 10 and node_id is None:
+    while tries < 200 and node_id is None:
         for p in node.getpeerinfo():
             for p2p in node.p2ps:
                 if uacomment is not None and p2p.uacomment != uacomment:
@@ -82,7 +82,7 @@ def get_mininode_id(node, uacomment=None):
                     node_id = p["id"]
                     break
         tries += 1
-        time.sleep(1)
+        time.sleep(0.05)
     assert node_id is not None
     return node_id
 
