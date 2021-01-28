@@ -139,8 +139,8 @@ class QuorumDataMessagesTest(DashTestFramework):
                 node0.generate(1)
                 self.sync_blocks()
 
-        def test_mnauth_restriction():
-            self.log.info("Testing mnauth restriction")
+        def test_basics():
+            self.log.info("Testing basics of QGETDATA/QDATA")
             p2p_node0 = p2p_connection(node0)
             p2p_mn1 = p2p_connection(mn1.node)
             network_thread_start()
@@ -188,21 +188,68 @@ class QuorumDataMessagesTest(DashTestFramework):
             wait_for_banscore(mn1.node, id_p2p_mn1, 50)
             mn1.node.disconnect_p2ps()
             network_thread_join()
-
-        # Test all invalid messages
-        def test_invalid_messages():
-            self.log.info("Test all invalid messages")
-            # Create invalid messages for all error cases
-            qgetdata_invalid_type = msg_qgetdata(quorum_hash_int, 103, 0x01, protx_hash_int)
-            qgetdata_invalid_block = msg_qgetdata(protx_hash_int, 100, 0x01, protx_hash_int)
-            qgetdata_invalid_quorum = msg_qgetdata(int(mn1.node.getblockhash(0), 16), 100, 0x01, protx_hash_int)
-            qgetdata_invalid_no_member = msg_qgetdata(quorum_hash_int, 100, 0x02, quorum_hash_int)
-
+            self.log.info("Test ban score increase for invalid / unexpected QDATA")
+            p2p_mn1 = p2p_connection(mn1.node)
+            p2p_mn2 = p2p_connection(mn2.node)
+            network_thread_start()
+            p2p_mn1.wait_for_verack()
+            p2p_mn2.wait_for_verack()
+            id_p2p_mn1 = get_mininode_id(mn1.node)
+            id_p2p_mn2 = get_mininode_id(mn2.node)
+            mnauth(mn1.node, id_p2p_mn1, fake_mnauth_1[0], fake_mnauth_1[1])
+            mnauth(mn2.node, id_p2p_mn2, fake_mnauth_2[0], fake_mnauth_2[1])
+            wait_for_banscore(mn1.node, id_p2p_mn1, 0)
+            p2p_mn2.test_qgetdata(qgetdata_all, 0, self.llmq_threshold, self.llmq_size)
+            qdata_valid = p2p_mn2.get_qdata()
+            # - Not requested
+            p2p_mn1.send_message(qdata_valid)
+            time.sleep(1)
+            wait_for_banscore(mn1.node, id_p2p_mn1, 10)
+            # - Already received
+            force_request_expire()
+            assert mn1.node.quorum("getdata", id_p2p_mn1, 100, quorum_hash, 0x03, mn1.proTxHash)
+            p2p_mn1.wait_for_qgetdata()
+            p2p_mn1.send_message(qdata_valid)
+            time.sleep(1)
+            p2p_mn1.send_message(qdata_valid)
+            wait_for_banscore(mn1.node, id_p2p_mn1, 20)
+            # - Not like requested
+            force_request_expire()
+            assert mn1.node.quorum("getdata", id_p2p_mn1, 100, quorum_hash, 0x03, mn1.proTxHash)
+            p2p_mn1.wait_for_qgetdata()
+            qdata_invalid_request = qdata_valid
+            qdata_invalid_request.data_mask = 2
+            p2p_mn1.send_message(qdata_invalid_request)
+            wait_for_banscore(mn1.node, id_p2p_mn1, 30)
+            # - Invalid verification vector
+            force_request_expire()
+            assert mn1.node.quorum("getdata", id_p2p_mn1, 100, quorum_hash, 0x03, mn1.proTxHash)
+            p2p_mn1.wait_for_qgetdata()
+            qdata_invalid_vvec = qdata_valid
+            qdata_invalid_vvec.quorum_vvec.pop()
+            p2p_mn1.send_message(qdata_invalid_vvec)
+            wait_for_banscore(mn1.node, id_p2p_mn1, 40)
+            # - Invalid contributions
+            force_request_expire()
+            assert mn1.node.quorum("getdata", id_p2p_mn1, 100, quorum_hash, 0x03, mn1.proTxHash)
+            p2p_mn1.wait_for_qgetdata()
+            qdata_invalid_contribution = qdata_valid
+            qdata_invalid_contribution.enc_contributions.pop()
+            p2p_mn1.send_message(qdata_invalid_contribution)
+            wait_for_banscore(mn1.node, id_p2p_mn1, 50)
+            mn1.node.disconnect_p2ps()
+            mn2.node.disconnect_p2ps()
+            network_thread_join()
+            self.log.info("Test all available error codes")
             p2p_mn1 = p2p_connection(mn1.node)
             network_thread_start()
             p2p_mn1.wait_for_verack()
             id_p2p_mn1 = get_mininode_id(mn1.node)
             mnauth(mn1.node, id_p2p_mn1, fake_mnauth_1[0], fake_mnauth_1[1])
+            qgetdata_invalid_type = msg_qgetdata(quorum_hash_int, 103, 0x01, protx_hash_int)
+            qgetdata_invalid_block = msg_qgetdata(protx_hash_int, 100, 0x01, protx_hash_int)
+            qgetdata_invalid_quorum = msg_qgetdata(int(mn1.node.getblockhash(0), 16), 100, 0x01, protx_hash_int)
+            qgetdata_invalid_no_member = msg_qgetdata(quorum_hash_int, 100, 0x02, quorum_hash_int)
             p2p_mn1.test_qgetdata(qgetdata_invalid_type, QUORUM_TYPE_INVALID)
             p2p_mn1.test_qgetdata(qgetdata_invalid_block, QUORUM_BLOCK_NOT_FOUND)
             p2p_mn1.test_qgetdata(qgetdata_invalid_quorum, QUORUM_NOT_FOUND)
@@ -226,6 +273,7 @@ class QuorumDataMessagesTest(DashTestFramework):
             # Validate the DKG data is missing
             p2p_mn1.test_qgetdata(qgetdata_vvec, QUORUM_VERIFICATION_VECTOR_MISSING)
             p2p_mn1.test_qgetdata(qgetdata_contributions, ENCRYPTED_CONTRIBUTIONS_MISSING)
+            self.log.info("Test DKG data recovery with QDATA")
             # Now that mn1 is missing its DKG data try to recover it by querying the data from mn2 and then sending it to
             # mn1 with a direct QDATA message.
             #
@@ -366,60 +414,6 @@ class QuorumDataMessagesTest(DashTestFramework):
                 mn2.node.disconnect_p2ps()
                 network_thread_join()
 
-        def test_invalid_unexpected_qdata():
-            self.log.info("Test ban score increase for invalid / unexpected QDATA")
-            p2p_mn1 = p2p_connection(mn1.node)
-            p2p_mn2 = p2p_connection(mn2.node)
-            network_thread_start()
-            p2p_mn1.wait_for_verack()
-            p2p_mn2.wait_for_verack()
-            id_p2p_mn1 = get_mininode_id(mn1.node)
-            id_p2p_mn2 = get_mininode_id(mn2.node)
-            mnauth(mn1.node, id_p2p_mn1, fake_mnauth_1[0], fake_mnauth_1[1])
-            mnauth(mn2.node, id_p2p_mn2, fake_mnauth_2[0], fake_mnauth_2[1])
-            wait_for_banscore(mn1.node, id_p2p_mn1, 0)
-            p2p_mn2.test_qgetdata(qgetdata_all, 0, self.llmq_threshold, self.llmq_size)
-            qdata_valid = p2p_mn2.get_qdata()
-            # - Not requested
-            p2p_mn1.send_message(qdata_valid)
-            time.sleep(1)
-            wait_for_banscore(mn1.node, id_p2p_mn1, 10)
-            # - Already received
-            force_request_expire()
-            assert mn1.node.quorum("getdata", id_p2p_mn1, 100, quorum_hash, 0x03, mn1.proTxHash)
-            p2p_mn1.wait_for_qgetdata()
-            p2p_mn1.send_message(qdata_valid)
-            time.sleep(1)
-            p2p_mn1.send_message(qdata_valid)
-            wait_for_banscore(mn1.node, id_p2p_mn1, 20)
-            # - Not like requested
-            force_request_expire()
-            assert mn1.node.quorum("getdata", id_p2p_mn1, 100, quorum_hash, 0x03, mn1.proTxHash)
-            p2p_mn1.wait_for_qgetdata()
-            qdata_invalid_request = qdata_valid
-            qdata_invalid_request.data_mask = 2
-            p2p_mn1.send_message(qdata_invalid_request)
-            wait_for_banscore(mn1.node, id_p2p_mn1, 30)
-            # - Invalid verification vector
-            force_request_expire()
-            assert mn1.node.quorum("getdata", id_p2p_mn1, 100, quorum_hash, 0x03, mn1.proTxHash)
-            p2p_mn1.wait_for_qgetdata()
-            qdata_invalid_vvec = qdata_valid
-            qdata_invalid_vvec.quorum_vvec.pop()
-            p2p_mn1.send_message(qdata_invalid_vvec)
-            wait_for_banscore(mn1.node, id_p2p_mn1, 40)
-            # - Invalid contributions
-            force_request_expire()
-            assert mn1.node.quorum("getdata", id_p2p_mn1, 100, quorum_hash, 0x03, mn1.proTxHash)
-            p2p_mn1.wait_for_qgetdata()
-            qdata_invalid_contribution = qdata_valid
-            qdata_invalid_contribution.enc_contributions.pop()
-            p2p_mn1.send_message(qdata_invalid_contribution)
-            wait_for_banscore(mn1.node, id_p2p_mn1, 50)
-            mn1.node.disconnect_p2ps()
-            mn2.node.disconnect_p2ps()
-            network_thread_join()
-
         def test_rpc_quorum_getdata_proTxHash():
             self.log.info("Test optional proTxHash of `quorum getdata`")
             assert_raises_rpc_error(-8, "proTxHash missing",
@@ -457,12 +451,10 @@ class QuorumDataMessagesTest(DashTestFramework):
         uacomment_m3_1 = "MN3_1"
         uacomment_m3_2 = "MN3_2"
 
-        test_mnauth_restriction()
-        test_invalid_messages()
+        test_basics()
         test_ratelimiting_banscore()
         test_qwatch_connections()
         test_watchquorums()
-        test_invalid_unexpected_qdata()
         test_rpc_quorum_getdata_proTxHash()
 
 
