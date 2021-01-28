@@ -274,8 +274,8 @@ class QuorumDataMessagesTest(DashTestFramework):
             p2p_mn1.test_qgetdata(qgetdata_vvec, QUORUM_VERIFICATION_VECTOR_MISSING)
             p2p_mn1.test_qgetdata(qgetdata_contributions, ENCRYPTED_CONTRIBUTIONS_MISSING)
             self.log.info("Test DKG data recovery with QDATA")
-            # Now that mn1 is missing its DKG data try to recover it by querying the data from mn2 and then sending it to
-            # mn1 with a direct QDATA message.
+            # Now that mn1 is missing its DKG data try to recover it by querying the data from mn2 and then sending it
+            # to mn1 with a direct QDATA message.
             #
             # mininode - QGETDATA -> mn2 - QDATA -> mininode - QDATA -> mn1
             #
@@ -302,15 +302,15 @@ class QuorumDataMessagesTest(DashTestFramework):
         # Test request limiting / banscore increase
         def test_request_limit():
 
-            def test_send_from_two_to_one(send_1, expected_banscore_1, send_2, expected_banscore_2, clear_requests=False):
+            def test_send_from_two_to_one(send_1, expected_score_1, send_2, expected_score_2, clear_requests=False):
                 if clear_requests:
                     force_request_expire()
                 if send_1:
                     p2p_mn3_1.test_qgetdata(qgetdata_vvec, 0, self.llmq_threshold, 0)
                 if send_2:
                     p2p_mn3_2.test_qgetdata(qgetdata_vvec, 0, self.llmq_threshold, 0)
-                wait_for_banscore(mn3.node, id_p2p_mn3_1, expected_banscore_1)
-                wait_for_banscore(mn3.node, id_p2p_mn3_2, expected_banscore_2)
+                wait_for_banscore(mn3.node, id_p2p_mn3_1, expected_score_1)
+                wait_for_banscore(mn3.node, id_p2p_mn3_2, expected_score_2)
 
             self.log.info("Test request limiting / banscore increases")
 
