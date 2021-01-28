@@ -84,7 +84,7 @@ def get_mininode_id(node, uacomment=None):
 
 
 def mnauth(node, node_id, protx_hash, operator_pubkey):
-    assert node.mnauth(node_id, protx_hash, operator_pubkey)
+    wait_until(lambda: node.mnauth(node_id, protx_hash, operator_pubkey), timeout=10)
     mnauth_peer_id = None
     for peer in node.getpeerinfo():
         if "verified_proregtx_hash" in peer and peer["verified_proregtx_hash"] == protx_hash:
