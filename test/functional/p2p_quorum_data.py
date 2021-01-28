@@ -71,20 +71,16 @@ def p2p_connection(node, uacomment=None):
 
 
 def get_mininode_id(node, uacomment=None):
-    tries = 0
-    node_id = None
-    while tries < 200 and node_id is None:
+    def get_id():
         for p in node.getpeerinfo():
             for p2p in node.p2ps:
                 if uacomment is not None and p2p.uacomment != uacomment:
                     continue
                 if p["subver"] == p2p.strSubVer.decode():
-                    node_id = p["id"]
-                    break
-        tries += 1
-        time.sleep(0.05)
-    assert node_id is not None
-    return node_id
+                    return p["id"]
+        return None
+    wait_until(lambda: get_id() != None, timeout=10)
+    return get_id()
 
 
 def mnauth(node, node_id, protx_hash, operator_pubkey):
