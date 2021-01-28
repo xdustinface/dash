@@ -79,7 +79,7 @@ def get_mininode_id(node, uacomment=None):
                 if p["subver"] == p2p.strSubVer.decode():
                     return p["id"]
         return None
-    wait_until(lambda: get_id() != None, timeout=10)
+    wait_until(lambda: get_id() is not None, timeout=10)
     return get_id()
 
 
