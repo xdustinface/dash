@@ -121,6 +121,12 @@ void CChainLocksHandler::ProcessNewChainLock(NodeId from, const llmq::CChainLock
             // no need to process/relay older CLSIGs
             return;
         }
+
+        if (InternalHasConflictingChainLock(clsig.nHeight, clsig.blockHash)) {
+            LogPrintf("CChainLocksHandler::%s -- new CLSIG (%s) tries to reorg previous CLSIG (%s), peer=%d\n",
+                __func__, clsig.ToString(), bestChainLock.ToString(), from);
+            return;
+        }
     }
 
     uint256 requestId = ::SerializeHash(std::make_pair(CLSIG_REQUESTID_PREFIX, clsig.nHeight));
@@ -132,18 +138,6 @@ void CChainLocksHandler::ProcessNewChainLock(NodeId from, const llmq::CChainLock
             Misbehaving(from, 10);
         }
         return;
-    }
-
-    {
-        LOCK(cs);
-
-        if (InternalHasConflictingChainLock(clsig.nHeight, clsig.blockHash)) {
-            // This should not happen. If it happens, it means that a malicious entity controls a large part of the MN
-            // network. In this case, we don't allow him to reorg older chainlocks.
-            LogPrintf("CChainLocksHandler::%s -- new CLSIG (%s) tries to reorg previous CLSIG (%s), peer=%d\n",
-                      __func__, clsig.ToString(), bestChainLock.ToString(), from);
-            return;
-        }
     }
 
     CInv inv(MSG_CLSIG, hash);
