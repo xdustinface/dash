@@ -218,7 +218,7 @@ void CQuorum::StartQuorumDataRecoveryThread(std::shared_ptr<CQuorum> _this, cons
 
         size_t nTries{0};
         uint16_t nDataMask{nDataMaskIn};
-        int64_t nTimeLastSuccess{Params().NetworkIDString() == CBaseChainParams::REGTEST ? GetAdjustedTime() : 0};
+        int64_t nTimeLastSuccess{0};
         uint256* pCurrentMemberHash{nullptr};
         std::vector<uint256> vecMemberHashes;
         const size_t nMyStartOffset{_this->GetQuorumRecoveryStartOffset(pIndex)};
