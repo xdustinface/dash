@@ -177,12 +177,6 @@ class QuorumDataRecoveryTest(DashTestFramework):
                                             "Error: Invalid llmqType in -llmq-qvvec-sync: 100")
         node.assert_start_raises_init_error(["-llmq-qvvec-sync=llmq_test", "-llmq-qvvec-sync=llmq_test"],
                                             "Error: Duplicated llmqType in -llmq-qvvec-sync: llmq_test")
-        node.assert_start_raises_init_error(["-llmq-data-recovery=-1"],
-                                            "Error: Invalid value for -llmq-data-recovery"
-                                            ", 1: Enabled, 0: Disabled")
-        node.assert_start_raises_init_error(["-llmq-data-recovery=2"],
-                                            "Error: Invalid value for -llmq-data-recovery"
-                                            ", 1: Enabled, 0: Disabled")
 
 
 if __name__ == '__main__':

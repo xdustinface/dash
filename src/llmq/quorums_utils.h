@@ -22,7 +22,7 @@ namespace llmq
 extern CCriticalSection cs_llmq_vbc;
 extern VersionBitsCache llmq_versionbitscache;
 
-static const int DEFAULT_ENABLE_QUORUM_DATA_RECOVERY = 1;
+static const bool DEFAULT_ENABLE_QUORUM_DATA_RECOVERY = true;
 
 class CLLMQUtils
 {

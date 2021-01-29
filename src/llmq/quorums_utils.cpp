@@ -315,11 +315,7 @@ std::vector<Consensus::LLMQType> CLLMQUtils::GetEnabledQuorumTypes(const CBlockI
 
 bool CLLMQUtils::QuorumDataRecoveryEnabled()
 {
-    int nDataRecovery = gArgs.GetArg("-llmq-data-recovery", DEFAULT_ENABLE_QUORUM_DATA_RECOVERY);
-    if ((nDataRecovery < 0) || (nDataRecovery > 1)) {
-        throw std::invalid_argument("Invalid value for -llmq-data-recovery, 1: Enabled, 0: Disabled");
-    }
-    return nDataRecovery > 0;
+    return gArgs.GetBoolArg("-llmq-data-recovery", DEFAULT_ENABLE_QUORUM_DATA_RECOVERY);
 }
 
 std::set<Consensus::LLMQType> CLLMQUtils::GetEnabledQuorumVvecSyncTypes()
