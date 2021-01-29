@@ -1090,8 +1090,8 @@ class DashTestFramework(BitcoinTestFramework):
         return None
 
     def test_mn_quorum_data(self, test_mn, quorum_type_in, quorum_hash_in, expect_secret=True):
-        quorum_info = test_mn.node.quorum("info", quorum_type_in, quorum_hash_in, expect_secret)
-        if expect_secret and "secretKeyShare" not in quorum_info:
+        quorum_info = test_mn.node.quorum("info", quorum_type_in, quorum_hash_in, True)
+        if expect_secret != ("secretKeyShare" in quorum_info):
             return False
         if "members" not in quorum_info or len(quorum_info["members"]) == 0:
             return False
