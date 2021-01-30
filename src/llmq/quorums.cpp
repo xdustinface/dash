@@ -204,7 +204,7 @@ size_t CQuorum::GetQuorumRecoveryStartOffset(const CBlockIndex* pIndex) const
     return nMyIndex % qc.validMembers.size();
 }
 
-void CQuorum::StartQuorumDataRecoveryThread(std::shared_ptr<CQuorum> _this, const CBlockIndex* pIndex, uint16_t nDataMaskIn)
+void CQuorum::StartQuorumDataRecoveryThread(const CQuorumCPtr _this, const CBlockIndex* pIndex, uint16_t nDataMaskIn)
 {
     if (_this->fQuorumDataRecoveryThreadRunning) {
         LogPrint(BCLog::LLMQ, "CQuorum::%s -- Already running\n", __func__);
@@ -382,15 +382,8 @@ void CQuorumManager::TriggerQuorumDataRecoveryThreads(const CBlockIndex* pIndex)
                 continue;
             }
 
-            LOCK(quorumsCacheCs);
-            CQuorumPtr pQuorumMutable;
-            if (!mapQuorumsCache[pQuorum->qc.llmqType].get(pQuorum->qc.quorumHash, pQuorumMutable)) {
-                // Shouldn't happen?
-                LogPrint(BCLog::LLMQ, "CQuorumManager::%s -- Quorum not found in cache\n", __func__);
-                continue;
-            }
             // Finally start the thread which triggers the requests for this quorum
-            CQuorum::StartQuorumDataRecoveryThread(pQuorumMutable, pIndex, nDataMask);
+            CQuorum::StartQuorumDataRecoveryThread(pQuorum, pIndex, nDataMask);
         }
     }
 }

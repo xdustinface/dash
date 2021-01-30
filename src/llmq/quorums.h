@@ -131,6 +131,11 @@ public:
  * will also contain the secret key share and the quorum verification vector. The quorum vvec is then used to recover
  * the public key shares of individual members, which are needed to verify signature shares of these members.
  */
+
+class CQuorum;
+typedef std::shared_ptr<CQuorum> CQuorumPtr;
+typedef std::shared_ptr<const CQuorum> CQuorumCPtr;
+
 class CQuorum
 {
     friend class CQuorumManager;
@@ -151,8 +156,8 @@ private:
     mutable CBLSWorkerCache blsCache;
     std::atomic<bool> stopQuorumThreads;
     std::thread cachePopulatorThread;
-    CThreadInterrupt interruptQuorumDataReceived;
-    std::atomic<bool> fQuorumDataRecoveryThreadRunning{false};
+    mutable CThreadInterrupt interruptQuorumDataReceived;
+    mutable std::atomic<bool> fQuorumDataRecoveryThreadRunning{false};
 
 public:
     CQuorum(const Consensus::LLMQParams& _params, CBLSWorker& _blsWorker);
@@ -173,14 +178,12 @@ private:
     void WriteContributions(CEvoDB& evoDb);
     bool ReadContributions(CEvoDB& evoDb);
     static void StartCachePopulatorThread(std::shared_ptr<CQuorum> _this);
-    static void StartQuorumDataRecoveryThread(std::shared_ptr<CQuorum> _this, const CBlockIndex* pIndex, uint16_t nDataMask);
+    static void StartQuorumDataRecoveryThread(const CQuorumCPtr _this, const CBlockIndex* pIndex, uint16_t nDataMask);
     /// Returns the start offset for the masternode with the given proTxHash. This offset is applied when picking data recovery members of a quorum's
     /// memberlist and is calculated based on a list of all member of all active quorums for the given llmqType in a way that each member
     /// should receive the same number of request if all active llmqType members requests data from one llmqType quorum.
     size_t GetQuorumRecoveryStartOffset(const CBlockIndex* pIndex) const;
 };
-typedef std::shared_ptr<CQuorum> CQuorumPtr;
-typedef std::shared_ptr<const CQuorum> CQuorumCPtr;
 
 /**
  * The quorum manager maintains quorums which were mined on chain. When a quorum is requested from the manager,
