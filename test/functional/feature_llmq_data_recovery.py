@@ -48,10 +48,9 @@ class QuorumDataRecoveryTest(DashTestFramework):
 
     def test_mns(self, quorum_type_in, quorum_hash_in, valid_mns=[], all_mns=[], expect_secret=True,
                  recover=False, timeout=120):
-        for invalid_mn in all_mns:
-            if invalid_mn in valid_mns:
-                continue
-            assert not self.test_mn_quorum_data(invalid_mn, quorum_type_in, quorum_hash_in, False)
+        for mn in all_mns:
+            if mn not in valid_mns:
+                assert not self.test_mn_quorum_data(mn, quorum_type_in, quorum_hash_in, False)
         self.wait_for_quorum_data(valid_mns, quorum_type_in, quorum_hash_in, expect_secret, recover, timeout)
 
     def get_mn(self, protx_hash):
