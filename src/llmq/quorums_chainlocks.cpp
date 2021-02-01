@@ -106,9 +106,11 @@ void CChainLocksHandler::ProcessMessage(CNode* pfrom, const std::string& strComm
 
 void CChainLocksHandler::ProcessNewChainLock(NodeId from, const llmq::CChainLockSig& clsig, const uint256& hash)
 {
+    CInv clsigInv(MSG_CLSIG, hash);
+
     if (from != -1) {
         LOCK(cs_main);
-        EraseObjectRequest(from, CInv(MSG_CLSIG, hash));
+        EraseObjectRequest(from, clsigInv);
     }
 
     {
@@ -133,8 +135,7 @@ void CChainLocksHandler::ProcessNewChainLock(NodeId from, const llmq::CChainLock
         return;
     }
 
-    CInv inv(MSG_CLSIG, hash);
-    g_connman->RelayInv(inv, LLMQS_PROTO_VERSION);
+    g_connman->RelayInv(clsigInv, LLMQS_PROTO_VERSION);
 
     {
         LOCK2(cs_main, cs);
