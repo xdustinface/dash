@@ -8,7 +8,7 @@ import time
 
 from test_framework.blocktools import (create_block, create_coinbase)
 from test_framework.messages import CInv, hash256, msg_clsig, msg_inv, ser_string, uint256_from_str
-from test_framework.mininode import P2PInterface, network_thread_join, network_thread_start
+from test_framework.mininode import P2PInterface, MSG_CLSIG, network_thread_join, network_thread_start
 from test_framework.test_framework import DashTestFramework
 from test_framework.util import connect_nodes, hex_str_to_bytes, isolate_node, reconnect_isolated_node
 
@@ -29,7 +29,7 @@ class TestP2PConn(P2PInterface):
         clhash = uint256_from_str(hash256(clsig.serialize()))
         self.clsigs[clhash] = clsig
 
-        inv = msg_inv([CInv(29, clhash)])
+        inv = msg_inv([CInv(MSG_CLSIG, clhash)])
         self.send_message(inv)
 
     def on_getdata(self, message):
