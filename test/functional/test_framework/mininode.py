@@ -28,6 +28,7 @@ from test_framework.util import wait_until
 
 MSG_TX = 1
 MSG_BLOCK = 2
+MSG_CLSIG = 29
 MSG_TYPE_MASK = 0xffffffff >> 2
 
 logger = logging.getLogger("TestFramework.mininode")
