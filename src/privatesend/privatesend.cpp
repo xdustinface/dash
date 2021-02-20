@@ -52,7 +52,7 @@ bool CPrivateSendQueue::Sign()
     if (!sig.IsValid()) {
         return false;
     }
-    sig.GetBuf(vchSig);
+    vchSig = sig.ToByteVector();
 
     return true;
 }
@@ -98,7 +98,7 @@ bool CPrivateSendBroadcastTx::Sign()
     if (!sig.IsValid()) {
         return false;
     }
-    sig.GetBuf(vchSig);
+    vchSig = sig.ToByteVector();
 
     return true;
 }
