@@ -49,18 +49,6 @@ public:
 
     CBLSWrapper()
     {
-        struct NullHash {
-            uint256 hash;
-            NullHash() {
-                char buf[_SerSize];
-                memset(buf, 0, _SerSize);
-                CHashWriter ss(SER_GETHASH, 0);
-                ss.write(buf, _SerSize);
-                hash = ss.GetHash();
-            }
-        };
-        static NullHash nullHash;
-        cachedHash = nullHash.hash;
     }
     CBLSWrapper(const std::vector<unsigned char>& vecBytes) : CBLSWrapper<ImplType, _SerSize, C>()
     {
@@ -114,7 +102,7 @@ public:
                 Reset();
             }
         }
-        UpdateHash();
+        cachedHash.SetNull();
     }
 
     void Reset()
@@ -148,6 +136,9 @@ public:
 
     const uint256& GetHash() const
     {
+        if (cachedHash.IsNull()) {
+            UpdateHash();
+        }
         return cachedHash;
     }
 
