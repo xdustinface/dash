@@ -371,7 +371,7 @@ public:
         if (!bufValid) {
             obj.GetBuf(buf, sizeof(buf));
             bufValid = true;
-            hash = uint256();
+            hash.SetNull();
         }
         s.write(buf, sizeof(buf));
     }
@@ -383,7 +383,7 @@ public:
         s.read(buf, sizeof(buf));
         bufValid = true;
         objInitialized = false;
-        hash = uint256();
+        hash.SetNull();
     }
 
     void Set(const BLSObject& _obj)
@@ -392,7 +392,7 @@ public:
         bufValid = false;
         objInitialized = true;
         obj = _obj;
-        hash = uint256();
+        hash.SetNull();
     }
     const BLSObject& Get() const
     {
@@ -436,7 +436,7 @@ public:
         if (!bufValid) {
             obj.GetBuf(buf, sizeof(buf));
             bufValid = true;
-            hash = uint256();
+            hash.SetNull();
         }
         if (hash.IsNull()) {
             UpdateHash();
