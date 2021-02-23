@@ -40,6 +40,7 @@ class CBLSWrapper
 protected:
     ImplType impl;
     bool fValid{false};
+    mutable bool fHashValid{false};
     mutable uint256 cachedHash;
 
     inline constexpr size_t GetSerSize() const { return SerSize; }
@@ -61,12 +62,14 @@ public:
     {
         std::swap(impl, ref.impl);
         std::swap(fValid, ref.fValid);
+        std::swap(fHashValid, ref.fHashValid);
         std::swap(cachedHash, ref.cachedHash);
     }
     CBLSWrapper& operator=(CBLSWrapper&& ref)
     {
         std::swap(impl, ref.impl);
         std::swap(fValid, ref.fValid);
+        std::swap(fHashValid, ref.fHashValid);
         std::swap(cachedHash, ref.cachedHash);
         return *this;
     }
@@ -102,7 +105,7 @@ public:
                 Reset();
             }
         }
-        cachedHash.SetNull();
+        fHashValid = false;
     }
 
     void Reset()
@@ -136,7 +139,7 @@ public:
 
     const uint256& GetHash() const
     {
-        if (cachedHash.IsNull()) {
+        if (!fHashValid) {
             UpdateHash();
         }
         return cachedHash;
@@ -145,6 +148,7 @@ public:
     void UpdateHash() const
     {
         cachedHash = ::SerializeHash(*this);
+        fHashValid = true;
     }
 
     bool SetHexStr(const std::string& str)
