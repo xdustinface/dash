@@ -442,17 +442,12 @@ public:
             fHashValid = false;
         }
         if (!fHashValid) {
-            UpdateHash();
+            CHashWriter ss(SER_GETHASH, PROTOCOL_VERSION);
+            ss.write(buf, sizeof(buf));
+            hash = ss.GetHash();
+            fHashValid = true;
         }
         return hash;
-    }
-private:
-    void UpdateHash() const
-    {
-        CHashWriter ss(SER_GETHASH, PROTOCOL_VERSION);
-        ss.write(buf, sizeof(buf));
-        hash = ss.GetHash();
-        fHashValid = true;
     }
 };
 typedef CBLSLazyWrapper<CBLSSignature> CBLSLazySignature;
