@@ -322,6 +322,7 @@ private:
     mutable bool objInitialized{false};
 
     mutable uint256 hash;
+    mutable bool fHashValid{false};
 
 public:
     CBLSLazyWrapper()
@@ -351,7 +352,10 @@ public:
         } else {
             obj.Reset();
         }
-        hash = r.hash;
+        fHashValid = r.fHashValid;
+        if (r.fHashValid) {
+            hash = r.hash;
+        }
         return *this;
     }
 
@@ -370,7 +374,7 @@ public:
         if (!bufValid) {
             obj.GetBuf(buf, sizeof(buf));
             bufValid = true;
-            hash.SetNull();
+            fHashValid = false;
         }
         s.write(buf, sizeof(buf));
     }
@@ -382,7 +386,7 @@ public:
         s.read(buf, sizeof(buf));
         bufValid = true;
         objInitialized = false;
-        hash.SetNull();
+        fHashValid = false;
     }
 
     void Set(const BLSObject& _obj)
@@ -391,7 +395,7 @@ public:
         bufValid = false;
         objInitialized = true;
         obj = _obj;
-        hash.SetNull();
+        fHashValid = false;
     }
     const BLSObject& Get() const
     {
@@ -435,9 +439,9 @@ public:
         if (!bufValid) {
             obj.GetBuf(buf, sizeof(buf));
             bufValid = true;
-            hash.SetNull();
+            fHashValid = false;
         }
-        if (hash.IsNull()) {
+        if (!fHashValid) {
             UpdateHash();
         }
         return hash;
@@ -448,6 +452,7 @@ private:
         CHashWriter ss(SER_GETHASH, PROTOCOL_VERSION);
         ss.write(buf, sizeof(buf));
         hash = ss.GetHash();
+        fHashValid = true;
     }
 };
 typedef CBLSLazyWrapper<CBLSSignature> CBLSLazySignature;
