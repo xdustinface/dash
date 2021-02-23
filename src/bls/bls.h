@@ -140,15 +140,10 @@ public:
     const uint256& GetHash() const
     {
         if (!fHashValid) {
-            UpdateHash();
+            cachedHash = ::SerializeHash(*this);
+            fHashValid = true;
         }
         return cachedHash;
-    }
-
-    void UpdateHash() const
-    {
-        cachedHash = ::SerializeHash(*this);
-        fHashValid = true;
     }
 
     bool SetHexStr(const std::string& str)
