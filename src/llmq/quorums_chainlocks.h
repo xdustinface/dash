@@ -121,6 +121,7 @@ private:
 extern CChainLocksHandler* chainLocksHandler;
 
 bool AreChainLocksEnabled();
+bool AreMultiQuorumChainLocksEnabled();
 
 } // namespace llmq
 

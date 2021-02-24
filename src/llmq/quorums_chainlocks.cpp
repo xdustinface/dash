@@ -722,4 +722,9 @@ bool AreChainLocksEnabled()
     return sporkManager.IsSporkActive(SPORK_19_CHAINLOCKS_ENABLED);
 }
 
+bool AreMultiQuorumChainLocksEnabled()
+{
+    return sporkManager.GetSporkValue(SPORK_19_CHAINLOCKS_ENABLED) == 1;
+}
+
 } // namespace llmq
