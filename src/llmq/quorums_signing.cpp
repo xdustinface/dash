@@ -928,15 +928,4 @@ CQuorumCPtr CSigningManager::SelectQuorumForSigning(Consensus::LLMQType llmqType
     return quorums[scores.front().second];
 }
 
-bool CSigningManager::VerifyRecoveredSig(Consensus::LLMQType llmqType, int signedAtHeight, const uint256& id, const uint256& msgHash, const CBLSSignature& sig)
-{
-    auto quorum = SelectQuorumForSigning(llmqType, id, signedAtHeight);
-    if (!quorum) {
-        return false;
-    }
-
-    uint256 signHash = CLLMQUtils::BuildSignHash(llmqType, quorum->qc.quorumHash, id, msgHash);
-    return sig.VerifyInsecure(quorum->qc.quorumPublicKey, signHash);
-}
-
 } // namespace llmq
