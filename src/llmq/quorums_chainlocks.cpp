@@ -164,7 +164,9 @@ bool CChainLocksHandler::TryUpdateBestChainLock(const CBlockIndex* pindex)
         return false;
     }
 
-    const auto llmqType = Params().GetConsensus().llmqTypeChainLocks;
+    const auto llmqType = AreMultiQuorumChainLocksEnabled() ?
+                Params().GetConsensus().llmqTypeInstantSend :
+                Params().GetConsensus().llmqTypeChainLocks;
     const size_t threshold = GetLLMQParams(llmqType).signingActiveQuorumCount / 2 + 1;
 
     std::vector<CBLSSignature> sigs;
@@ -198,7 +200,9 @@ bool CChainLocksHandler::VerifyChainLockShare(const CChainLockSig& clsig, const 
 {
     AssertLockNotHeld(cs);
 
-    const auto llmqType = Params().GetConsensus().llmqTypeChainLocks;
+    const auto llmqType = AreMultiQuorumChainLocksEnabled() ?
+                Params().GetConsensus().llmqTypeInstantSend :
+                Params().GetConsensus().llmqTypeChainLocks;
     const auto signingActiveQuorumCount = GetLLMQParams(llmqType).signingActiveQuorumCount;
 
     if (!AreMultiQuorumChainLocksEnabled()) {
@@ -264,7 +268,9 @@ bool CChainLocksHandler::VerifyAggregatedChainLock(const CChainLockSig& clsig, c
 {
     AssertLockNotHeld(cs);
 
-    const auto llmqType = Params().GetConsensus().llmqTypeChainLocks;
+    const auto llmqType = AreMultiQuorumChainLocksEnabled() ?
+                Params().GetConsensus().llmqTypeInstantSend :
+                Params().GetConsensus().llmqTypeChainLocks;
     const auto signingActiveQuorumCount = GetLLMQParams(llmqType).signingActiveQuorumCount;
 
     std::vector<uint256> hashes;
@@ -367,7 +373,9 @@ void CChainLocksHandler::ProcessNewChainLock(const NodeId from, CChainLockSig& c
         }
     }
 
-    const auto llmqType = Params().GetConsensus().llmqTypeChainLocks;
+    const auto llmqType = AreMultiQuorumChainLocksEnabled() ?
+                Params().GetConsensus().llmqTypeInstantSend :
+                Params().GetConsensus().llmqTypeChainLocks;
     const auto signingActiveQuorumCount = GetLLMQParams(llmqType).signingActiveQuorumCount;
 
     if (AreMultiQuorumChainLocksEnabled()) {
@@ -659,11 +667,13 @@ void CChainLocksHandler::TrySignChainTip()
         }
     }
 
-    const auto llmqType = Params().GetConsensus().llmqTypeChainLocks;
+    const auto llmqType = AreMultiQuorumChainLocksEnabled() ?
+                Params().GetConsensus().llmqTypeInstantSend :
+                Params().GetConsensus().llmqTypeChainLocks;
     const auto signingActiveQuorumCount = GetLLMQParams(llmqType).signingActiveQuorumCount;
 
     if (AreMultiQuorumChainLocksEnabled()) {
-        // Use multiple ChainLock quorums
+        // Use multiple InstantSend quorums
         const auto quorums_scanned = llmq::quorumManager->ScanQuorums(llmqType, pindex, signingActiveQuorumCount);
         RequestIdStep requestIdStep{pindex->nHeight};
         for (const auto& quorum : quorums_scanned) {
