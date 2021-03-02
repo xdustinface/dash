@@ -108,7 +108,7 @@ public:
     const CChainLockSig GetBestChainLock();
 
     void ProcessMessage(CNode* pfrom, const std::string& strCommand, CDataStream& vRecv);
-    void ProcessNewChainLock(NodeId from, CChainLockSig& clsig, const uint256& hash);
+    void ProcessNewChainLock(NodeId from, CChainLockSig& clsig, const uint256& hash, const uint256& idIn = uint256());
     void AcceptedBlockHeader(const CBlockIndex* pindexNew);
     void UpdatedBlockTip(const CBlockIndex* pindexNew);
     void TransactionAddedToMempool(const CTransactionRef& tx, int64_t nAcceptTime);
