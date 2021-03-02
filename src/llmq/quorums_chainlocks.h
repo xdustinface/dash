@@ -79,6 +79,7 @@ private:
     const CBlockIndex* lastNotifyChainLockBlockIndex{nullptr};
 
     // Keep best chainlock shares and candidates, sorted by height (highest heght first).
+    std::map<int, std::map<CQuorumCPtr, CChainLockSigCPtr>, ReverseHeightComparator> bestChainLockShares;
     std::map<int, CChainLockSigCPtr, ReverseHeightComparator> bestChainLockCandidates;
 
     int32_t lastSignedHeight{-1};
@@ -107,7 +108,7 @@ public:
     const CChainLockSig GetBestChainLock();
 
     void ProcessMessage(CNode* pfrom, const std::string& strCommand, CDataStream& vRecv);
-    void ProcessNewChainLock(NodeId from, const CChainLockSig& clsig, const uint256& hash);
+    void ProcessNewChainLock(NodeId from, CChainLockSig& clsig, const uint256& hash);
     void AcceptedBlockHeader(const CBlockIndex* pindexNew);
     void UpdatedBlockTip(const CBlockIndex* pindexNew);
     void TransactionAddedToMempool(const CTransactionRef& tx, int64_t nAcceptTime);
@@ -130,7 +131,9 @@ private:
 
     BlockTxs::mapped_type GetBlockTxs(const uint256& blockHash);
 
-    void TryUpdateBestChainLock(const CBlockIndex* pindex);
+    bool TryUpdateBestChainLock(const CBlockIndex* pindex);
+    bool VerifyChainLockShare(const CChainLockSig& clsig, const CBlockIndex* pindexScan, const uint256& idIn, std::pair<int, CQuorumCPtr>& ret);
+    bool VerifyAggregatedChainLock(const CChainLockSig& clsig, const CBlockIndex* pindexScan);
 
     void Cleanup();
 };
