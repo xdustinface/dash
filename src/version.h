@@ -39,4 +39,7 @@ static const int MNAUTH_NODE_VER_VERSION = 70218;
 //! introduction of QGETDATA/QDATA messages
 static const int LLMQ_DATA_MESSAGES_VERSION = 70219;
 
+//! introduction of Multi-Quorum ChainLocks
+static const int MULTI_QUORUM_CHAINLOCKS_VERSION = 70220;
+
 #endif // BITCOIN_VERSION_H

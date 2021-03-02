@@ -28,7 +28,9 @@ bool CChainLockSig::IsNull() const
 
 std::string CChainLockSig::ToString() const
 {
-    return strprintf("CChainLockSig(nHeight=%d, blockHash=%s)", nHeight, blockHash.ToString());
+    return strprintf("CChainLockSig(nHeight=%d, blockHash=%s, signers: hex=%s size=%d count=%d)",
+                nHeight, blockHash.ToString(), CLLMQUtils::ToHexStr(signers), signers.size(),
+                std::count(signers.begin(), signers.end(), true));
 }
 
 CChainLocksHandler::CChainLocksHandler()

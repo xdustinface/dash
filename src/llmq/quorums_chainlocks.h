@@ -28,6 +28,7 @@ public:
     int32_t nHeight{-1};
     uint256 blockHash;
     CBLSSignature sig;
+    std::vector<bool> signers;
 
 public:
     ADD_SERIALIZE_METHODS
@@ -38,6 +39,9 @@ public:
         READWRITE(nHeight);
         READWRITE(blockHash);
         READWRITE(sig);
+        if (!(s.GetType() & SER_GETHASH) && (s.GetVersion() >= MULTI_QUORUM_CHAINLOCKS_VERSION)) {
+            READWRITE(DYNBITSET(signers));
+        }
     }
 
     bool IsNull() const;
