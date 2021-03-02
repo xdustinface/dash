@@ -44,6 +44,15 @@ public:
     std::string ToString() const;
 };
 
+typedef std::shared_ptr<const CChainLockSig> CChainLockSigCPtr;
+
+struct ReverseHeightComparator
+{
+    bool operator()(const int h1, const int h2) const {
+        return h1 > h2;
+    }
+};
+
 class CChainLocksHandler : public CRecoveredSigsListener
 {
     static const int64_t CLEANUP_INTERVAL = 1000 * 30;
@@ -60,15 +69,16 @@ private:
     bool isEnabled{false};
     bool isEnforced{false};
 
-    uint256 bestChainLockHash;
-    CChainLockSig bestChainLock;
-
+    CChainLockSig mostRecentChainLockShare;
     CChainLockSig bestChainLockWithKnownBlock;
     const CBlockIndex* bestChainLockBlockIndex{nullptr};
     const CBlockIndex* lastNotifyChainLockBlockIndex{nullptr};
 
+    // Keep best chainlock shares and candidates, sorted by height (highest heght first).
+    std::map<int, CChainLockSigCPtr, ReverseHeightComparator> bestChainLockCandidates;
+
     int32_t lastSignedHeight{-1};
-    uint256 lastSignedRequestId;
+    std::set<uint256> lastSignedRequestIds;
     uint256 lastSignedMsgHash;
 
     // We keep track of txids from recently received blocks so that we can check if all TXs got islocked
@@ -89,7 +99,8 @@ public:
 
     bool AlreadyHave(const CInv& inv);
     bool GetChainLockByHash(const uint256& hash, CChainLockSig& ret);
-    CChainLockSig GetBestChainLock();
+    const CChainLockSig GetMostRecentChainLock();
+    const CChainLockSig GetBestChainLock();
 
     void ProcessMessage(CNode* pfrom, const std::string& strCommand, CDataStream& vRecv);
     void ProcessNewChainLock(NodeId from, const CChainLockSig& clsig, const uint256& hash);
@@ -114,6 +125,8 @@ private:
     bool InternalHasConflictingChainLock(int nHeight, const uint256& blockHash);
 
     BlockTxs::mapped_type GetBlockTxs(const uint256& blockHash);
+
+    void TryUpdateBestChainLock(const CBlockIndex* pindex);
 
     void Cleanup();
 };
