@@ -4,7 +4,7 @@ $(package)_version=v0.0.11
 $(package)_download_path=https://github.com/xdustinface/bls-signatures/archive
 $(package)_file_name=$($(package)_version).tar.gz
 $(package)_sha256_hash=be3499fbb157ac4038bbc09202c743afc64930fdbbd2c3de7fee0b4017b4efc5
-$(package)_dependencies=gmp
+$(package)_dependencies=gmp cmake
 #$(package)_patches=...TODO (when we switch back to https://github.com/Chia-Network/bls-signatures)
 
 #define $(package)_preprocess_cmds
@@ -38,7 +38,7 @@ define $(package)_config_cmds
   export CXXFLAGS="$($(package)_cxxflags) $($(package)_cppflags)" && \
   export LDFLAGS="$($(package)_ldflags)" && \
   mkdir -p build && cd build && \
-  cmake ../ $($(package)_config_opts)
+  $(host_prefix)/bin/cmake ../ $($(package)_config_opts)
 endef
 
 define $(package)_build_cmds
