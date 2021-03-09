@@ -514,23 +514,16 @@ CQuorumCPtr CQuorumManager::GetQuorum(Consensus::LLMQType llmqType, const CBlock
 
 size_t CQuorumManager::GetQuorumRecoveryStartOffset(const CQuorumCPtr pQuorum, const CBlockIndex* pIndex) const
 {
-    const size_t nActiveQuorums = pQuorum->params.signingActiveQuorumCount + 1;
-    const std::vector<CQuorumCPtr> vecQuorums = ScanQuorums(pQuorum->params.type, pIndex, nActiveQuorums);
-    assert(vecQuorums.size() > 0);
-    std::set<uint256> setAllTypeMembers;
-    for (auto& q : vecQuorums) {
-        auto& vecValid = q->qc.validMembers;
-        for (size_t i = 0; i < vecValid.size(); ++i) {
-            if (vecValid[i]) {
-                setAllTypeMembers.emplace(q->members[i]->proTxHash);
-            }
-        }
-    }
-    std::vector<uint256> vecAllTypeMembers{setAllTypeMembers.begin(), setAllTypeMembers.end()};
-    std::sort(vecAllTypeMembers.begin(), vecAllTypeMembers.end());
+    auto mns = deterministicMNManager->GetListForBlock(pIndex);
+    std::vector<uint256> vecProTxHashes;
+    vecProTxHashes.reserve(mns.GetValidMNsCount());
+    mns.ForEachMN(true, [&](const CDeterministicMNCPtr& pMasternode) {
+        vecProTxHashes.emplace_back(pMasternode->proTxHash);
+    });
+    std::sort(vecProTxHashes.begin(), vecProTxHashes.end());
     size_t nIndex{0};
-    for (size_t i = 0; i < vecAllTypeMembers.size(); ++i) {
-        if (activeMasternodeInfo.proTxHash == vecAllTypeMembers[i]) {
+    for (size_t i = 0; i < vecProTxHashes.size(); ++i) {
+        if (activeMasternodeInfo.proTxHash == vecProTxHashes[i]) {
             nIndex = i;
             break;
         }
