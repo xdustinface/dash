@@ -267,6 +267,35 @@ class BitcoinTestFramework():
     # Public helper methods. These can be accessed by the subclass test scripts.
 
     def add_nodes(self, num_nodes, extra_args=None, rpchost=None, timewait=None, binary=None, stderr=None):
+
+        def get_dashd_legacy():
+            import platform
+            import requests
+            import stat
+            dashd_legacy_path = tempfile.gettempdir() + "/dashd_legacy"
+            # If the file exists already just return the path
+            if os.path.exists(dashd_legacy_path):
+                return dashd_legacy_path
+            # Download from gitlab to dashd_legacy_path
+            system = platform.system()
+            if system == "Darwin":
+                job_number = 1081153573
+                job_platform = "mac"
+            elif system == "Linux":
+                if platform.architecture() == "64bit":
+                    job_number = 1081153570
+                    job_platform = "linux64"
+                else:
+                    job_number = 1081153569
+                    job_platform = "linux32"
+            else:
+                raise RuntimeError("Not supported")
+            url = "https://gitlab.com/xdustinface/dash/-/jobs/%s/artifacts/raw/build-ci/dashcore-%s/src/dashd" % (job_number, job_platform)
+            with open(dashd_legacy_path, 'wb') as dashd_legacy:
+                dashd_legacy.write(requests.get(url).content)
+            os.chmod(dashd_legacy_path, stat.S_IEXEC)
+            return dashd_legacy_path
+
         """Instantiate TestNode objects"""
         if self.bind_to_localhost_only:
             extra_confs = [["bind=127.0.0.1"]] * num_nodes
@@ -275,7 +304,11 @@ class BitcoinTestFramework():
         if extra_args is None:
             extra_args = [[]] * num_nodes
         if binary is None:
-            binary = [self.options.bitcoind] * num_nodes
+            if num_nodes > 2:
+                binary = [self.options.bitcoind] * int(num_nodes / 2)
+                binary += [get_dashd_legacy()] * (int(num_nodes / 2) + (num_nodes % 2))
+            else:
+                binary = [self.options.bitcoind] * num_nodes
         assert_equal(len(extra_confs), num_nodes)
         assert_equal(len(extra_args), num_nodes)
         assert_equal(len(binary), num_nodes)
