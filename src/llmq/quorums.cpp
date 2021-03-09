@@ -186,7 +186,7 @@ void CQuorumManager::TriggerQuorumDataRecoveryThreads(const CBlockIndex* pIndex)
         return;
     }
 
-    const std::set<Consensus::LLMQType> setQuorumVvecSyncTypes = CLLMQUtils::GetEnabledQuorumVvecSyncTypes();
+    const std::map<Consensus::LLMQType, QvvecSyncMode> mapQuorumVvecSync = CLLMQUtils::GetEnabledQuorumVvecSyncEntries();
 
     LogPrint(BCLog::LLMQ, "CQuorumManager::%s -- Process block %s\n", __func__, pIndex->GetBlockHash().ToString());
 
@@ -211,9 +211,11 @@ void CQuorumManager::TriggerQuorumDataRecoveryThreads(const CBlockIndex* pIndex)
 
             uint16_t nDataMask{0};
             const bool fWeAreQuorumMember = pQuorum->IsValidMember(activeMasternodeInfo.proTxHash);
-            const bool fTypeRequestsEnabled = setQuorumVvecSyncTypes.count(pQuorum->qc.llmqType) > 0;
+            const bool fSyncForTypeEnabled = mapQuorumVvecSync.count(pQuorum->qc.llmqType) > 0;
+            const QvvecSyncMode syncMode = fSyncForTypeEnabled ? mapQuorumVvecSync.at(pQuorum->qc.llmqType) : Invalid;
+            const bool fSyncCurrent = syncMode == SyncAlways || (syncMode == SyncOnlyIfTypeMember && fWeAreQuorumTypeMember);
 
-            if ((fWeAreQuorumMember || (fWeAreQuorumTypeMember && fTypeRequestsEnabled)) && pQuorum->quorumVvec == nullptr) {
+            if ((fWeAreQuorumMember || (fSyncForTypeEnabled && fSyncCurrent)) && pQuorum->quorumVvec == nullptr) {
                 nDataMask |= llmq::CQuorumDataRequest::QUORUM_VERIFICATION_VECTOR;
             }
 
