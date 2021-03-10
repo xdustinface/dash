@@ -437,7 +437,7 @@ void CInstantSendManager::ProcessTx(const CTransaction& tx, bool fRetroactive, c
     }
 
     auto conflictingLock = GetConflictingLock(tx);
-    if (conflictingLock) {
+    if (conflictingLock != nullptr) {
         auto conflictingLockHash = ::SerializeHash(*conflictingLock);
         LogPrintf("CInstantSendManager::%s -- txid=%s: conflicts with islock %s, txid=%s\n", __func__,
                   tx.GetHash().ToString(), conflictingLockHash.ToString(), conflictingLock->txid.ToString());
