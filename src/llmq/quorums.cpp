@@ -212,8 +212,8 @@ void CQuorumManager::TriggerQuorumDataRecoveryThreads(const CBlockIndex* pIndex)
             uint16_t nDataMask{0};
             const bool fWeAreQuorumMember = pQuorum->IsValidMember(activeMasternodeInfo.proTxHash);
             const bool fSyncForTypeEnabled = mapQuorumVvecSync.count(pQuorum->qc.llmqType) > 0;
-            const QvvecSyncMode syncMode = fSyncForTypeEnabled ? mapQuorumVvecSync.at(pQuorum->qc.llmqType) : Invalid;
-            const bool fSyncCurrent = syncMode == SyncAlways || (syncMode == SyncOnlyIfTypeMember && fWeAreQuorumTypeMember);
+            const QvvecSyncMode syncMode = fSyncForTypeEnabled ? mapQuorumVvecSync.at(pQuorum->qc.llmqType) : QvvecSyncMode::Invalid;
+            const bool fSyncCurrent = syncMode == QvvecSyncMode::Always || (syncMode == QvvecSyncMode::OnlyIfTypeMember && fWeAreQuorumTypeMember);
 
             if ((fWeAreQuorumMember || (fSyncForTypeEnabled && fSyncCurrent)) && pQuorum->quorumVvec == nullptr) {
                 nDataMask |= llmq::CQuorumDataRequest::QUORUM_VERIFICATION_VECTOR;

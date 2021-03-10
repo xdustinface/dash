@@ -323,7 +323,7 @@ std::map<Consensus::LLMQType, QvvecSyncMode> CLLMQUtils::GetEnabledQuorumVvecSyn
     std::map<Consensus::LLMQType, QvvecSyncMode> mapQuorumVvecSyncEntries;
     for (const auto& strEntry : gArgs.GetArgs("-llmq-qvvec-sync")) {
         Consensus::LLMQType llmqType = Consensus::LLMQ_NONE;
-        QvvecSyncMode mode{Invalid};
+        QvvecSyncMode mode{QvvecSyncMode::Invalid};
         std::istringstream ssEntry(strEntry);
         std::string strLLMQType, strMode, strTest;
         const bool fLLMQTypePresent = std::getline(ssEntry, strLLMQType, ':') && strLLMQType != "";
@@ -345,14 +345,14 @@ std::map<Consensus::LLMQType, QvvecSyncMode> CLLMQUtils::GetEnabledQuorumVvecSyn
             throw std::invalid_argument(strprintf("Duplicated llmqType in -llmq-qvvec-sync: %s", strEntry));
         }
 
-        int32_t nMode{QvvecSyncMode::Invalid};
+        int32_t nMode;
         if (ParseInt32(strMode, &nMode)) {
             switch (nMode) {
-            case QvvecSyncMode::SyncAlways:
-                mode = QvvecSyncMode::SyncAlways;
+            case (int32_t)QvvecSyncMode::Always:
+                mode = QvvecSyncMode::Always;
                 break;
-            case QvvecSyncMode::SyncOnlyIfTypeMember:
-                mode = QvvecSyncMode::SyncOnlyIfTypeMember;
+            case (int32_t)QvvecSyncMode::OnlyIfTypeMember:
+                mode = QvvecSyncMode::OnlyIfTypeMember;
                 break;
             default:
                 mode = QvvecSyncMode::Invalid;

@@ -24,10 +24,10 @@ extern VersionBitsCache llmq_versionbitscache;
 
 static const bool DEFAULT_ENABLE_QUORUM_DATA_RECOVERY = true;
 
-enum QvvecSyncMode {
+enum class QvvecSyncMode {
     Invalid = -1,
-    SyncAlways = 0,
-    SyncOnlyIfTypeMember = 1,
+    Always = 0,
+    OnlyIfTypeMember = 1,
 };
 
 class CLLMQUtils
