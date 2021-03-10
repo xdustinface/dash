@@ -375,7 +375,7 @@ void BitcoinGUI::createActions()
     sendCoinsMenuAction->setToolTip(sendCoinsMenuAction->statusTip());
 
     privateSendCoinsMenuAction = new QAction("&CoinJoin", this);
-    privateSendCoinsMenuAction->setStatusTip(tr("CoinJoin coins to a Dash address"));
+    privateSendCoinsMenuAction->setStatusTip(tr("Send CoinJoin funds to a Dash address"));
     privateSendCoinsMenuAction->setToolTip(privateSendCoinsMenuAction->statusTip());
 
     receiveCoinsMenuAction = new QAction(tr("&Receive"), this);
