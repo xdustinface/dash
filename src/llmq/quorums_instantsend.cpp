@@ -409,20 +409,12 @@ void CInstantSendManager::InterruptWorkerThread()
 
 void CInstantSendManager::ProcessTx(const CTransaction& tx, bool fRetroactive, const Consensus::Params& params)
 {
-    if (!IsInstantSendEnabled()) {
+    if (!fMasternodeMode || !IsInstantSendEnabled() || !masternodeSync.IsBlockchainSynced()) {
         return;
     }
 
     auto llmqType = params.llmqTypeInstantSend;
     if (llmqType == Consensus::LLMQ_NONE) {
-        return;
-    }
-    if (!fMasternodeMode) {
-        return;
-    }
-
-    // Ignore any InstantSend messages until blockchain is synced
-    if (!masternodeSync.IsBlockchainSynced()) {
         return;
     }
 
