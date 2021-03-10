@@ -394,8 +394,17 @@ void CChainLocksHandler::ProcessNewChainLock(const NodeId from, CChainLockSig& c
                 // We just created an aggregated CLSIG, relay it
                 g_connman->RelayInv(clsigAggInv, MULTI_QUORUM_CHAINLOCKS_VERSION);
             } else {
-                // Relay partial CLSIG
-                g_connman->RelayInv(clsigInv, MULTI_QUORUM_CHAINLOCKS_VERSION);
+                // Relay partial CLSIGs to full nodes only, SPV wallets should wait for the aggregated CLSIG.
+                g_connman->ForEachNode([&](CNode* pnode) {
+                    bool fSPV{false};
+                    {
+                        LOCK(pnode->cs_filter);
+                        fSPV = pnode->pfilter != nullptr;
+                    }
+                    if (pnode->nVersion >= MULTI_QUORUM_CHAINLOCKS_VERSION && !fSPV && !pnode->m_masternode_connection) {
+                        pnode->PushInventory(clsigInv);
+                    }
+                });
             }
         } else {
             // An aggregated CLSIG
