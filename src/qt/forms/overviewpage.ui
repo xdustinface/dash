@@ -368,7 +368,7 @@
             <item>
              <widget class="QLabel" name="labelPrivateSendHeader">
               <property name="text">
-               <string>PrivateSend</string>
+               <string>CoinJoin</string>
               </property>
              </widget>
             </item>
@@ -448,7 +448,7 @@
             <item row="2" column="0">
              <widget class="QLabel" name="labelAnonymizedText">
               <property name="text">
-               <string>PrivateSend Balance:</string>
+               <string>CoinJoin Balance:</string>
               </property>
              </widget>
             </item>

@@ -668,11 +668,11 @@ void CoinControlDialog::updateView()
         if (fHideAdditional) {
             strHideButton = tr("Show all coins");
         } else {
-            strHideButton = tr("Hide PrivateSend coins");
+            strHideButton = tr("Hide CoinJoin coins");
         }
     } else {
         if (fHideAdditional) {
-            strHideButton = tr("Show all PrivateSend coins");
+            strHideButton = tr("Show all CoinJoin coins");
         } else {
             strHideButton = tr("Show spendable coins only");
         }

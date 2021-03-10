@@ -157,8 +157,8 @@ SendCoinsDialog::SendCoinsDialog(bool _fPrivateSend, QWidget* parent) :
     minimizeFeeSection(settings.value("fFeeSectionMinimized").toBool());
 
     if (_fPrivateSend) {
-        ui->sendButton->setText("PrivateS&end");
-        ui->sendButton->setToolTip(tr("Confirm the PrivateSend action"));
+        ui->sendButton->setText("Send");
+        ui->sendButton->setToolTip(tr("Confirm the send action"));
     } else {
         ui->sendButton->setText(tr("S&end"));
         ui->sendButton->setToolTip(tr("Confirm the send action"));
@@ -377,7 +377,7 @@ void SendCoinsDialog::send(QList<SendCoinsRecipient> recipients)
 
 
     if(m_coin_control->IsUsingPrivateSend()) {
-        questionString.append(tr("using") + " <b>" + tr("PrivateSend funds only") + "</b>");
+        questionString.append(tr("using") + " <b>" + tr("CoinJoin funds only") + "</b>");
     } else {
         questionString.append(tr("using") + " <b>" + tr("any available funds") + "</b>");
     }
@@ -400,7 +400,7 @@ void SendCoinsDialog::send(QList<SendCoinsRecipient> recipients)
         questionString.append(tr("are added as transaction fee"));
 
         if (m_coin_control->IsUsingPrivateSend()) {
-            questionString.append(" " + tr("(PrivateSend transactions have higher fees usually due to no change output being allowed)"));
+            questionString.append(" " + tr("(CoinJoin transactions have higher fees usually due to no change output being allowed)"));
         }
     }
 
@@ -422,7 +422,7 @@ void SendCoinsDialog::send(QList<SendCoinsRecipient> recipients)
         if (nInputs >= 10 && m_coin_control->IsUsingPrivateSend()) {
             questionString.append("<br />");
             questionString.append("<span style='" + GUIUtil::getThemedStyleQString(GUIUtil::ThemedStyle::TS_ERROR) + "'>");
-            questionString.append(tr("Warning: Using PrivateSend with %1 or more inputs can harm your privacy and is not recommended").arg(10));
+            questionString.append(tr("Warning: Using CoinJoin with %1 or more inputs can harm your privacy and is not recommended").arg(10));
             questionString.append("</span> ");
         }
     }

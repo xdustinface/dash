@@ -380,7 +380,7 @@ QString TransactionTableModel::formatTxType(const TransactionRecord *wtx) const
     case TransactionRecord::RecvFromOther:
         return tr("Received from");
     case TransactionRecord::RecvWithPrivateSend:
-        return tr("Received via PrivateSend");
+        return tr("Received via CoinJoin");
     case TransactionRecord::SendToAddress:
     case TransactionRecord::SendToOther:
         return tr("Sent to");
@@ -390,15 +390,15 @@ QString TransactionTableModel::formatTxType(const TransactionRecord *wtx) const
         return tr("Mined");
 
     case TransactionRecord::PrivateSendDenominate:
-        return tr("PrivateSend Denominate");
+        return tr("CoinJoin Denominate");
     case TransactionRecord::PrivateSendCollateralPayment:
-        return tr("PrivateSend Collateral Payment");
+        return tr("CoinJoin Collateral Payment");
     case TransactionRecord::PrivateSendMakeCollaterals:
-        return tr("PrivateSend Make Collateral Inputs");
+        return tr("CoinJoin Make Collateral Inputs");
     case TransactionRecord::PrivateSendCreateDenominations:
-        return tr("PrivateSend Create Denominations");
+        return tr("CoinJoin Create Denominations");
     case TransactionRecord::PrivateSend:
-        return "PrivateSend";
+        return "CoinJoin";
 
     default:
         return QString();

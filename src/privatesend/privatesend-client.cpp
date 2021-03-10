@@ -315,7 +315,7 @@ std::string CPrivateSendClientSession::GetStatus(bool fWaitForBlock)
 
     switch (nState) {
     case POOL_STATE_IDLE:
-        return _("PrivateSend is idle.");
+        return _("CoinJoin is idle.");
     case POOL_STATE_QUEUE:
         if (nStatusMessageProgress % 70 <= 30)
             strSuffix = ".";
@@ -337,7 +337,7 @@ std::string CPrivateSendClientSession::GetStatus(bool fWaitForBlock)
             strSuffix = "...";
         return strprintf(_("Found enough users, signing ( waiting %s )"), strSuffix);
     case POOL_STATE_ERROR:
-        return _("PrivateSend request incomplete:") + " " + strLastMessage + " " + _("Will retry...");
+        return _("CoinJoin request incomplete:") + " " + strLastMessage + " " + _("Will retry...");
     default:
         return strprintf(_("Unknown state: id = %u"), nState);
     }
@@ -982,7 +982,7 @@ bool CPrivateSendClientManager::DoAutomaticDenominating(CConnman& connman, bool 
 
         if (WaitForAnotherBlock()) {
             LogPrint(BCLog::PRIVATESEND, "CPrivateSendClientManager::DoAutomaticDenominating -- Last successful PrivateSend action was too recent\n");
-            strAutoDenomResult = _("Last successful PrivateSend action was too recent.");
+            strAutoDenomResult = _("Last successful CoinJoin action was too recent.");
             return false;
         }
 
@@ -1297,7 +1297,7 @@ bool CPrivateSendClientSession::SelectDenominate(std::string& strErrorRet, std::
     }
 
     if (GetEntriesCount() > 0) {
-        strErrorRet = "Already have pending entries in the PrivateSend pool";
+        strErrorRet = "Already have pending entries in the CoinJoin pool";
         return false;
     }
 

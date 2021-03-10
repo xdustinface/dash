@@ -374,8 +374,8 @@ void BitcoinGUI::createActions()
     sendCoinsMenuAction->setStatusTip(tr("Send coins to a Dash address"));
     sendCoinsMenuAction->setToolTip(sendCoinsMenuAction->statusTip());
 
-    privateSendCoinsMenuAction = new QAction("&PrivateSend", this);
-    privateSendCoinsMenuAction->setStatusTip(tr("PrivateSend coins to a Dash address"));
+    privateSendCoinsMenuAction = new QAction("&CoinJoin", this);
+    privateSendCoinsMenuAction->setStatusTip(tr("CoinJoin coins to a Dash address"));
     privateSendCoinsMenuAction->setToolTip(privateSendCoinsMenuAction->statusTip());
 
     receiveCoinsMenuAction = new QAction(tr("&Receive"), this);
@@ -458,9 +458,9 @@ void BitcoinGUI::createActions()
     showHelpMessageAction->setMenuRole(QAction::NoRole);
     showHelpMessageAction->setStatusTip(tr("Show the %1 help message to get a list with possible Dash command-line options").arg(tr(PACKAGE_NAME)));
 
-    showPrivateSendHelpAction = new QAction(tr("&PrivateSend information"), this);
+    showPrivateSendHelpAction = new QAction(tr("&CoinJoin information"), this);
     showPrivateSendHelpAction->setMenuRole(QAction::NoRole);
-    showPrivateSendHelpAction->setStatusTip(tr("Show the PrivateSend basic information"));
+    showPrivateSendHelpAction->setStatusTip(tr("Show the CoinJoin basic information"));
 
     connect(quitAction, SIGNAL(triggered()), qApp, SLOT(quit()));
     connect(aboutAction, SIGNAL(triggered()), this, SLOT(aboutClicked()));
