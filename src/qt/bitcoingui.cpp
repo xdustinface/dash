@@ -593,11 +593,6 @@ void BitcoinGUI::createToolBars()
         sendCoinsButton->setStatusTip(sendCoinsMenuAction->statusTip());
         tabGroup->addButton(sendCoinsButton);
 
-        privateSendCoinsButton = new QToolButton(this);
-        privateSendCoinsButton->setText(privateSendCoinsMenuAction->text());
-        privateSendCoinsButton->setStatusTip(privateSendCoinsMenuAction->statusTip());
-        tabGroup->addButton(privateSendCoinsButton);
-
         receiveCoinsButton = new QToolButton(this);
         receiveCoinsButton->setText(receiveCoinsMenuAction->text());
         receiveCoinsButton->setStatusTip(receiveCoinsMenuAction->statusTip());
@@ -607,6 +602,11 @@ void BitcoinGUI::createToolBars()
         historyButton->setText(tr("&Transactions"));
         historyButton->setStatusTip(tr("Browse transaction history"));
         tabGroup->addButton(historyButton);
+
+        privateSendCoinsButton = new QToolButton(this);
+        privateSendCoinsButton->setText(privateSendCoinsMenuAction->text());
+        privateSendCoinsButton->setStatusTip(privateSendCoinsMenuAction->statusTip());
+        tabGroup->addButton(privateSendCoinsButton);
 
         QSettings settings;
         if (settings.value("fShowMasternodesTab").toBool()) {
@@ -1152,7 +1152,7 @@ void BitcoinGUI::updatePrivateSendVisibility()
     // Hiding the QToolButton itself doesn't work for the GUI part
     // but is still needed for shortcuts to work properly.
     if (appToolBar != nullptr) {
-        appToolBar->actions()[2]->setVisible(fEnabled);
+        appToolBar->actions()[4]->setVisible(fEnabled);
         privateSendCoinsButton->setVisible(fEnabled);
         GUIUtil::updateButtonGroupShortcuts(tabGroup);
     }
