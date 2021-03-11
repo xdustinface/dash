@@ -519,7 +519,7 @@ bool OptionsModel::setData(const QModelIndex & index, const QVariant & value, in
             {
                 m_node.coinJoinOptions().setAmount(value.toInt());
                 settings.setValue("nCoinJoinAmount", m_node.coinJoinOptions().getAmount());
-                Q_EMIT privateSentAmountChanged();
+                Q_EMIT coinJoinAmountChanged();
             }
             break;
         case CoinJoinMultiSession:

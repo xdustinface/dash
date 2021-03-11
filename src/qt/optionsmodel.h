@@ -121,7 +121,7 @@ Q_SIGNALS:
     void displayUnitChanged(int unit);
     void coinJoinEnabledChanged();
     void coinJoinRoundsChanged();
-    void privateSentAmountChanged();
+    void coinJoinAmountChanged();
     void AdvancedCJUIChanged(bool);
     void coinControlFeaturesChanged(bool);
     void hideTrayIconChanged(bool);

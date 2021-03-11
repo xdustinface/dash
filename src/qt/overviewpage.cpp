@@ -270,7 +270,7 @@ void OverviewPage::setWalletModel(WalletModel *model)
         updateAdvancedCJUI(model->getOptionsModel()->getShowAdvancedCJUI());
 
         connect(model->getOptionsModel(), SIGNAL(coinJoinRoundsChanged()), this, SLOT(updateCoinJoinProgress()));
-        connect(model->getOptionsModel(), SIGNAL(privateSentAmountChanged()), this, SLOT(updateCoinJoinProgress()));
+        connect(model->getOptionsModel(), SIGNAL(coinJoinAmountChanged()), this, SLOT(updateCoinJoinProgress()));
         connect(model->getOptionsModel(), SIGNAL(AdvancedCJUIChanged(bool)), this, SLOT(updateAdvancedCJUI(bool)));
         connect(model->getOptionsModel(), &OptionsModel::coinJoinEnabledChanged, [=]() {
             coinJoinStatus(true);
