@@ -156,13 +156,9 @@ SendCoinsDialog::SendCoinsDialog(bool _fCoinJoin, QWidget* parent) :
     ui->checkBoxMinimumFee->setChecked(settings.value("fPayOnlyMinFee").toBool());
     minimizeFeeSection(settings.value("fFeeSectionMinimized").toBool());
 
-    if (_fCoinJoin) {
-        ui->sendButton->setText("Send");
-        ui->sendButton->setToolTip(tr("Confirm the send action"));
-    } else {
-        ui->sendButton->setText(tr("S&end"));
-        ui->sendButton->setToolTip(tr("Confirm the send action"));
-    }
+    ui->sendButton->setText(tr("S&end"));
+    ui->sendButton->setToolTip(tr("Confirm the send action"));
+
     m_coin_control->UseCoinJoin(_fCoinJoin);
 }
 

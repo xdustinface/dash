@@ -307,7 +307,7 @@ private:
     static CCoinJoinClientOptions* _instance;
     static std::once_flag onceFlag;
 
-    CCriticalSection cs_ps_options;
+    CCriticalSection cs_cj_options;
     int nCoinJoinSessions;
     int nCoinJoinRounds;
     int nCoinJoinRandomRounds;

@@ -25,35 +25,35 @@ class CoinJoinTest(BitcoinTestFramework):
         # Start Mixing
         self.nodes[0].coinjoin("start")
         # Get CoinJoin info
-        ps_info = self.nodes[0].getcoinjoininfo()
+        cj_info = self.nodes[0].getcoinjoininfo()
         # Ensure that it started properly
-        assert_equal(ps_info['enabled'], True)
-        assert_equal(ps_info['running'], True)
+        assert_equal(cj_info['enabled'], True)
+        assert_equal(cj_info['running'], True)
 
         # Stop mixing
         self.nodes[0].coinjoin("stop")
         # Get CoinJoin info
-        ps_info = self.nodes[0].getcoinjoininfo()
+        cj_info = self.nodes[0].getcoinjoininfo()
         # Ensure that it stopped properly
-        assert_equal(ps_info['enabled'], True)
-        assert_equal(ps_info['running'], False)
+        assert_equal(cj_info['enabled'], True)
+        assert_equal(cj_info['running'], False)
 
     def test_coinjoin_setamount(self):
         # Try normal values
         self.nodes[0].setcoinjoinamount(50)
-        ps_info = self.nodes[0].getcoinjoininfo()
-        assert_equal(ps_info['max_amount'], 50)
+        cj_info = self.nodes[0].getcoinjoininfo()
+        assert_equal(cj_info['max_amount'], 50)
 
         # Try large values
         self.nodes[0].setcoinjoinamount(1200000)
-        ps_info = self.nodes[0].getcoinjoininfo()
-        assert_equal(ps_info['max_amount'], 1200000)
+        cj_info = self.nodes[0].getcoinjoininfo()
+        assert_equal(cj_info['max_amount'], 1200000)
 
     def test_coinjoin_setrounds(self):
         # Try normal values
         self.nodes[0].setcoinjoinrounds(5)
-        ps_info = self.nodes[0].getcoinjoininfo()
-        assert_equal(ps_info['max_rounds'], 5)
+        cj_info = self.nodes[0].getcoinjoininfo()
+        assert_equal(cj_info['max_rounds'], 5)
 
 
 if __name__ == '__main__':
