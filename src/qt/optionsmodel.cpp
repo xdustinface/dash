@@ -705,5 +705,9 @@ void OptionsModel::checkAndMigrate()
         settings.setValue("nCoinJoinRounds", settings.value("nPrivateSendRounds").toInt());
         settings.remove("nPrivateSendRounds");
     }
+    if (settings.contains("nPrivateSendAmount") && !settings.contains("nCoinJoinAmount")) {
+        settings.setValue("nCoinJoinAmount", settings.value("nPrivateSendAmount").toInt());
+        settings.remove("nPrivateSendAmount");
+    }
 
 }

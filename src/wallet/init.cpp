@@ -294,6 +294,14 @@ bool WalletInit::ParameterInteraction() const
         }
         gArgs.ForceRemoveArg("-privatesendrounds");
     }
+    if (gArgs.IsArgSet("-privatesendamount")) {
+        int nAmountDeprecated = gArgs.GetArg("-privatesendamount", DEFAULT_COINJOIN_AMOUNT);
+        InitWarning("Warning: -privatesendamount is deprecated, please use -coinjoinamount.\n");
+        if (gArgs.SoftSetArg("-coinjoinamount", itostr(nAmountDeprecated))) {
+            LogPrintf("%s: parameter interaction: -privatesendamount=%d -> setting -coinjoinamount=%d\n", __func__, nAmountDeprecated, nAmountDeprecated);
+        }
+        gArgs.ForceRemoveArg("-privatesendamount");
+    }
 
     return true;
 }
