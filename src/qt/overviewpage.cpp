@@ -499,7 +499,7 @@ void OverviewPage::coinJoinStatus(bool fForce)
     nLastDSProgressBlockTime = GetTime();
 
     QString strKeysLeftText(tr("keys left: %1").arg(walletModel->getKeysLeftSinceAutoBackup()));
-    if(walletModel->getKeysLeftSinceAutoBackup() < PRIVATESEND_KEYS_THRESHOLD_WARNING) {
+    if(walletModel->getKeysLeftSinceAutoBackup() < COINJOIN_KEYS_THRESHOLD_WARNING) {
         strKeysLeftText = "<span style='" + GUIUtil::getThemedStyleQString(GUIUtil::ThemedStyle::TS_ERROR) + "'>" + strKeysLeftText + "</span>";
     }
     ui->labelCoinJoinEnabled->setToolTip(strKeysLeftText);
@@ -529,7 +529,7 @@ void OverviewPage::coinJoinStatus(bool fForce)
 
     // Warn user that wallet is running out of keys
     // NOTE: we do NOT warn user and do NOT create autobackups if mixing is not running
-    if (nWalletBackups > 0 && walletModel->getKeysLeftSinceAutoBackup() < PRIVATESEND_KEYS_THRESHOLD_WARNING) {
+    if (nWalletBackups > 0 && walletModel->getKeysLeftSinceAutoBackup() < COINJOIN_KEYS_THRESHOLD_WARNING) {
         QSettings settings;
         if(settings.value("fLowKeysWarning").toBool()) {
             QString strWarn =   tr("Very low number of keys left since last automatic backup!") + "<br><br>" +
@@ -538,10 +538,10 @@ void OverviewPage::coinJoinStatus(bool fForce)
                                    "saved in some safe place</span>!").arg(GUIUtil::getThemedStyleQString(GUIUtil::ThemedStyle::TS_COMMAND)) + "<br><br>" +
                                 tr("Note: You can turn this message off in options.");
             ui->labelCoinJoinEnabled->setToolTip(strWarn);
-            LogPrint(BCLog::PRIVATESEND, "OverviewPage::coinJoinStatus -- Very low number of keys left since last automatic backup, warning user and trying to create new backup...\n");
+            LogPrint(BCLog::COINJOIN, "OverviewPage::coinJoinStatus -- Very low number of keys left since last automatic backup, warning user and trying to create new backup...\n");
             QMessageBox::warning(this, "CoinJoin", strWarn, QMessageBox::Ok, QMessageBox::Ok);
         } else {
-            LogPrint(BCLog::PRIVATESEND, "OverviewPage::coinJoinStatus -- Very low number of keys left since last automatic backup, skipping warning and trying to create new backup...\n");
+            LogPrint(BCLog::COINJOIN, "OverviewPage::coinJoinStatus -- Very low number of keys left since last automatic backup, skipping warning and trying to create new backup...\n");
         }
 
         QString strBackupWarning;
@@ -549,7 +549,7 @@ void OverviewPage::coinJoinStatus(bool fForce)
         if(!walletModel->autoBackupWallet(strBackupWarning, strBackupError)) {
             if (!strBackupWarning.isEmpty()) {
                 // It's still more or less safe to continue but warn user anyway
-                LogPrint(BCLog::PRIVATESEND, "OverviewPage::coinJoinStatus -- WARNING! Something went wrong on automatic backup: %s\n", strBackupWarning.toStdString());
+                LogPrint(BCLog::COINJOIN, "OverviewPage::coinJoinStatus -- WARNING! Something went wrong on automatic backup: %s\n", strBackupWarning.toStdString());
 
                 QMessageBox::warning(this, "CoinJoin",
                     tr("WARNING! Something went wrong on automatic backup") + ":<br><br>" + strBackupWarning,
@@ -557,7 +557,7 @@ void OverviewPage::coinJoinStatus(bool fForce)
             }
             if (!strBackupError.isEmpty()) {
                 // Things are really broken, warn user and stop mixing immediately
-                LogPrint(BCLog::PRIVATESEND, "OverviewPage::coinJoinStatus -- ERROR! Failed to create automatic backup: %s\n", strBackupError.toStdString());
+                LogPrint(BCLog::COINJOIN, "OverviewPage::coinJoinStatus -- ERROR! Failed to create automatic backup: %s\n", strBackupError.toStdString());
 
                 QMessageBox::warning(this, "CoinJoin",
                     tr("ERROR! Failed to create automatic backup") + ":<br><br>" + strBackupError + "<br>" +
@@ -633,7 +633,7 @@ void OverviewPage::toggleCoinJoin(){
                 QMessageBox::warning(this, "CoinJoin",
                     tr("Wallet is locked and user declined to unlock. Disabling CoinJoin."),
                     QMessageBox::Ok, QMessageBox::Ok);
-                LogPrint(BCLog::PRIVATESEND, "OverviewPage::toggleCoinJoin -- Wallet is locked and user declined to unlock. Disabling CoinJoin.\n");
+                LogPrint(BCLog::COINJOIN, "OverviewPage::toggleCoinJoin -- Wallet is locked and user declined to unlock. Disabling CoinJoin.\n");
                 return;
             }
         }

@@ -106,13 +106,13 @@ std::string WalletInit::GetHelpString(bool showDebug) const
 
     strUsage += HelpMessageGroup(_("CoinJoin options:"));
     strUsage += HelpMessageOpt("-enablecoinjoin", strprintf(_("Enable use of CoinJoin for funds stored in this wallet (0-1, default: %u)"), 0));
-    strUsage += HelpMessageOpt("-coinjoinamount=<n>", strprintf(_("Target CoinJoin balance (%u-%u, default: %u)"), MIN_PRIVATESEND_AMOUNT, MAX_PRIVATESEND_AMOUNT, DEFAULT_PRIVATESEND_AMOUNT));
-    strUsage += HelpMessageOpt("-coinjoinautostart", strprintf(_("Start CoinJoin automatically (0-1, default: %u)"), DEFAULT_PRIVATESEND_AUTOSTART));
-    strUsage += HelpMessageOpt("-coinjoindenomsgoal=<n>", strprintf(_("Try to create at least N inputs of each denominated amount (%u-%u, default: %u)"), MIN_PRIVATESEND_DENOMS_GOAL, MAX_PRIVATESEND_DENOMS_GOAL, DEFAULT_PRIVATESEND_DENOMS_GOAL));
-    strUsage += HelpMessageOpt("-coinjoindenomshardcap=<n>", strprintf(_("Create up to N inputs of each denominated amount (%u-%u, default: %u)"), MIN_PRIVATESEND_DENOMS_HARDCAP, MAX_PRIVATESEND_DENOMS_HARDCAP, DEFAULT_PRIVATESEND_DENOMS_HARDCAP));
-    strUsage += HelpMessageOpt("-coinjoinmultisession", strprintf(_("Enable multiple CoinJoin mixing sessions per block, experimental (0-1, default: %u)"), DEFAULT_PRIVATESEND_MULTISESSION));
-    strUsage += HelpMessageOpt("-coinjoinrounds=<n>", strprintf(_("Use N separate masternodes for each denominated input to mix funds (%u-%u, default: %u)"), MIN_PRIVATESEND_ROUNDS, MAX_PRIVATESEND_ROUNDS, DEFAULT_PRIVATESEND_ROUNDS));
-    strUsage += HelpMessageOpt("-coinjoinsessions=<n>", strprintf(_("Use N separate masternodes in parallel to mix funds (%u-%u, default: %u)"), MIN_PRIVATESEND_SESSIONS, MAX_PRIVATESEND_SESSIONS, DEFAULT_PRIVATESEND_SESSIONS));
+    strUsage += HelpMessageOpt("-coinjoinamount=<n>", strprintf(_("Target CoinJoin balance (%u-%u, default: %u)"), MIN_COINJOIN_AMOUNT, MAX_COINJOIN_AMOUNT, DEFAULT_COINJOIN_AMOUNT));
+    strUsage += HelpMessageOpt("-coinjoinautostart", strprintf(_("Start CoinJoin automatically (0-1, default: %u)"), DEFAULT_COINJOIN_AUTOSTART));
+    strUsage += HelpMessageOpt("-coinjoindenomsgoal=<n>", strprintf(_("Try to create at least N inputs of each denominated amount (%u-%u, default: %u)"), MIN_COINJOIN_DENOMS_GOAL, MAX_COINJOIN_DENOMS_GOAL, DEFAULT_COINJOIN_DENOMS_GOAL));
+    strUsage += HelpMessageOpt("-coinjoindenomshardcap=<n>", strprintf(_("Create up to N inputs of each denominated amount (%u-%u, default: %u)"), MIN_COINJOIN_DENOMS_HARDCAP, MAX_COINJOIN_DENOMS_HARDCAP, DEFAULT_COINJOIN_DENOMS_HARDCAP));
+    strUsage += HelpMessageOpt("-coinjoinmultisession", strprintf(_("Enable multiple CoinJoin mixing sessions per block, experimental (0-1, default: %u)"), DEFAULT_COINJOIN_MULTISESSION));
+    strUsage += HelpMessageOpt("-coinjoinrounds=<n>", strprintf(_("Use N separate masternodes for each denominated input to mix funds (%u-%u, default: %u)"), MIN_COINJOIN_ROUNDS, MAX_COINJOIN_ROUNDS, DEFAULT_COINJOIN_ROUNDS));
+    strUsage += HelpMessageOpt("-coinjoinsessions=<n>", strprintf(_("Use N separate masternodes in parallel to mix funds (%u-%u, default: %u)"), MIN_COINJOIN_SESSIONS, MAX_COINJOIN_SESSIONS, DEFAULT_COINJOIN_SESSIONS));
 
     if (showDebug)
     {
@@ -273,7 +273,7 @@ bool WalletInit::ParameterInteraction() const
     }
 
     if (gArgs.IsArgSet("-coinjoindenoms")) {
-        int nDenomsDeprecated = gArgs.GetArg("-coinjoindenoms", DEFAULT_PRIVATESEND_DENOMS_HARDCAP);
+        int nDenomsDeprecated = gArgs.GetArg("-coinjoindenoms", DEFAULT_COINJOIN_DENOMS_HARDCAP);
         InitWarning("Warning: -coinjoindenoms is deprecated, please use -coinjoindenomshardcap or -coinjoindenomsgoal.\n");
         if (gArgs.SoftSetArg("-coinjoindenomshardcap", itostr(nDenomsDeprecated))) {
             LogPrintf("%s: parameter interaction: -coinjoindenoms=%d -> setting -coinjoindenomshardcap=%d\n", __func__, nDenomsDeprecated, nDenomsDeprecated);
@@ -281,7 +281,7 @@ bool WalletInit::ParameterInteraction() const
         gArgs.ForceRemoveArg("-coinjoindenoms");
     }
 
-    if (gArgs.GetArg("-coinjoindenomshardcap", DEFAULT_PRIVATESEND_DENOMS_HARDCAP) < gArgs.GetArg("-coinjoindenomsgoal", DEFAULT_PRIVATESEND_DENOMS_GOAL)) {
+    if (gArgs.GetArg("-coinjoindenomshardcap", DEFAULT_COINJOIN_DENOMS_HARDCAP) < gArgs.GetArg("-coinjoindenomsgoal", DEFAULT_COINJOIN_DENOMS_GOAL)) {
         return InitError("-coinjoindenomshardcap can't be lower than -coinjoindenomsgoal");
     }
 
@@ -418,7 +418,7 @@ void WalletInit::InitCoinJoinSettings() const
     if (!CCoinJoinClientOptions::IsEnabled()) {
         return;
     }
-    bool fAutoStart = gArgs.GetBoolArg("-coinjoinautostart", DEFAULT_PRIVATESEND_AUTOSTART);
+    bool fAutoStart = gArgs.GetBoolArg("-coinjoinautostart", DEFAULT_COINJOIN_AUTOSTART);
     for (auto& pwallet : GetWallets()) {
         if (pwallet->IsLocked()) {
             coinJoinClientManagers.at(pwallet->GetName())->StopMixing();

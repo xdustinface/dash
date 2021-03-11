@@ -36,7 +36,7 @@ bool CoinControlDialog::fSubtractFeeFromAmount = false;
 
 bool CCoinControlWidgetItem::operator<(const QTreeWidgetItem &other) const {
     int column = treeWidget()->sortColumn();
-    if (column == CoinControlDialog::COLUMN_AMOUNT || column == CoinControlDialog::COLUMN_DATE || column == CoinControlDialog::COLUMN_CONFIRMATIONS || column == CoinControlDialog::COLUMN_PRIVATESEND_ROUNDS)
+    if (column == CoinControlDialog::COLUMN_AMOUNT || column == CoinControlDialog::COLUMN_DATE || column == CoinControlDialog::COLUMN_CONFIRMATIONS || column == CoinControlDialog::COLUMN_COINJOIN_ROUNDS)
         return data(column, Qt::UserRole).toLongLong() < other.data(column, Qt::UserRole).toLongLong();
     return QTreeWidgetItem::operator<(other);
 }
@@ -137,7 +137,7 @@ CoinControlDialog::CoinControlDialog(CCoinControl& coin_control, WalletModel* _m
     ui->treeWidget->setColumnWidth(COLUMN_CHECKBOX, 94);
     ui->treeWidget->setColumnWidth(COLUMN_AMOUNT, 100);
     ui->treeWidget->setColumnWidth(COLUMN_LABEL, 170);
-    ui->treeWidget->setColumnWidth(COLUMN_PRIVATESEND_ROUNDS, 110);
+    ui->treeWidget->setColumnWidth(COLUMN_COINJOIN_ROUNDS, 110);
     ui->treeWidget->setColumnWidth(COLUMN_DATE, 120);
     ui->treeWidget->setColumnWidth(COLUMN_CONFIRMATIONS, 110);
 
@@ -653,7 +653,7 @@ void CoinControlDialog::updateView()
         return;
 
     bool fNormalMode = !m_coin_control.IsUsingCoinJoin();
-    ui->treeWidget->setColumnHidden(COLUMN_PRIVATESEND_ROUNDS, fNormalMode);
+    ui->treeWidget->setColumnHidden(COLUMN_COINJOIN_ROUNDS, fNormalMode);
     ui->treeWidget->setColumnHidden(COLUMN_LABEL, !fNormalMode);
     ui->radioTreeMode->setVisible(fNormalMode);
     ui->radioListMode->setVisible(fNormalMode);
@@ -787,12 +787,12 @@ void CoinControlDialog::updateView()
 
             // CoinJoin rounds
             int nRounds = model->getRealOutpointCoinJoinRounds(output);
-            if (nRounds >= 0 || LogAcceptCategory(BCLog::PRIVATESEND)) {
-                itemOutput->setText(COLUMN_PRIVATESEND_ROUNDS, QString::number(nRounds));
+            if (nRounds >= 0 || LogAcceptCategory(BCLog::COINJOIN)) {
+                itemOutput->setText(COLUMN_COINJOIN_ROUNDS, QString::number(nRounds));
             } else {
-                itemOutput->setText(COLUMN_PRIVATESEND_ROUNDS, tr("n/a"));
+                itemOutput->setText(COLUMN_COINJOIN_ROUNDS, tr("n/a"));
             }
-            itemOutput->setData(COLUMN_PRIVATESEND_ROUNDS, Qt::UserRole, QVariant((qlonglong)nRounds));
+            itemOutput->setData(COLUMN_COINJOIN_ROUNDS, Qt::UserRole, QVariant((qlonglong)nRounds));
 
             // confirmations
             itemOutput->setText(COLUMN_CONFIRMATIONS, QString::number(out.depth_in_main_chain));

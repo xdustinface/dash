@@ -2,8 +2,8 @@
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#ifndef BITCOIN_PRIVATESEND_PRIVATESEND_H
-#define BITCOIN_PRIVATESEND_PRIVATESEND_H
+#ifndef BITCOIN_COINJOIN_COINJOIN_H
+#define BITCOIN_COINJOIN_COINJOIN_H
 
 #include <bls/bls.h>
 #include <chain.h>
@@ -19,15 +19,15 @@ class CCoinJoin;
 class CConnman;
 
 // timeouts
-static const int PRIVATESEND_AUTO_TIMEOUT_MIN = 5;
-static const int PRIVATESEND_AUTO_TIMEOUT_MAX = 15;
-static const int PRIVATESEND_QUEUE_TIMEOUT = 30;
-static const int PRIVATESEND_SIGNING_TIMEOUT = 15;
+static const int COINJOIN_AUTO_TIMEOUT_MIN = 5;
+static const int COINJOIN_AUTO_TIMEOUT_MAX = 15;
+static const int COINJOIN_QUEUE_TIMEOUT = 30;
+static const int COINJOIN_SIGNING_TIMEOUT = 15;
 
 //! minimum peer version accepted by mixing pool
-static const int MIN_PRIVATESEND_PEER_PROTO_VERSION = 70213;
+static const int MIN_COINJOIN_PEER_PROTO_VERSION = 70213;
 
-static const size_t PRIVATESEND_ENTRY_MAX_SIZE = 9;
+static const size_t COINJOIN_ENTRY_MAX_SIZE = 9;
 
 // pool responses
 enum PoolMessage : int32_t {
@@ -452,7 +452,7 @@ public:
     static int GetMinPoolParticipants() { return Params().PoolMinParticipants(); }
     static int GetMaxPoolParticipants() { return Params().PoolMaxParticipants(); }
 
-    static CAmount GetMaxPoolAmount() { return vecStandardDenominations.empty() ? 0 : PRIVATESEND_ENTRY_MAX_SIZE * vecStandardDenominations.front(); }
+    static CAmount GetMaxPoolAmount() { return vecStandardDenominations.empty() ? 0 : COINJOIN_ENTRY_MAX_SIZE * vecStandardDenominations.front(); }
 
     /// If the collateral is valid given by a client
     static bool IsCollateralValid(const CTransaction& txCollateral);
@@ -474,4 +474,4 @@ public:
 
 };
 
-#endif // BITCOIN_PRIVATESEND_PRIVATESEND_H
+#endif // BITCOIN_COINJOIN_COINJOIN_H

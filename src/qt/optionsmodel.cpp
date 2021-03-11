@@ -156,7 +156,7 @@ void OptionsModel::Init(bool resetSettings)
 
     // CoinJoin
     if (!settings.contains("nCoinJoinRounds"))
-        settings.setValue("nCoinJoinRounds", DEFAULT_PRIVATESEND_ROUNDS);
+        settings.setValue("nCoinJoinRounds", DEFAULT_COINJOIN_ROUNDS);
     if (!m_node.softSetArg("-coinjoinrounds", settings.value("nCoinJoinRounds").toString().toStdString()))
         addOverriddenOption("-coinjoinrounds");
     m_node.coinJoinOptions().setRounds(settings.value("nCoinJoinRounds").toInt());
@@ -164,7 +164,7 @@ void OptionsModel::Init(bool resetSettings)
     if (!settings.contains("nCoinJoinAmount")) {
         // for migration from old settings
         if (!settings.contains("nAnonymizeDashAmount"))
-            settings.setValue("nCoinJoinAmount", DEFAULT_PRIVATESEND_AMOUNT);
+            settings.setValue("nCoinJoinAmount", DEFAULT_COINJOIN_AMOUNT);
         else
             settings.setValue("nCoinJoinAmount", settings.value("nAnonymizeDashAmount").toInt());
     }
@@ -173,7 +173,7 @@ void OptionsModel::Init(bool resetSettings)
     m_node.coinJoinOptions().setAmount(settings.value("nCoinJoinAmount").toInt());
 
     if (!settings.contains("fCoinJoinMultiSession"))
-        settings.setValue("fCoinJoinMultiSession", DEFAULT_PRIVATESEND_MULTISESSION);
+        settings.setValue("fCoinJoinMultiSession", DEFAULT_COINJOIN_MULTISESSION);
     if (!m_node.softSetBoolArg("-coinjoinmultisession", settings.value("fCoinJoinMultiSession").toBool()))
         addOverriddenOption("-coinjoinmultisession");
     m_node.coinJoinOptions().setMultiSessionEnabled(settings.value("fCoinJoinMultiSession").toBool());

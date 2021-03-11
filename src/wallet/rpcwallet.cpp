@@ -2877,8 +2877,8 @@ UniValue setcoinjoinrounds(const JSONRPCRequest& request)
             "setcoinjoinrounds rounds\n"
             "\nSet the number of rounds for CoinJoin.\n"
             "\nArguments:\n"
-            "1. rounds         (numeric, required) The default number of rounds is " + std::to_string(DEFAULT_PRIVATESEND_ROUNDS) +
-            " Cannot be more than " + std::to_string(MAX_PRIVATESEND_ROUNDS) + " nor less than " + std::to_string(MIN_PRIVATESEND_ROUNDS) +
+            "1. rounds         (numeric, required) The default number of rounds is " + std::to_string(DEFAULT_COINJOIN_ROUNDS) +
+            " Cannot be more than " + std::to_string(MAX_COINJOIN_ROUNDS) + " nor less than " + std::to_string(MIN_COINJOIN_ROUNDS) +
             "\nExamples:\n"
             + HelpExampleCli("setcoinjoinrounds", "4")
             + HelpExampleRpc("setcoinjoinrounds", "16")
@@ -2886,7 +2886,7 @@ UniValue setcoinjoinrounds(const JSONRPCRequest& request)
 
     int nRounds = request.params[0].get_int();
 
-    if (nRounds > MAX_PRIVATESEND_ROUNDS || nRounds < MIN_PRIVATESEND_ROUNDS)
+    if (nRounds > MAX_COINJOIN_ROUNDS || nRounds < MIN_COINJOIN_ROUNDS)
         throw JSONRPCError(RPC_INVALID_PARAMETER, "Invalid number of rounds");
 
     CCoinJoinClientOptions::SetRounds(nRounds);
@@ -2905,8 +2905,8 @@ UniValue setcoinjoinamount(const JSONRPCRequest& request)
             "setcoinjoinamount amount\n"
             "\nSet the goal amount in " + CURRENCY_UNIT + " for CoinJoin.\n"
             "\nArguments:\n"
-            "1. amount         (numeric, required) The default amount is " + std::to_string(DEFAULT_PRIVATESEND_AMOUNT) +
-            " Cannot be more than " + std::to_string(MAX_PRIVATESEND_AMOUNT) + " nor less than " + std::to_string(MIN_PRIVATESEND_AMOUNT) +
+            "1. amount         (numeric, required) The default amount is " + std::to_string(DEFAULT_COINJOIN_AMOUNT) +
+            " Cannot be more than " + std::to_string(MAX_COINJOIN_AMOUNT) + " nor less than " + std::to_string(MIN_COINJOIN_AMOUNT) +
             "\nExamples:\n"
             + HelpExampleCli("setcoinjoinamount", "500")
             + HelpExampleRpc("setcoinjoinamount", "208")
@@ -2914,7 +2914,7 @@ UniValue setcoinjoinamount(const JSONRPCRequest& request)
 
     int nAmount = request.params[0].get_int();
 
-    if (nAmount > MAX_PRIVATESEND_AMOUNT || nAmount < MIN_PRIVATESEND_AMOUNT)
+    if (nAmount > MAX_COINJOIN_AMOUNT || nAmount < MIN_COINJOIN_AMOUNT)
         throw JSONRPCError(RPC_INVALID_PARAMETER, "Invalid amount of " + CURRENCY_UNIT + " as mixing goal amount");
 
     CCoinJoinClientOptions::SetAmount(nAmount);
@@ -3385,7 +3385,7 @@ UniValue listunspent(const JSONRPCRequest& request)
             "      \"minimumSumAmount\" (numeric or string, default=unlimited) Minimum sum value of all UTXOs in " + CURRENCY_UNIT + "\n"
             "      \"coinType\"         (numeric, default=0) Filter coinTypes as follows:\n"
             "                         0=ALL_COINS, 1=ONLY_FULLY_MIXED, 2=ONLY_READY_TO_MIX, 3=ONLY_NONDENOMINATED,\n"
-            "                         4=ONLY_MASTERNODE_COLLATERAL, 5=ONLY_PRIVATESEND_COLLATERAL\n"
+            "                         4=ONLY_MASTERNODE_COLLATERAL, 5=ONLY_COINJOIN_COLLATERAL\n"
             "    }\n"
             "\nResult\n"
             "[                   (array of json object)\n"

@@ -61,7 +61,7 @@ bool CCoinJoinQueue::Sign()
 bool CCoinJoinQueue::CheckSignature(const CBLSPublicKey& blsPubKey) const
 {
     if (!CBLSSignature(vchSig).VerifyInsecure(blsPubKey, GetSignatureHash())) {
-        LogPrint(BCLog::PRIVATESEND, "CCoinJoinQueue::CheckSignature -- VerifyInsecure() failed\n");
+        LogPrint(BCLog::COINJOIN, "CCoinJoinQueue::CheckSignature -- VerifyInsecure() failed\n");
         return false;
     }
 
@@ -72,7 +72,7 @@ bool CCoinJoinQueue::Relay(CConnman& connman)
 {
     connman.ForEachNode([&connman, this](CNode* pnode) {
         CNetMsgMaker msgMaker(pnode->GetSendVersion());
-        if (pnode->nVersion >= MIN_PRIVATESEND_PEER_PROTO_VERSION && pnode->fSendDSQueue) {
+        if (pnode->nVersion >= MIN_COINJOIN_PEER_PROTO_VERSION && pnode->fSendDSQueue) {
             connman.PushMessage(pnode, msgMaker.Make(NetMsgType::DSQUEUE, (*this)));
         }
     });
@@ -81,7 +81,7 @@ bool CCoinJoinQueue::Relay(CConnman& connman)
 
 bool CCoinJoinQueue::IsTimeOutOfBounds() const
 {
-    return GetAdjustedTime() - nTime > PRIVATESEND_QUEUE_TIMEOUT || nTime - GetAdjustedTime() > PRIVATESEND_QUEUE_TIMEOUT;
+    return GetAdjustedTime() - nTime > COINJOIN_QUEUE_TIMEOUT || nTime - GetAdjustedTime() > COINJOIN_QUEUE_TIMEOUT;
 }
 
 uint256 CCoinJoinBroadcastTx::GetSignatureHash() const
@@ -107,7 +107,7 @@ bool CCoinJoinBroadcastTx::Sign()
 bool CCoinJoinBroadcastTx::CheckSignature(const CBLSPublicKey& blsPubKey) const
 {
     if (!CBLSSignature(vchSig).VerifyInsecure(blsPubKey, GetSignatureHash())) {
-        LogPrint(BCLog::PRIVATESEND, "CCoinJoinBroadcastTx::CheckSignature -- VerifyInsecure() failed\n");
+        LogPrint(BCLog::COINJOIN, "CCoinJoinBroadcastTx::CheckSignature -- VerifyInsecure() failed\n");
         return false;
     }
 
@@ -131,7 +131,7 @@ bool CCoinJoinBroadcastTx::IsValidStructure()
     if (tx->vin.size() < CCoinJoin::GetMinPoolParticipants()) {
         return false;
     }
-    if (tx->vin.size() > CCoinJoin::GetMaxPoolParticipants() * PRIVATESEND_ENTRY_MAX_SIZE) {
+    if (tx->vin.size() > CCoinJoin::GetMaxPoolParticipants() * COINJOIN_ENTRY_MAX_SIZE) {
         return false;
     }
     for (const auto& out : tx->vout) {
@@ -173,7 +173,7 @@ void CCoinJoinBaseManager::CheckQueue()
     auto it = vecCoinJoinQueue.begin();
     while (it != vecCoinJoinQueue.end()) {
         if ((*it).IsTimeOutOfBounds()) {
-            LogPrint(BCLog::PRIVATESEND, "CCoinJoinBaseManager::%s -- Removing a queue (%s)\n", __func__, (*it).ToString());
+            LogPrint(BCLog::COINJOIN, "CCoinJoinBaseManager::%s -- Removing a queue (%s)\n", __func__, (*it).ToString());
             it = vecCoinJoinQueue.erase(it);
         } else {
             ++it;
@@ -222,7 +222,7 @@ bool CCoinJoinBaseSession::IsValidInOuts(const std::vector<CTxIn>& vin, const st
     if (fConsumeCollateralRet) *fConsumeCollateralRet = false;
 
     if (vin.size() != vout.size()) {
-        LogPrint(BCLog::PRIVATESEND, "CCoinJoinBaseSession::%s -- ERROR: inputs vs outputs size mismatch! %d vs %d\n", __func__, vin.size(), vout.size());
+        LogPrint(BCLog::COINJOIN, "CCoinJoinBaseSession::%s -- ERROR: inputs vs outputs size mismatch! %d vs %d\n", __func__, vin.size(), vout.size());
         nMessageIDRet = ERR_SIZE_MISMATCH;
         if (fConsumeCollateralRet) *fConsumeCollateralRet = true;
         return false;
@@ -231,20 +231,20 @@ bool CCoinJoinBaseSession::IsValidInOuts(const std::vector<CTxIn>& vin, const st
     auto checkTxOut = [&](const CTxOut& txout) {
         int nDenom = CCoinJoin::AmountToDenomination(txout.nValue);
         if (nDenom != nSessionDenom) {
-            LogPrint(BCLog::PRIVATESEND, "CCoinJoinBaseSession::IsValidInOuts -- ERROR: incompatible denom %d (%s) != nSessionDenom %d (%s)\n",
+            LogPrint(BCLog::COINJOIN, "CCoinJoinBaseSession::IsValidInOuts -- ERROR: incompatible denom %d (%s) != nSessionDenom %d (%s)\n",
                     nDenom, CCoinJoin::DenominationToString(nDenom), nSessionDenom, CCoinJoin::DenominationToString(nSessionDenom));
             nMessageIDRet = ERR_DENOM;
             if (fConsumeCollateralRet) *fConsumeCollateralRet = true;
             return false;
         }
         if (!txout.scriptPubKey.IsPayToPublicKeyHash()) {
-            LogPrint(BCLog::PRIVATESEND, "CCoinJoinBaseSession::IsValidInOuts -- ERROR: invalid script! scriptPubKey=%s\n", ScriptToAsmStr(txout.scriptPubKey));
+            LogPrint(BCLog::COINJOIN, "CCoinJoinBaseSession::IsValidInOuts -- ERROR: invalid script! scriptPubKey=%s\n", ScriptToAsmStr(txout.scriptPubKey));
             nMessageIDRet = ERR_INVALID_SCRIPT;
             if (fConsumeCollateralRet) *fConsumeCollateralRet = true;
             return false;
         }
         if (!setScripPubKeys.insert(txout.scriptPubKey).second) {
-            LogPrint(BCLog::PRIVATESEND, "CCoinJoinBaseSession::IsValidInOuts -- ERROR: already have this script! scriptPubKey=%s\n", ScriptToAsmStr(txout.scriptPubKey));
+            LogPrint(BCLog::COINJOIN, "CCoinJoinBaseSession::IsValidInOuts -- ERROR: already have this script! scriptPubKey=%s\n", ScriptToAsmStr(txout.scriptPubKey));
             nMessageIDRet = ERR_ALREADY_HAVE;
             if (fConsumeCollateralRet) *fConsumeCollateralRet = true;
             return false;
@@ -266,10 +266,10 @@ bool CCoinJoinBaseSession::IsValidInOuts(const std::vector<CTxIn>& vin, const st
     CCoinsViewMemPool viewMemPool(pcoinsTip.get(), mempool);
 
     for (const auto& txin : vin) {
-        LogPrint(BCLog::PRIVATESEND, "CCoinJoinBaseSession::%s -- txin=%s\n", __func__, txin.ToString());
+        LogPrint(BCLog::COINJOIN, "CCoinJoinBaseSession::%s -- txin=%s\n", __func__, txin.ToString());
 
         if (txin.prevout.IsNull()) {
-            LogPrint(BCLog::PRIVATESEND, "CCoinJoinBaseSession::%s -- ERROR: invalid input!\n", __func__);
+            LogPrint(BCLog::COINJOIN, "CCoinJoinBaseSession::%s -- ERROR: invalid input!\n", __func__);
             nMessageIDRet = ERR_INVALID_INPUT;
             if (fConsumeCollateralRet) *fConsumeCollateralRet = true;
             return false;
@@ -278,7 +278,7 @@ bool CCoinJoinBaseSession::IsValidInOuts(const std::vector<CTxIn>& vin, const st
         Coin coin;
         if (!viewMemPool.GetCoin(txin.prevout, coin) || coin.IsSpent() ||
             (coin.nHeight == MEMPOOL_HEIGHT && !llmq::quorumInstantSendManager->IsLocked(txin.prevout.hash))) {
-            LogPrint(BCLog::PRIVATESEND, "CCoinJoinBaseSession::%s -- ERROR: missing, spent or non-locked mempool input! txin=%s\n", __func__, txin.ToString());
+            LogPrint(BCLog::COINJOIN, "CCoinJoinBaseSession::%s -- ERROR: missing, spent or non-locked mempool input! txin=%s\n", __func__, txin.ToString());
             nMessageIDRet = ERR_MISSING_TX;
             return false;
         }
@@ -293,7 +293,7 @@ bool CCoinJoinBaseSession::IsValidInOuts(const std::vector<CTxIn>& vin, const st
     // The same size and denom for inputs and outputs ensures their total value is also the same,
     // no need to double check. If not, we are doing something wrong, bail out.
     if (nFees != 0) {
-        LogPrint(BCLog::PRIVATESEND, "CCoinJoinBaseSession::%s -- ERROR: non-zero fees! fees: %lld\n", __func__, nFees);
+        LogPrint(BCLog::COINJOIN, "CCoinJoinBaseSession::%s -- ERROR: non-zero fees! fees: %lld\n", __func__, nFees);
         nMessageIDRet = ERR_FEES;
         return false;
     }
@@ -341,7 +341,7 @@ bool CCoinJoin::IsCollateralValid(const CTransaction& txCollateral)
         nValueOut += txout.nValue;
 
         if (!txout.scriptPubKey.IsPayToPublicKeyHash() && !txout.scriptPubKey.IsUnspendable()) {
-            LogPrint(BCLog::PRIVATESEND, "CCoinJoin::IsCollateralValid -- Invalid Script, txCollateral=%s", txCollateral.ToString()); /* Continued */
+            LogPrint(BCLog::COINJOIN, "CCoinJoin::IsCollateralValid -- Invalid Script, txCollateral=%s", txCollateral.ToString()); /* Continued */
             return false;
         }
     }
@@ -351,31 +351,31 @@ bool CCoinJoin::IsCollateralValid(const CTransaction& txCollateral)
         auto mempoolTx = mempool.get(txin.prevout.hash);
         if (mempoolTx != nullptr) {
             if (mempool.isSpent(txin.prevout) || !llmq::quorumInstantSendManager->IsLocked(txin.prevout.hash)) {
-                LogPrint(BCLog::PRIVATESEND, "CCoinJoin::IsCollateralValid -- spent or non-locked mempool input! txin=%s\n", txin.ToString());
+                LogPrint(BCLog::COINJOIN, "CCoinJoin::IsCollateralValid -- spent or non-locked mempool input! txin=%s\n", txin.ToString());
                 return false;
             }
             nValueIn += mempoolTx->vout[txin.prevout.n].nValue;
         } else if (GetUTXOCoin(txin.prevout, coin)) {
             nValueIn += coin.out.nValue;
         } else {
-            LogPrint(BCLog::PRIVATESEND, "CCoinJoin::IsCollateralValid -- Unknown inputs in collateral transaction, txCollateral=%s", txCollateral.ToString()); /* Continued */
+            LogPrint(BCLog::COINJOIN, "CCoinJoin::IsCollateralValid -- Unknown inputs in collateral transaction, txCollateral=%s", txCollateral.ToString()); /* Continued */
             return false;
         }
     }
 
     //collateral transactions are required to pay out a small fee to the miners
     if (nValueIn - nValueOut < GetCollateralAmount()) {
-        LogPrint(BCLog::PRIVATESEND, "CCoinJoin::IsCollateralValid -- did not include enough fees in transaction: fees: %d, txCollateral=%s", nValueOut - nValueIn, txCollateral.ToString()); /* Continued */
+        LogPrint(BCLog::COINJOIN, "CCoinJoin::IsCollateralValid -- did not include enough fees in transaction: fees: %d, txCollateral=%s", nValueOut - nValueIn, txCollateral.ToString()); /* Continued */
         return false;
     }
 
-    LogPrint(BCLog::PRIVATESEND, "CCoinJoin::IsCollateralValid -- %s", txCollateral.ToString()); /* Continued */
+    LogPrint(BCLog::COINJOIN, "CCoinJoin::IsCollateralValid -- %s", txCollateral.ToString()); /* Continued */
 
     {
         LOCK(cs_main);
         CValidationState validationState;
         if (!AcceptToMemoryPool(mempool, validationState, MakeTransactionRef(txCollateral), nullptr /* pfMissingInputs */, false /* bypass_limits */, maxTxFee /* nAbsurdFee */, true /* fDryRun */)) {
-            LogPrint(BCLog::PRIVATESEND, "CCoinJoin::IsCollateralValid -- didn't pass AcceptToMemoryPool()\n");
+            LogPrint(BCLog::COINJOIN, "CCoinJoin::IsCollateralValid -- didn't pass AcceptToMemoryPool()\n");
             return false;
         }
     }
@@ -545,7 +545,7 @@ void CCoinJoin::CheckDSTXes(const CBlockIndex* pindex)
             ++it;
         }
     }
-    LogPrint(BCLog::PRIVATESEND, "CCoinJoin::CheckDSTXes -- mapDSTX.size()=%llu\n", mapDSTX.size());
+    LogPrint(BCLog::COINJOIN, "CCoinJoin::CheckDSTXes -- mapDSTX.size()=%llu\n", mapDSTX.size());
 }
 
 void CCoinJoin::UpdatedBlockTip(const CBlockIndex* pindex)
@@ -572,7 +572,7 @@ void CCoinJoin::UpdateDSTXConfirmedHeight(const CTransactionRef& tx, int nHeight
     }
 
     it->second.SetConfirmedHeight(nHeight);
-    LogPrint(BCLog::PRIVATESEND, "CCoinJoin::%s -- txid=%s, nHeight=%d\n", __func__, tx->GetHash().ToString(), nHeight);
+    LogPrint(BCLog::COINJOIN, "CCoinJoin::%s -- txid=%s, nHeight=%d\n", __func__, tx->GetHash().ToString(), nHeight);
 }
 
 void CCoinJoin::TransactionAddedToMempool(const CTransactionRef& tx)
