@@ -143,7 +143,7 @@ OverviewPage::OverviewPage(QWidget* parent) :
 
     // Recent transactions
     ui->listTransactions->setItemDelegate(txdelegate);
-    // Note: minimum height of listTransactions will be set later in updateAdvancedPSUI() to reflect actual settings
+    // Note: minimum height of listTransactions will be set later in updateAdvancedCJUI() to reflect actual settings
     ui->listTransactions->setAttribute(Qt::WA_MacShowFocusRect, false);
 
     connect(ui->listTransactions, SIGNAL(clicked(QModelIndex)), this, SLOT(handleTransactionClicked(QModelIndex)));
@@ -267,11 +267,11 @@ void OverviewPage::setWalletModel(WalletModel *model)
         connect(model, SIGNAL(notifyWatchonlyChanged(bool)), this, SLOT(updateWatchOnlyLabels(bool)));
 
         // explicitly update PS frame and transaction list to reflect actual settings
-        updateAdvancedPSUI(model->getOptionsModel()->getShowAdvancedPSUI());
+        updateAdvancedCJUI(model->getOptionsModel()->getShowAdvancedCJUI());
 
         connect(model->getOptionsModel(), SIGNAL(coinJoinRoundsChanged()), this, SLOT(updateCoinJoinProgress()));
         connect(model->getOptionsModel(), SIGNAL(privateSentAmountChanged()), this, SLOT(updateCoinJoinProgress()));
-        connect(model->getOptionsModel(), SIGNAL(advancedPSUIChanged(bool)), this, SLOT(updateAdvancedPSUI(bool)));
+        connect(model->getOptionsModel(), SIGNAL(AdvancedCJUIChanged(bool)), this, SLOT(updateAdvancedCJUI(bool)));
         connect(model->getOptionsModel(), &OptionsModel::coinJoinEnabledChanged, [=]() {
             coinJoinStatus(true);
         });
@@ -365,7 +365,7 @@ void OverviewPage::updateCoinJoinProgress()
     }
     ui->labelAmountRounds->setText(strAmountAndRounds);
 
-    if (!fShowAdvancedPSUI) return;
+    if (!fShowAdvancedCJUI) return;
 
     CAmount nDenominatedConfirmedBalance;
     CAmount nDenominatedUnconfirmedBalance;
@@ -422,11 +422,11 @@ void OverviewPage::updateCoinJoinProgress()
     ui->coinJoinProgress->setToolTip(strToolPip);
 }
 
-void OverviewPage::updateAdvancedPSUI(bool fShowAdvancedPSUI)
+void OverviewPage::updateAdvancedCJUI(bool fShowAdvancedCJUI)
 {
     if (!walletModel || !clientModel || !clientModel->coinJoinOptions().isEnabled()) return;
 
-    this->fShowAdvancedPSUI = fShowAdvancedPSUI;
+    this->fShowAdvancedCJUI = fShowAdvancedCJUI;
     coinJoinStatus(true);
 }
 
@@ -476,7 +476,7 @@ void OverviewPage::coinJoinStatus(bool fForce)
         static bool fLastVisible{false};
         static bool fLastShowAdvanced{false};
         // Only update the widget's visibility if something changed since the last call of setWidgetsVisible
-        if (fLastShowAdvanced == fShowAdvancedPSUI && fLastVisible == fVisible) {
+        if (fLastShowAdvanced == fShowAdvancedCJUI && fLastVisible == fVisible) {
             if (fInitial) {
                 fInitial = false;
             } else {
@@ -485,10 +485,10 @@ void OverviewPage::coinJoinStatus(bool fForce)
         }
         // Set visible if: fVisible and not advanced UI element or advanced ui element and advanced ui active
         for (const auto& it : coinJoinWidgets) {
-            it.first->setVisible(fVisible && (!it.second || it.second == fShowAdvancedPSUI));
+            it.first->setVisible(fVisible && (!it.second || it.second == fShowAdvancedCJUI));
         }
         fLastVisible = fVisible;
-        fLastShowAdvanced = fShowAdvancedPSUI;
+        fLastShowAdvanced = fShowAdvancedCJUI;
     };
 
     static int64_t nLastDSProgressBlockTime = 0;
@@ -515,7 +515,7 @@ void OverviewPage::coinJoinStatus(bool fForce)
 
         QString strEnabled = tr("Disabled");
         // Show how many keys left in advanced PS UI mode only
-        if (fShowAdvancedPSUI) strEnabled += ", " + strKeysLeftText;
+        if (fShowAdvancedCJUI) strEnabled += ", " + strKeysLeftText;
         ui->labelCoinJoinEnabled->setText(strEnabled);
 
         // If mixing isn't active always show the lower number of txes because there are
@@ -524,7 +524,7 @@ void OverviewPage::coinJoinStatus(bool fForce)
 
         return;
     } else {
-        SetupTransactionList(fShowAdvancedPSUI ? NUM_ITEMS_ENABLED_ADVANCED : NUM_ITEMS_ENABLED_NORMAL);
+        SetupTransactionList(fShowAdvancedCJUI ? NUM_ITEMS_ENABLED_ADVANCED : NUM_ITEMS_ENABLED_NORMAL);
     }
 
     // Warn user that wallet is running out of keys
@@ -569,7 +569,7 @@ void OverviewPage::coinJoinStatus(bool fForce)
 
     QString strEnabled = walletModel->coinJoin().isMixing() ? tr("Enabled") : tr("Disabled");
     // Show how many keys left in advanced PS UI mode only
-    if(fShowAdvancedPSUI) strEnabled += ", " + strKeysLeftText;
+    if(fShowAdvancedCJUI) strEnabled += ", " + strKeysLeftText;
     ui->labelCoinJoinEnabled->setText(strEnabled);
 
     if(nWalletBackups == -1) {

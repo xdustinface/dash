@@ -117,9 +117,9 @@ void OptionsModel::Init(bool resetSettings)
         addOverriddenOption("-enablecoinjoin");
     }
 
-    if (!settings.contains("fShowAdvancedPSUI"))
-        settings.setValue("fShowAdvancedPSUI", false);
-    fShowAdvancedPSUI = settings.value("fShowAdvancedPSUI", false).toBool();
+    if (!settings.contains("fShowAdvancedCJUI"))
+        settings.setValue("fShowAdvancedCJUI", false);
+    fShowAdvancedCJUI = settings.value("fShowAdvancedCJUI", false).toBool();
 
     if (!settings.contains("fShowCoinJoinPopups"))
         settings.setValue("fShowCoinJoinPopups", true);
@@ -336,8 +336,8 @@ QVariant OptionsModel::data(const QModelIndex & index, int role) const
             return settings.value("fShowMasternodesTab");
         case CoinJoinEnabled:
             return settings.value("fCoinJoinEnabled");
-        case ShowAdvancedPSUI:
-            return fShowAdvancedPSUI;
+        case ShowAdvancedCJUI:
+            return fShowAdvancedCJUI;
         case ShowCoinJoinPopups:
             return settings.value("fShowCoinJoinPopups");
         case LowKeysWarning:
@@ -493,11 +493,11 @@ bool OptionsModel::setData(const QModelIndex & index, const QVariant & value, in
                 Q_EMIT coinJoinEnabledChanged();
             }
             break;
-        case ShowAdvancedPSUI:
-            if (settings.value("fShowAdvancedPSUI") != value) {
-                fShowAdvancedPSUI = value.toBool();
-                settings.setValue("fShowAdvancedPSUI", fShowAdvancedPSUI);
-                Q_EMIT advancedPSUIChanged(fShowAdvancedPSUI);
+        case ShowAdvancedCJUI:
+            if (settings.value("fShowAdvancedCJUI") != value) {
+                fShowAdvancedCJUI = value.toBool();
+                settings.setValue("fShowAdvancedCJUI", fShowAdvancedCJUI);
+                Q_EMIT AdvancedCJUIChanged(fShowAdvancedCJUI);
             }
             break;
         case ShowCoinJoinPopups:

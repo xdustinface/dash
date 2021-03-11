@@ -51,7 +51,7 @@ private:
     WalletModel *walletModel;
     interfaces::WalletBalances m_balances;
     int nDisplayUnit;
-    bool fShowAdvancedPSUI;
+    bool fShowAdvancedCJUI;
     int cachedNumISLocks;
 
     TxViewDelegate *txdelegate;
@@ -64,7 +64,7 @@ private Q_SLOTS:
     void toggleCoinJoin();
     void updateDisplayUnit();
     void updateCoinJoinProgress();
-    void updateAdvancedPSUI(bool fShowAdvancedPSUI);
+    void updateAdvancedCJUI(bool fShowAdvancedCJUI);
     void handleTransactionClicked(const QModelIndex &index);
     void updateAlerts(const QString &warnings);
     void updateWatchOnlyLabels(bool showWatchOnly);

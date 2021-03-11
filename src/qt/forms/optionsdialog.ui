@@ -305,7 +305,7 @@
      <widget class="QWidget" name="pageCoinJoin">
       <layout class="QVBoxLayout" name="verticalLayout_4">
        <item>
-        <widget class="QCheckBox" name="showAdvancedPSUI">
+        <widget class="QCheckBox" name="showAdvancedCJUI">
          <property name="toolTip">
           <string>Show additional information and buttons for CoinJoin on overview screen.</string>
          </property>

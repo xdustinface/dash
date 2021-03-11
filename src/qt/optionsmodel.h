@@ -60,7 +60,7 @@ public:
         SpendZeroConfChange,    // bool
         ShowMasternodesTab,     // bool
         CoinJoinEnabled,     // bool
-        ShowAdvancedPSUI,       // bool
+        ShowAdvancedCJUI,       // bool
         ShowCoinJoinPopups,  // bool
         LowKeysWarning,         // bool
         CoinJoinRounds,      // int
@@ -87,7 +87,7 @@ public:
     QString getThirdPartyTxUrls() const { return strThirdPartyTxUrls; }
     bool getProxySettings(QNetworkProxy& proxy) const;
     bool getCoinControlFeatures() const { return fCoinControlFeatures; }
-    bool getShowAdvancedPSUI() { return fShowAdvancedPSUI; }
+    bool getShowAdvancedCJUI() { return fShowAdvancedCJUI; }
     const QString& getOverriddenByCommandLine() { return strOverriddenByCommandLine; }
     void emitCoinJoinEnabledChanged();
 
@@ -108,7 +108,7 @@ private:
     int nDisplayUnit;
     QString strThirdPartyTxUrls;
     bool fCoinControlFeatures;
-    bool fShowAdvancedPSUI;
+    bool fShowAdvancedCJUI;
     /* settings that were overridden by command-line */
     QString strOverriddenByCommandLine;
 
@@ -122,7 +122,7 @@ Q_SIGNALS:
     void coinJoinEnabledChanged();
     void coinJoinRoundsChanged();
     void privateSentAmountChanged();
-    void advancedPSUIChanged(bool);
+    void AdvancedCJUIChanged(bool);
     void coinControlFeaturesChanged(bool);
     void hideTrayIconChanged(bool);
 };
