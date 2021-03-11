@@ -212,12 +212,12 @@ void WalletView::processNewTransaction(const QModelIndex& parent, int start, int
 
     QModelIndex index = ttm->index(start, 0, parent);
     QSettings settings;
-    if (!settings.value("fShowPrivateSendPopups").toBool()) {
+    if (!settings.value("fShowCoinJoinPopups").toBool()) {
         QVariant nType = ttm->data(index, TransactionTableModel::TypeRole);
-        if (nType == TransactionRecord::PrivateSendDenominate ||
-            nType == TransactionRecord::PrivateSendCollateralPayment ||
-            nType == TransactionRecord::PrivateSendMakeCollaterals ||
-            nType == TransactionRecord::PrivateSendCreateDenominations) return;
+        if (nType == TransactionRecord::CoinJoinDenominate ||
+            nType == TransactionRecord::CoinJoinCollateralPayment ||
+            nType == TransactionRecord::CoinJoinMakeCollaterals ||
+            nType == TransactionRecord::CoinJoinCreateDenominations) return;
     }
 
     QString date = ttm->index(start, TransactionTableModel::Date, parent).data().toString();
@@ -261,7 +261,7 @@ void WalletView::gotoSendCoinsPage(QString addr)
     }
 }
 
-void WalletView::gotoPrivateSendCoinsPage(QString addr)
+void WalletView::gotoCoinJoinCoinsPage(QString addr)
 {
     setCurrentWidget(coinJoinCoinsPage);
 

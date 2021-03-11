@@ -433,7 +433,7 @@ static CTransactionRef SendMoney(CWallet * const pwallet, const CTxDestination &
         throw JSONRPCError(RPC_CLIENT_P2P_DISABLED, "Error: Peer-to-peer functionality missing or disabled");
     }
 
-    if (coin_control.IsUsingPrivateSend()) {
+    if (coin_control.IsUsingCoinJoin()) {
         mapValue["DS"] = "1";
     }
 
@@ -532,7 +532,7 @@ UniValue sendtoaddress(const JSONRPCRequest& request)
     CCoinControl coin_control;
 
     if (!request.params[6].isNull()) {
-        coin_control.UsePrivateSend(request.params[6].get_bool());
+        coin_control.UseCoinJoin(request.params[6].get_bool());
     }
 
     if (!request.params[7].isNull()) {
@@ -1236,7 +1236,7 @@ UniValue sendmany(const JSONRPCRequest& request)
     CCoinControl coin_control;
 
     if (!request.params[7].isNull()) {
-        coin_control.UsePrivateSend(request.params[7].get_bool());
+        coin_control.UseCoinJoin(request.params[7].get_bool());
     }
 
     if (!request.params[8].isNull()) {
@@ -1249,7 +1249,7 @@ UniValue sendmany(const JSONRPCRequest& request)
         }
     }
 
-    if (coin_control.IsUsingPrivateSend()) {
+    if (coin_control.IsUsingCoinJoin()) {
         mapValue["DS"] = "1";
     }
 
@@ -2889,7 +2889,7 @@ UniValue setcoinjoinrounds(const JSONRPCRequest& request)
     if (nRounds > MAX_PRIVATESEND_ROUNDS || nRounds < MIN_PRIVATESEND_ROUNDS)
         throw JSONRPCError(RPC_INVALID_PARAMETER, "Invalid number of rounds");
 
-    CPrivateSendClientOptions::SetRounds(nRounds);
+    CCoinJoinClientOptions::SetRounds(nRounds);
 
     return NullUniValue;
 }
@@ -2917,7 +2917,7 @@ UniValue setcoinjoinamount(const JSONRPCRequest& request)
     if (nAmount > MAX_PRIVATESEND_AMOUNT || nAmount < MIN_PRIVATESEND_AMOUNT)
         throw JSONRPCError(RPC_INVALID_PARAMETER, "Invalid amount of " + CURRENCY_UNIT + " as mixing goal amount");
 
-    CPrivateSendClientOptions::SetAmount(nAmount);
+    CCoinJoinClientOptions::SetAmount(nAmount);
 
     return NullUniValue;
 }
@@ -3545,7 +3545,7 @@ UniValue listunspent(const JSONRPCRequest& request)
         entry.pushKV("spendable", out.fSpendable);
         entry.pushKV("solvable", out.fSolvable);
         entry.pushKV("safe", out.fSafe);
-        entry.pushKV("ps_rounds", pwallet->GetRealOutpointPrivateSendRounds(COutPoint(out.tx->GetHash(), out.i)));
+        entry.pushKV("ps_rounds", pwallet->GetRealOutpointCoinJoinRounds(COutPoint(out.tx->GetHash(), out.i)));
         results.push_back(entry);
     }
 

@@ -104,12 +104,12 @@ public:
 
     // Dash-specific helpers
 
-    void UsePrivateSend(bool fUsePrivateSend)
+    void UseCoinJoin(bool fUseCoinJoin)
     {
-        nCoinType = fUsePrivateSend ? CoinType::ONLY_FULLY_MIXED : CoinType::ALL_COINS;
+        nCoinType = fUseCoinJoin ? CoinType::ONLY_FULLY_MIXED : CoinType::ALL_COINS;
     }
 
-    bool IsUsingPrivateSend() const
+    bool IsUsingCoinJoin() const
     {
         return nCoinType == CoinType::ONLY_FULLY_MIXED;
     }

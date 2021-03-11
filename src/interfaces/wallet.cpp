@@ -77,7 +77,7 @@ WalletTx MakeWalletTx(CWallet& wallet, const CWalletTx& wtx)
         result.txout_address_is_mine.emplace_back(ExtractDestination(txout.scriptPubKey, result.txout_address.back()) ?
                                                       IsMine(wallet, result.txout_address.back()) :
                                                       ISMINE_NO);
-        if (!fOutputDenomFound && result.txout_address_is_mine.back() && CPrivateSend::IsDenominatedAmount(txout.nValue)) {
+        if (!fOutputDenomFound && result.txout_address_is_mine.back() && CCoinJoin::IsDenominatedAmount(txout.nValue)) {
             fOutputDenomFound = true;
         }
     }
@@ -127,11 +127,11 @@ WalletTxOut MakeWalletTxOut(CWallet& wallet, const CWalletTx& wtx, int n, int de
     return result;
 }
 
-class PrivateSendImpl : public PrivateSend::Client
+class CoinJoinImpl : public CoinJoin::Client
 {
-    std::shared_ptr<CPrivateSendClientManager> m_manager;
+    std::shared_ptr<CCoinJoinClientManager> m_manager;
 public:
-    PrivateSendImpl(CWallet& wallet) : m_manager(coinJoinClientManagers.at(wallet.GetName())) {}
+    CoinJoinImpl(CWallet& wallet) : m_manager(coinJoinClientManagers.at(wallet.GetName())) {}
     void resetCachedBlocks() override
     {
         m_manager->nCachedNumBlocks = std::numeric_limits<int>::max();
@@ -173,7 +173,7 @@ public:
 class WalletImpl : public Wallet
 {
 public:
-    PrivateSendImpl m_coinjoin;
+    CoinJoinImpl m_coinjoin;
 
     WalletImpl(CWallet& wallet) : m_wallet(wallet), m_coinjoin(wallet) {}
 
@@ -371,7 +371,7 @@ public:
         }
         return {};
     }
-    int getRealOutpointPrivateSendRounds(const COutPoint& outpoint) override { return m_wallet.GetRealOutpointPrivateSendRounds(outpoint); }
+    int getRealOutpointCoinJoinRounds(const COutPoint& outpoint) override { return m_wallet.GetRealOutpointCoinJoinRounds(outpoint); }
     bool isFullyMixed(const COutPoint& outpoint) override { return m_wallet.IsFullyMixed(outpoint); }
     WalletBalances getBalances() override
     {
@@ -426,7 +426,7 @@ public:
     }
     CAmount getAvailableBalance(const CCoinControl& coin_control) override
     {
-        if (coin_control.IsUsingPrivateSend()) {
+        if (coin_control.IsUsingCoinJoin()) {
             return m_wallet.GetAnonymizedBalance(&coin_control);
         } else {
             return m_wallet.GetAvailableBalance(&coin_control);
@@ -483,7 +483,7 @@ public:
         return result;
     }
     bool hdEnabled() override { return m_wallet.IsHDEnabled(); }
-    PrivateSend::Client& coinJoin() override { return m_coinjoin; }
+    CoinJoin::Client& coinJoin() override { return m_coinjoin; }
     std::unique_ptr<Handler> handleShowProgress(ShowProgressFn fn) override
     {
         return MakeHandler(m_wallet.ShowProgress.connect(fn));

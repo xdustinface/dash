@@ -60,7 +60,7 @@ void CDSNotificationInterface::UpdatedBlockTip(const CBlockIndex *pindexNew, con
     if (fInitialDownload)
         return;
 
-    CPrivateSend::UpdatedBlockTip(pindexNew);
+    CCoinJoin::UpdatedBlockTip(pindexNew);
 #ifdef ENABLE_WALLET
     for (auto& pair : coinJoinClientManagers) {
         pair.second->UpdatedBlockTip(pindexNew);
@@ -80,7 +80,7 @@ void CDSNotificationInterface::TransactionAddedToMempool(const CTransactionRef& 
 {
     llmq::quorumInstantSendManager->TransactionAddedToMempool(ptx);
     llmq::chainLocksHandler->TransactionAddedToMempool(ptx, nAcceptTime);
-    CPrivateSend::TransactionAddedToMempool(ptx);
+    CCoinJoin::TransactionAddedToMempool(ptx);
 }
 
 void CDSNotificationInterface::BlockConnected(const std::shared_ptr<const CBlock>& pblock, const CBlockIndex* pindex, const std::vector<CTransactionRef>& vtxConflicted)
@@ -95,14 +95,14 @@ void CDSNotificationInterface::BlockConnected(const std::shared_ptr<const CBlock
 
     llmq::quorumInstantSendManager->BlockConnected(pblock, pindex, vtxConflicted);
     llmq::chainLocksHandler->BlockConnected(pblock, pindex, vtxConflicted);
-    CPrivateSend::BlockConnected(pblock, pindex, vtxConflicted);
+    CCoinJoin::BlockConnected(pblock, pindex, vtxConflicted);
 }
 
 void CDSNotificationInterface::BlockDisconnected(const std::shared_ptr<const CBlock>& pblock, const CBlockIndex* pindexDisconnected)
 {
     llmq::quorumInstantSendManager->BlockDisconnected(pblock, pindexDisconnected);
     llmq::chainLocksHandler->BlockDisconnected(pblock, pindexDisconnected);
-    CPrivateSend::BlockDisconnected(pblock, pindexDisconnected);
+    CCoinJoin::BlockDisconnected(pblock, pindexDisconnected);
 }
 
 void CDSNotificationInterface::NotifyMasternodeListChanged(bool undo, const CDeterministicMNList& oldMNList, const CDeterministicMNListDiff& diff)
@@ -114,5 +114,5 @@ void CDSNotificationInterface::NotifyMasternodeListChanged(bool undo, const CDet
 void CDSNotificationInterface::NotifyChainLock(const CBlockIndex* pindex, const std::shared_ptr<const llmq::CChainLockSig>& clsig)
 {
     llmq::quorumInstantSendManager->NotifyChainLock(pindex);
-    CPrivateSend::NotifyChainLock(pindex);
+    CCoinJoin::NotifyChainLock(pindex);
 }

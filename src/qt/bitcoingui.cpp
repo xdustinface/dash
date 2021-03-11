@@ -112,7 +112,7 @@ BitcoinGUI::BitcoinGUI(interfaces::Node& node, const NetworkStyle* networkStyle,
     openRPCConsoleAction(0),
     openAction(0),
     showHelpMessageAction(0),
-    showPrivateSendHelpAction(0),
+    showCoinJoinHelpAction(0),
     trayIcon(0),
     trayIconMenu(0),
     dockIconMenu(0),
@@ -387,7 +387,7 @@ void BitcoinGUI::createActions()
     connect(sendCoinsMenuAction, SIGNAL(triggered()), this, SLOT(showNormalIfMinimized()));
     connect(sendCoinsMenuAction, SIGNAL(triggered()), this, SLOT(gotoSendCoinsPage()));
     connect(coinJoinCoinsMenuAction, SIGNAL(triggered()), this, SLOT(showNormalIfMinimized()));
-    connect(coinJoinCoinsMenuAction, SIGNAL(triggered()), this, SLOT(gotoPrivateSendCoinsPage()));
+    connect(coinJoinCoinsMenuAction, SIGNAL(triggered()), this, SLOT(gotoCoinJoinCoinsPage()));
     connect(receiveCoinsMenuAction, SIGNAL(triggered()), this, SLOT(showNormalIfMinimized()));
     connect(receiveCoinsMenuAction, SIGNAL(triggered()), this, SLOT(gotoReceiveCoinsPage()));
 
@@ -458,9 +458,9 @@ void BitcoinGUI::createActions()
     showHelpMessageAction->setMenuRole(QAction::NoRole);
     showHelpMessageAction->setStatusTip(tr("Show the %1 help message to get a list with possible Dash command-line options").arg(tr(PACKAGE_NAME)));
 
-    showPrivateSendHelpAction = new QAction(tr("&CoinJoin information"), this);
-    showPrivateSendHelpAction->setMenuRole(QAction::NoRole);
-    showPrivateSendHelpAction->setStatusTip(tr("Show the CoinJoin basic information"));
+    showCoinJoinHelpAction = new QAction(tr("&CoinJoin information"), this);
+    showCoinJoinHelpAction->setMenuRole(QAction::NoRole);
+    showCoinJoinHelpAction->setStatusTip(tr("Show the CoinJoin basic information"));
 
     connect(quitAction, SIGNAL(triggered()), qApp, SLOT(quit()));
     connect(aboutAction, SIGNAL(triggered()), this, SLOT(aboutClicked()));
@@ -468,7 +468,7 @@ void BitcoinGUI::createActions()
     connect(optionsAction, SIGNAL(triggered()), this, SLOT(optionsClicked()));
     connect(toggleHideAction, SIGNAL(triggered()), this, SLOT(toggleHidden()));
     connect(showHelpMessageAction, SIGNAL(triggered()), this, SLOT(showHelpMessageClicked()));
-    connect(showPrivateSendHelpAction, SIGNAL(triggered()), this, SLOT(showPrivateSendHelpClicked()));
+    connect(showCoinJoinHelpAction, SIGNAL(triggered()), this, SLOT(showCoinJoinHelpClicked()));
 
     // Jump directly to tabs in RPC-console
     connect(openInfoAction, SIGNAL(triggered()), this, SLOT(showInfo()));
@@ -563,7 +563,7 @@ void BitcoinGUI::createMenuBar()
 
     QMenu *help = appMenuBar->addMenu(tr("&Help"));
     help->addAction(showHelpMessageAction);
-    help->addAction(showPrivateSendHelpAction);
+    help->addAction(showCoinJoinHelpAction);
     help->addSeparator();
     help->addAction(aboutAction);
     help->addAction(aboutQtAction);
@@ -619,7 +619,7 @@ void BitcoinGUI::createToolBars()
 
         connect(overviewButton, SIGNAL(clicked()), this, SLOT(gotoOverviewPage()));
         connect(sendCoinsButton, SIGNAL(clicked()), this, SLOT(gotoSendCoinsPage()));
-        connect(coinJoinCoinsButton, SIGNAL(clicked()), this, SLOT(gotoPrivateSendCoinsPage()));
+        connect(coinJoinCoinsButton, SIGNAL(clicked()), this, SLOT(gotoCoinJoinCoinsPage()));
         connect(receiveCoinsButton, SIGNAL(clicked()), this, SLOT(gotoReceiveCoinsPage()));
         connect(historyButton, SIGNAL(clicked()), this, SLOT(gotoHistoryPage()));
 
@@ -731,7 +731,7 @@ void BitcoinGUI::setClientModel(ClientModel *_clientModel)
             // initialize the disable state of the tray icon with the current value in the model.
             setTrayIconVisible(optionsModel->getHideTrayIcon());
 
-            connect(optionsModel, SIGNAL(coinJoinEnabledChanged()), this, SLOT(updatePrivateSendVisibility()));
+            connect(optionsModel, SIGNAL(coinJoinEnabledChanged()), this, SLOT(updateCoinJoinVisibility()));
         }
     } else {
         // Disable possibility to show main window via action
@@ -760,7 +760,7 @@ void BitcoinGUI::setClientModel(ClientModel *_clientModel)
 #endif
     }
 
-    updatePrivateSendVisibility();
+    updateCoinJoinVisibility();
 }
 
 #ifdef ENABLE_WALLET
@@ -904,7 +904,7 @@ void BitcoinGUI::optionsClicked()
     });
     dlg.exec();
 
-    updatePrivateSendVisibility();
+    updateCoinJoinVisibility();
 }
 
 void BitcoinGUI::aboutClicked()
@@ -966,7 +966,7 @@ void BitcoinGUI::showHelpMessageClicked()
     helpMessageDialog->show();
 }
 
-void BitcoinGUI::showPrivateSendHelpClicked()
+void BitcoinGUI::showCoinJoinHelpClicked()
 {
     if(!clientModel)
         return;
@@ -1024,10 +1024,10 @@ void BitcoinGUI::gotoSendCoinsPage(QString addr)
     if (walletFrame) walletFrame->gotoSendCoinsPage(addr);
 }
 
-void BitcoinGUI::gotoPrivateSendCoinsPage(QString addr)
+void BitcoinGUI::gotoCoinJoinCoinsPage(QString addr)
 {
     coinJoinCoinsButton->setChecked(true);
-    if (walletFrame) walletFrame->gotoPrivateSendCoinsPage(addr);
+    if (walletFrame) walletFrame->gotoCoinJoinCoinsPage(addr);
 }
 
 void BitcoinGUI::gotoSignMessageTab(QString addr)
@@ -1141,14 +1141,14 @@ void BitcoinGUI::updateProgressBarVisibility()
     progressBar->setVisible(fShowProgressBar);
 }
 
-void BitcoinGUI::updatePrivateSendVisibility()
+void BitcoinGUI::updateCoinJoinVisibility()
 {
 #ifdef ENABLE_WALLET
     bool fEnabled = m_node.coinJoinOptions().isEnabled();
 #else
     bool fEnabled = false;
 #endif
-    // PrivateSend button is the third QToolButton, show/hide the underlying QAction
+    // CoinJoin button is the third QToolButton, show/hide the underlying QAction
     // Hiding the QToolButton itself doesn't work for the GUI part
     // but is still needed for shortcuts to work properly.
     if (appToolBar != nullptr) {
@@ -1157,7 +1157,7 @@ void BitcoinGUI::updatePrivateSendVisibility()
         GUIUtil::updateButtonGroupShortcuts(tabGroup);
     }
     coinJoinCoinsMenuAction->setVisible(fEnabled);
-    showPrivateSendHelpAction->setVisible(fEnabled);
+    showCoinJoinHelpAction->setVisible(fEnabled);
     updateWidth();
 }
 
@@ -1488,7 +1488,7 @@ void BitcoinGUI::showEvent(QShowEvent *event)
     optionsAction->setEnabled(true);
 
     if (!event->spontaneous()) {
-        updatePrivateSendVisibility();
+        updateCoinJoinVisibility();
     }
 }
 

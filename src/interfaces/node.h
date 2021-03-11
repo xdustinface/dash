@@ -64,7 +64,7 @@ public:
 };
 }
 
-namespace PrivateSend {
+namespace CoinJoin {
 //! Interface for the global coinjoin options in src/coinjoin
 class Options
 {
@@ -260,7 +260,7 @@ public:
 
     //! Return interface for accessing masternode related handler.
 #ifdef ENABLE_WALLET
-    virtual PrivateSend::Options& coinJoinOptions() = 0;
+    virtual CoinJoin::Options& coinJoinOptions() = 0;
 #endif
 
     //! Register handler for init messages.

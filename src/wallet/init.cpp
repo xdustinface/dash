@@ -53,7 +53,7 @@ public:
 
     // Dash Specific Wallet Init
     void AutoLockMasternodeCollaterals() const override;
-    void InitPrivateSendSettings() const override;
+    void InitCoinJoinSettings() const override;
     void InitKeePass() const override;
     bool InitAutoBackup() const override;
 };
@@ -104,13 +104,13 @@ std::string WalletInit::GetHelpString(bool showDebug) const
     strUsage += HelpMessageOpt("-keepassport=<port>", strprintf(_("Connect to KeePassHttp on port <port> (default: %u)"), DEFAULT_KEEPASS_HTTP_PORT));
     strUsage += HelpMessageOpt("-keepasskey=<key>", _("KeePassHttp key for AES encrypted communication with KeePass"));
 
-    strUsage += HelpMessageGroup(_("PrivateSend options:"));
-    strUsage += HelpMessageOpt("-enablecoinjoin", strprintf(_("Enable use of PrivateSend for funds stored in this wallet (0-1, default: %u)"), 0));
-    strUsage += HelpMessageOpt("-coinjoinamount=<n>", strprintf(_("Target PrivateSend balance (%u-%u, default: %u)"), MIN_PRIVATESEND_AMOUNT, MAX_PRIVATESEND_AMOUNT, DEFAULT_PRIVATESEND_AMOUNT));
-    strUsage += HelpMessageOpt("-coinjoinautostart", strprintf(_("Start PrivateSend automatically (0-1, default: %u)"), DEFAULT_PRIVATESEND_AUTOSTART));
+    strUsage += HelpMessageGroup(_("CoinJoin options:"));
+    strUsage += HelpMessageOpt("-enablecoinjoin", strprintf(_("Enable use of CoinJoin for funds stored in this wallet (0-1, default: %u)"), 0));
+    strUsage += HelpMessageOpt("-coinjoinamount=<n>", strprintf(_("Target CoinJoin balance (%u-%u, default: %u)"), MIN_PRIVATESEND_AMOUNT, MAX_PRIVATESEND_AMOUNT, DEFAULT_PRIVATESEND_AMOUNT));
+    strUsage += HelpMessageOpt("-coinjoinautostart", strprintf(_("Start CoinJoin automatically (0-1, default: %u)"), DEFAULT_PRIVATESEND_AUTOSTART));
     strUsage += HelpMessageOpt("-coinjoindenomsgoal=<n>", strprintf(_("Try to create at least N inputs of each denominated amount (%u-%u, default: %u)"), MIN_PRIVATESEND_DENOMS_GOAL, MAX_PRIVATESEND_DENOMS_GOAL, DEFAULT_PRIVATESEND_DENOMS_GOAL));
     strUsage += HelpMessageOpt("-coinjoindenomshardcap=<n>", strprintf(_("Create up to N inputs of each denominated amount (%u-%u, default: %u)"), MIN_PRIVATESEND_DENOMS_HARDCAP, MAX_PRIVATESEND_DENOMS_HARDCAP, DEFAULT_PRIVATESEND_DENOMS_HARDCAP));
-    strUsage += HelpMessageOpt("-coinjoinmultisession", strprintf(_("Enable multiple PrivateSend mixing sessions per block, experimental (0-1, default: %u)"), DEFAULT_PRIVATESEND_MULTISESSION));
+    strUsage += HelpMessageOpt("-coinjoinmultisession", strprintf(_("Enable multiple CoinJoin mixing sessions per block, experimental (0-1, default: %u)"), DEFAULT_PRIVATESEND_MULTISESSION));
     strUsage += HelpMessageOpt("-coinjoinrounds=<n>", strprintf(_("Use N separate masternodes for each denominated input to mix funds (%u-%u, default: %u)"), MIN_PRIVATESEND_ROUNDS, MAX_PRIVATESEND_ROUNDS, DEFAULT_PRIVATESEND_ROUNDS));
     strUsage += HelpMessageOpt("-coinjoinsessions=<n>", strprintf(_("Use N separate masternodes in parallel to mix funds (%u-%u, default: %u)"), MIN_PRIVATESEND_SESSIONS, MAX_PRIVATESEND_SESSIONS, DEFAULT_PRIVATESEND_SESSIONS));
 
@@ -371,16 +371,16 @@ void WalletInit::Start(CScheduler& scheduler) const
     // Run a thread to flush wallet periodically
     scheduler.scheduleEvery(MaybeCompactWalletDB, 500);
 
-    if (!fMasternodeMode && CPrivateSendClientOptions::IsEnabled()) {
-        scheduler.scheduleEvery(std::bind(&DoPrivateSendMaintenance, std::ref(*g_connman)), 1 * 1000);
+    if (!fMasternodeMode && CCoinJoinClientOptions::IsEnabled()) {
+        scheduler.scheduleEvery(std::bind(&DoCoinJoinMaintenance, std::ref(*g_connman)), 1 * 1000);
     }
 }
 
 void WalletInit::Flush() const
 {
     for (CWallet* pwallet : GetWallets()) {
-        if (CPrivateSendClientOptions::IsEnabled()) {
-            // Stop PrivateSend, release keys
+        if (CCoinJoinClientOptions::IsEnabled()) {
+            // Stop CoinJoin, release keys
             auto it = coinJoinClientManagers.find(pwallet->GetName());
             it->second->ResetPool();
             it->second->StopMixing();
@@ -412,10 +412,10 @@ void WalletInit::AutoLockMasternodeCollaterals() const
     }
 }
 
-void WalletInit::InitPrivateSendSettings() const
+void WalletInit::InitCoinJoinSettings() const
 {
-    CPrivateSendClientOptions::SetEnabled(HasWallets() ? gArgs.GetBoolArg("-enablecoinjoin", true) : false);
-    if (!CPrivateSendClientOptions::IsEnabled()) {
+    CCoinJoinClientOptions::SetEnabled(HasWallets() ? gArgs.GetBoolArg("-enablecoinjoin", true) : false);
+    if (!CCoinJoinClientOptions::IsEnabled()) {
         return;
     }
     bool fAutoStart = gArgs.GetBoolArg("-coinjoinautostart", DEFAULT_PRIVATESEND_AUTOSTART);
@@ -426,12 +426,12 @@ void WalletInit::InitPrivateSendSettings() const
             coinJoinClientManagers.at(pwallet->GetName())->StartMixing();
         }
     }
-    LogPrintf("PrivateSend: autostart=%d, multisession=%d," /* Continued */
+    LogPrintf("CoinJoin: autostart=%d, multisession=%d," /* Continued */
               "sessions=%d, rounds=%d, amount=%d, denoms_goal=%d, denoms_hardcap=%d\n",
-              fAutoStart, CPrivateSendClientOptions::IsMultiSessionEnabled(),
-              CPrivateSendClientOptions::GetSessions(), CPrivateSendClientOptions::GetRounds(),
-              CPrivateSendClientOptions::GetAmount(), CPrivateSendClientOptions::GetDenomsGoal(),
-              CPrivateSendClientOptions::GetDenomsHardCap());
+              fAutoStart, CCoinJoinClientOptions::IsMultiSessionEnabled(),
+              CCoinJoinClientOptions::GetSessions(), CCoinJoinClientOptions::GetRounds(),
+              CCoinJoinClientOptions::GetAmount(), CCoinJoinClientOptions::GetDenomsGoal(),
+              CCoinJoinClientOptions::GetDenomsHardCap());
 }
 
 void WalletInit::InitKeePass() const

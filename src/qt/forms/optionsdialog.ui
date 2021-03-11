@@ -52,7 +52,7 @@
       </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="btnPrivateSend">
+      <widget class="QPushButton" name="btnCoinJoin">
        <property name="text">
         <string>CoinJoin</string>
        </property>
@@ -302,7 +302,7 @@
        </item>
       </layout>
      </widget>
-     <widget class="QWidget" name="pagePrivateSend">
+     <widget class="QWidget" name="pageCoinJoin">
       <layout class="QVBoxLayout" name="verticalLayout_4">
        <item>
         <widget class="QCheckBox" name="showAdvancedPSUI">
@@ -315,7 +315,7 @@
         </widget>
        </item>
        <item>
-        <widget class="QCheckBox" name="showPrivateSendPopups">
+        <widget class="QCheckBox" name="showCoinJoinPopups">
          <property name="toolTip">
           <string>Show system popups for CoinJoin mixing transactions&lt;br/&gt;just like for all other transaction types.</string>
          </property>
@@ -347,7 +347,7 @@
        <item>
         <layout class="QHBoxLayout" name="horizontalLayout_4_Wallet">
          <item>
-          <widget class="QLabel" name="lblPrivateSendRoundsText">
+          <widget class="QLabel" name="lblCoinJoinRoundsText">
            <property name="toolTip">
             <string>This setting determines the amount of individual masternodes that an input will be mixed through.&lt;br/&gt;More rounds of mixing gives a higher degree of privacy, but also costs more in fees.</string>
            </property>
@@ -374,7 +374,7 @@
        <item>
         <layout class="QHBoxLayout" name="horizontalLayout">
          <item>
-          <widget class="QLabel" name="lblPrivateSendAmountText">
+          <widget class="QLabel" name="lblCoinJoinAmountText">
            <property name="toolTip">
             <string>This amount acts as a threshold to turn off CoinJoin once it's reached.</string>
            </property>

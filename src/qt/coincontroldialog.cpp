@@ -211,8 +211,8 @@ void CoinControlDialog::buttonToggleLockClicked()
         for (int i = 0; i < ui->treeWidget->topLevelItemCount(); i++){
             item = ui->treeWidget->topLevelItem(i);
             COutPoint outpt(uint256S(item->data(COLUMN_ADDRESS, TxHashRole).toString().toStdString()), item->data(COLUMN_ADDRESS, VOutRole).toUInt());
-            // Don't toggle the lock state of partially mixed coins if they are not hidden in PrivateSend mode
-            if (m_coin_control.IsUsingPrivateSend() && !fHideAdditional && !model->isFullyMixed(outpt)) {
+            // Don't toggle the lock state of partially mixed coins if they are not hidden in CoinJoin mode
+            if (m_coin_control.IsUsingCoinJoin() && !fHideAdditional && !model->isFullyMixed(outpt)) {
                 continue;
             }
             if (model->wallet().isLockedCoin(outpt)) {
@@ -542,8 +542,8 @@ void CoinControlDialog::updateLabels(CCoinControl& m_coin_control, WalletModel *
         {
             nChange = nAmount - nPayAmount;
 
-            // PrivateSend Fee = overpay
-            if(m_coin_control.IsUsingPrivateSend() && nChange > 0)
+            // CoinJoin Fee = overpay
+            if(m_coin_control.IsUsingCoinJoin() && nChange > 0)
             {
                 nPayFee = std::max(nChange, nPayFee);
                 nChange = 0;
@@ -652,7 +652,7 @@ void CoinControlDialog::updateView()
     if (!model || !model->getOptionsModel() || !model->getAddressTableModel())
         return;
 
-    bool fNormalMode = !m_coin_control.IsUsingPrivateSend();
+    bool fNormalMode = !m_coin_control.IsUsingCoinJoin();
     ui->treeWidget->setColumnHidden(COLUMN_PRIVATESEND_ROUNDS, fNormalMode);
     ui->treeWidget->setColumnHidden(COLUMN_LABEL, !fNormalMode);
     ui->radioTreeMode->setVisible(fNormalMode);
@@ -721,16 +721,16 @@ void CoinControlDialog::updateView()
             const interfaces::WalletTxOut& out = std::get<1>(outpair);
             bool fFullyMixed{false};
             CAmount nAmount = out.txout.nValue;
-            bool fPrivateSendAmount = model->node().coinJoinOptions().isDenominated(nAmount) || model->node().coinJoinOptions().isCollateralAmount(nAmount);
+            bool fCoinJoinAmount = model->node().coinJoinOptions().isDenominated(nAmount) || model->node().coinJoinOptions().isCollateralAmount(nAmount);
 
-            if (m_coin_control.IsUsingPrivateSend()) {
+            if (m_coin_control.IsUsingCoinJoin()) {
                 fFullyMixed = model->isFullyMixed(output);
-                if ((fHideAdditional && !fFullyMixed) || (!fHideAdditional && !fPrivateSendAmount)) {
+                if ((fHideAdditional && !fFullyMixed) || (!fHideAdditional && !fCoinJoinAmount)) {
                     m_coin_control.UnSelect(output);
                     continue;
                 }
             } else {
-                if (fHideAdditional && fPrivateSendAmount) {
+                if (fHideAdditional && fCoinJoinAmount) {
                     m_coin_control.UnSelect(output);
                     continue;
                 }
@@ -785,8 +785,8 @@ void CoinControlDialog::updateView()
             itemOutput->setToolTip(COLUMN_DATE, GUIUtil::dateTimeStr(out.time));
             itemOutput->setData(COLUMN_DATE, Qt::UserRole, QVariant((qlonglong)out.time));
 
-            // PrivateSend rounds
-            int nRounds = model->getRealOutpointPrivateSendRounds(output);
+            // CoinJoin rounds
+            int nRounds = model->getRealOutpointCoinJoinRounds(output);
             if (nRounds >= 0 || LogAcceptCategory(BCLog::PRIVATESEND)) {
                 itemOutput->setText(COLUMN_PRIVATESEND_ROUNDS, QString::number(nRounds));
             } else {
@@ -816,7 +816,7 @@ void CoinControlDialog::updateView()
                 itemOutput->setCheckState(COLUMN_CHECKBOX, Qt::Checked);
             }
 
-            if (m_coin_control.IsUsingPrivateSend() && !fHideAdditional && !fFullyMixed) {
+            if (m_coin_control.IsUsingCoinJoin() && !fHideAdditional && !fFullyMixed) {
                 itemOutput->setDisabled(true);
             }
         }

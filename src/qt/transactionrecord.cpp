@@ -96,7 +96,7 @@ QList<TransactionRecord> TransactionRecord::decomposeTransaction(interfaces::Wal
         }
 
         if(wtx.is_denominate) {
-            parts.append(TransactionRecord(hash, nTime, TransactionRecord::PrivateSendDenominate, "", -nDebit, nCredit));
+            parts.append(TransactionRecord(hash, nTime, TransactionRecord::CoinJoinDenominate, "", -nDebit, nCredit));
             parts.last().involvesWatchAddress = false;   // maybe pass to TransactionRecord as constructor argument
         }
         else if (fAllFromMe && fAllToMe)
@@ -112,7 +112,7 @@ QList<TransactionRecord> TransactionRecord::decomposeTransaction(interfaces::Wal
 
             if(mapValue["DS"] == "1")
             {
-                sub.type = TransactionRecord::PrivateSend;
+                sub.type = TransactionRecord::CoinJoin;
                 CTxDestination address;
                 if (ExtractDestination(wtx.tx->vout[0].scriptPubKey, address))
                 {
@@ -136,27 +136,27 @@ QList<TransactionRecord> TransactionRecord::decomposeTransaction(interfaces::Wal
                     && coinJoinOptions.isCollateralAmount(nCredit)
                     && coinJoinOptions.isCollateralAmount(-nNet))
                 {
-                    sub.type = TransactionRecord::PrivateSendCollateralPayment;
+                    sub.type = TransactionRecord::CoinJoinCollateralPayment;
                 } else {
                     bool fMakeCollateral{false};
                     if (wtx.tx->vout.size() == 2) {
                         CAmount nAmount0 = wtx.tx->vout[0].nValue;
                         CAmount nAmount1 = wtx.tx->vout[1].nValue;
-                        // <case1>, see CPrivateSendClientSession::MakeCollateralAmounts
+                        // <case1>, see CCoinJoinClientSession::MakeCollateralAmounts
                         fMakeCollateral = (nAmount0 == coinJoinOptions.getMaxCollateralAmount() && !coinJoinOptions.isDenominated(nAmount1) && nAmount1 >= coinJoinOptions.getMinCollateralAmount()) ||
                                           (nAmount1 == coinJoinOptions.getMaxCollateralAmount() && !coinJoinOptions.isDenominated(nAmount0) && nAmount0 >= coinJoinOptions.getMinCollateralAmount()) ||
-                        // <case2>, see CPrivateSendClientSession::MakeCollateralAmounts
+                        // <case2>, see CCoinJoinClientSession::MakeCollateralAmounts
                                           (nAmount0 == nAmount1 && coinJoinOptions.isCollateralAmount(nAmount0));
                     } else if (wtx.tx->vout.size() == 1) {
-                        // <case3>, see CPrivateSendClientSession::MakeCollateralAmounts
+                        // <case3>, see CCoinJoinClientSession::MakeCollateralAmounts
                         fMakeCollateral = coinJoinOptions.isCollateralAmount(wtx.tx->vout[0].nValue);
                     }
                     if (fMakeCollateral) {
-                        sub.type = TransactionRecord::PrivateSendMakeCollaterals;
+                        sub.type = TransactionRecord::CoinJoinMakeCollaterals;
                     } else {
                         for (const auto& txout : wtx.tx->vout) {
                             if (coinJoinOptions.isDenominated(txout.nValue)) {
-                                sub.type = TransactionRecord::PrivateSendCreateDenominations;
+                                sub.type = TransactionRecord::CoinJoinCreateDenominations;
                                 break; // Done, it's definitely a tx creating mixing denoms, no need to look any further
                             }
                         }
@@ -186,7 +186,7 @@ QList<TransactionRecord> TransactionRecord::decomposeTransaction(interfaces::Wal
             {
                 TransactionRecord sub(hash, nTime);
                 sub.idx = 0;
-                sub.type = TransactionRecord::PrivateSendCollateralPayment;
+                sub.type = TransactionRecord::CoinJoinCollateralPayment;
                 sub.debit = -nDebit;
                 parts.append(sub);
                 fDone = true;
@@ -224,7 +224,7 @@ QList<TransactionRecord> TransactionRecord::decomposeTransaction(interfaces::Wal
 
                 if(mapValue["DS"] == "1")
                 {
-                    sub.type = TransactionRecord::PrivateSend;
+                    sub.type = TransactionRecord::CoinJoin;
                 }
 
                 CAmount nValue = txout.nValue;

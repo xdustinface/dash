@@ -219,7 +219,7 @@ static void ApproximateBestSubset(const std::vector<CInputCoin>& vValue, const C
 
 int CInputCoin::Priority() const
 {
-    for (const auto& d : CPrivateSend::GetStandardDenominations()) {
+    for (const auto& d : CCoinJoin::GetStandardDenominations()) {
         // large denoms have lower value
         if (txout.nValue == d) return (float)COIN / d * 10000;
     }
@@ -243,7 +243,7 @@ bool less_then_denom (const CInputCoin& coin1, const CInputCoin& coin2)
 {
     bool found1 = false;
     bool found2 = false;
-    for (const auto& d : CPrivateSend::GetStandardDenominations()) // loop through predefined denoms
+    for (const auto& d : CCoinJoin::GetStandardDenominations()) // loop through predefined denoms
     {
         if(coin1.txout.nValue == d) found1 = true;
         if(coin2.txout.nValue == d) found2 = true;
@@ -287,7 +287,7 @@ bool KnapsackSolver(const CAmount& nTargetValue, std::vector<CInputCoin>& vCoins
         nTotalLower = 0;
         for (const CInputCoin &coin : vCoins)
         {
-            if (tryDenom == 0 && CPrivateSend::IsDenominatedAmount(coin.txout.nValue)) continue; // we don't want denom values on first run
+            if (tryDenom == 0 && CCoinJoin::IsDenominatedAmount(coin.txout.nValue)) continue; // we don't want denom values on first run
 
             if (coin.txout.nValue == nTargetValue)
             {

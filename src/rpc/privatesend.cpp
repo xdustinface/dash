@@ -32,7 +32,7 @@ UniValue coinjoin(const JSONRPCRequest& request)
     if (fMasternodeMode)
         throw JSONRPCError(RPC_INTERNAL_ERROR, "Client-side mixing is not supported on masternodes");
 
-    if (!CPrivateSendClientOptions::IsEnabled()) {
+    if (!CCoinJoinClientOptions::IsEnabled()) {
         if (!gArgs.GetBoolArg("-enablecoinjoin", true)) {
             // otherwise it's on by default, unless cmd line option says otherwise
             throw JSONRPCError(RPC_INTERNAL_ERROR, "Mixing is disabled via -enablecoinjoin=0 command line option, remove it to enable mixing again");
@@ -87,14 +87,14 @@ UniValue getcoinjoininfo(const JSONRPCRequest& request)
     if (request.fHelp || request.params.size() != 0) {
         throw std::runtime_error(
                 "getcoinjoininfo\n"
-                "Returns an object containing an information about PrivateSend settings and state.\n"
+                "Returns an object containing an information about CoinJoin settings and state.\n"
                 "\nResult (for regular nodes):\n"
                 "{\n"
                 "  \"enabled\": true|false,             (bool) Whether mixing functionality is enabled\n"
-                "  \"multisession\": true|false,        (bool) Whether PrivateSend Multisession option is enabled\n"
+                "  \"multisession\": true|false,        (bool) Whether CoinJoin Multisession option is enabled\n"
                 "  \"max_sessions\": xxx,               (numeric) How many parallel mixing sessions can there be at once\n"
                 "  \"max_rounds\": xxx,                 (numeric) How many rounds to mix\n"
-                "  \"max_amount\": xxx,                 (numeric) Target PrivateSend balance in " + CURRENCY_UNIT + "\n"
+                "  \"max_amount\": xxx,                 (numeric) Target CoinJoin balance in " + CURRENCY_UNIT + "\n"
                 "  \"denoms_goal\": xxx,                (numeric) How many inputs of each denominated amount to target\n"
                 "  \"denoms_hardcap\": xxx,             (numeric) Maximum limit of how many inputs of each denominated amount to create\n"
                 "  \"queue_size\": xxx,                 (numeric) How many queues there are currently on the network\n"
@@ -137,7 +137,7 @@ UniValue getcoinjoininfo(const JSONRPCRequest& request)
 
 #ifdef ENABLE_WALLET
 
-    CPrivateSendClientOptions::GetJsonInfo(obj);
+    CCoinJoinClientOptions::GetJsonInfo(obj);
 
     obj.pushKV("queue_size", coinJoinClientQueueManager.GetQueueSize());
 
@@ -166,7 +166,7 @@ static const CRPCCommand commands[] =
 #endif // ENABLE_WALLET
 };
 
-void RegisterPrivateSendRPCCommands(CRPCTable &t)
+void RegisterCoinJoinRPCCommands(CRPCTable &t)
 {
     for (unsigned int vcidx = 0; vcidx < ARRAYLEN(commands); vcidx++)
         t.appendCommand(commands[vcidx].name, &commands[vcidx]);

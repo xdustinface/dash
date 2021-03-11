@@ -58,12 +58,12 @@ private:
     std::unique_ptr<TransactionFilterProxy> filter;
 
     void SetupTransactionList(int nNumItems);
-    void DisablePrivateSendCompletely();
+    void DisableCoinJoinCompletely();
 
 private Q_SLOTS:
-    void togglePrivateSend();
+    void toggleCoinJoin();
     void updateDisplayUnit();
-    void updatePrivateSendProgress();
+    void updateCoinJoinProgress();
     void updateAdvancedPSUI(bool fShowAdvancedPSUI);
     void handleTransactionClicked(const QModelIndex &index);
     void updateAlerts(const QString &warnings);

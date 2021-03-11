@@ -9,10 +9,10 @@ from test_framework.util import assert_equal
 '''
 rpc_coinjoin.py
 
-Tests PrivateSend basic RPC
+Tests CoinJoin basic RPC
 '''
 
-class PrivateSendTest(BitcoinTestFramework):
+class CoinJoinTest(BitcoinTestFramework):
     def set_test_params(self):
         self.num_nodes = 1
 
@@ -24,7 +24,7 @@ class PrivateSendTest(BitcoinTestFramework):
     def test_coinjoin_start_stop(self):
         # Start Mixing
         self.nodes[0].coinjoin("start")
-        # Get PrivateSend info
+        # Get CoinJoin info
         ps_info = self.nodes[0].getcoinjoininfo()
         # Ensure that it started properly
         assert_equal(ps_info['enabled'], True)
@@ -32,7 +32,7 @@ class PrivateSendTest(BitcoinTestFramework):
 
         # Stop mixing
         self.nodes[0].coinjoin("stop")
-        # Get PrivateSend info
+        # Get CoinJoin info
         ps_info = self.nodes[0].getcoinjoininfo()
         # Ensure that it stopped properly
         assert_equal(ps_info['enabled'], True)
@@ -57,4 +57,4 @@ class PrivateSendTest(BitcoinTestFramework):
 
 
 if __name__ == '__main__':
-    PrivateSendTest().main()
+    CoinJoinTest().main()
