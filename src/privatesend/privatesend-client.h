@@ -5,8 +5,8 @@
 #ifndef BITCOIN_PRIVATESEND_PRIVATESEND_CLIENT_H
 #define BITCOIN_PRIVATESEND_PRIVATESEND_CLIENT_H
 
-#include <privatesend/privatesend-util.h>
-#include <privatesend/privatesend.h>
+#include <coinjoin/coinjoin-util.h>
+#include <coinjoin/coinjoin.h>
 #include <evo/deterministicmns.h>
 
 class CPrivateSendClientOptions;

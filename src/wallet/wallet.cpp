@@ -32,7 +32,7 @@
 
 #include <governance/governance.h>
 #include <keepass.h>
-#include <privatesend/privatesend-client.h>
+#include <coinjoin/coinjoin-client.h>
 #include <spork.h>
 
 #include <evo/providertx.h>

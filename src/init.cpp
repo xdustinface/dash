@@ -56,7 +56,7 @@
 #include <masternode/masternode-utils.h>
 #include <messagesigner.h>
 #include <netfulfilledman.h>
-#include <privatesend/privatesend-server.h>
+#include <coinjoin/coinjoin-server.h>
 #include <spork.h>
 #include <warnings.h>
 #include <walletinitinterface.h>

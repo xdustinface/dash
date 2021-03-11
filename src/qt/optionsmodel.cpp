@@ -19,7 +19,7 @@
 #include <txdb.h> // for -dbcache defaults
 
 #ifdef ENABLE_WALLET
-#include <privatesend/privatesend-client.h>
+#include <coinjoin/coinjoin-client.h>
 #endif
 
 #include <QNetworkProxy>
@@ -113,8 +113,8 @@ void OptionsModel::Init(bool resetSettings)
     if (!settings.contains("fPrivateSendEnabled")) {
         settings.setValue("fPrivateSendEnabled", true);
     }
-    if (!gArgs.SoftSetBoolArg("-enableprivatesend", settings.value("fPrivateSendEnabled").toBool())) {
-        addOverriddenOption("-enableprivatesend");
+    if (!gArgs.SoftSetBoolArg("-enablecoinjoin", settings.value("fPrivateSendEnabled").toBool())) {
+        addOverriddenOption("-enablecoinjoin");
     }
 
     if (!settings.contains("fShowAdvancedPSUI"))
@@ -157,8 +157,8 @@ void OptionsModel::Init(bool resetSettings)
     // PrivateSend
     if (!settings.contains("nPrivateSendRounds"))
         settings.setValue("nPrivateSendRounds", DEFAULT_PRIVATESEND_ROUNDS);
-    if (!m_node.softSetArg("-privatesendrounds", settings.value("nPrivateSendRounds").toString().toStdString()))
-        addOverriddenOption("-privatesendrounds");
+    if (!m_node.softSetArg("-coinjoinrounds", settings.value("nPrivateSendRounds").toString().toStdString()))
+        addOverriddenOption("-coinjoinrounds");
     m_node.coinJoinOptions().setRounds(settings.value("nPrivateSendRounds").toInt());
 
     if (!settings.contains("nPrivateSendAmount")) {
@@ -168,14 +168,14 @@ void OptionsModel::Init(bool resetSettings)
         else
             settings.setValue("nPrivateSendAmount", settings.value("nAnonymizeDashAmount").toInt());
     }
-    if (!m_node.softSetArg("-privatesendamount", settings.value("nPrivateSendAmount").toString().toStdString()))
-        addOverriddenOption("-privatesendamount");
+    if (!m_node.softSetArg("-coinjoinamount", settings.value("nPrivateSendAmount").toString().toStdString()))
+        addOverriddenOption("-coinjoinamount");
     m_node.coinJoinOptions().setAmount(settings.value("nPrivateSendAmount").toInt());
 
     if (!settings.contains("fPrivateSendMultiSession"))
         settings.setValue("fPrivateSendMultiSession", DEFAULT_PRIVATESEND_MULTISESSION);
-    if (!m_node.softSetBoolArg("-privatesendmultisession", settings.value("fPrivateSendMultiSession").toBool()))
-        addOverriddenOption("-privatesendmultisession");
+    if (!m_node.softSetBoolArg("-coinjoinmultisession", settings.value("fPrivateSendMultiSession").toBool()))
+        addOverriddenOption("-coinjoinmultisession");
     m_node.coinJoinOptions().setMultiSessionEnabled(settings.value("fPrivateSendMultiSession").toBool());
 #endif
 

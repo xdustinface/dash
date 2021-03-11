@@ -6,14 +6,14 @@
 
 #include <amount.h>
 #include <consensus/validation.h>
-#include <privatesend/privatesend-util.h>
-#include <privatesend/privatesend.h>
+#include <coinjoin/coinjoin-util.h>
+#include <coinjoin/coinjoin.h>
 #include <validation.h>
 #include <wallet/wallet.h>
 
 #include <boost/test/unit_test.hpp>
 
-BOOST_FIXTURE_TEST_SUITE(privatesend_tests, BasicTestingSetup)
+BOOST_FIXTURE_TEST_SUITE(coinjoin_tests, BasicTestingSetup)
 
 BOOST_AUTO_TEST_CASE(ps_collatoral_tests)
 {

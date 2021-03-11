@@ -25,7 +25,7 @@
 
 #include <masternode/masternode-meta.h>
 #include <masternode/masternode-sync.h>
-#include <privatesend/privatesend.h>
+#include <coinjoin/coinjoin.h>
 #include <evo/deterministicmns.h>
 
 #include <statsd_client.h>

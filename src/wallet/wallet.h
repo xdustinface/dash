@@ -24,7 +24,7 @@
 #include <wallet/rpcwallet.h>
 
 #include <governance/governance-object.h>
-#include <privatesend/privatesend.h>
+#include <coinjoin/coinjoin.h>
 
 #include <algorithm>
 #include <atomic>

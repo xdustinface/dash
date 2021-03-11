@@ -16,7 +16,7 @@
 #include <qt/utilitydialog.h>
 #include <qt/walletmodel.h>
 
-#include <privatesend/privatesend-client.h>
+#include <coinjoin/coinjoin-client.h>
 
 #include <QAbstractItemDelegate>
 #include <QPainter>
@@ -282,7 +282,7 @@ void OverviewPage::setWalletModel(WalletModel *model)
 
         connect(ui->togglePrivateSend, SIGNAL(clicked()), this, SLOT(togglePrivateSend()));
 
-        // privatesend buttons will not react to spacebar must be clicked on
+        // coinjoin buttons will not react to spacebar must be clicked on
         ui->togglePrivateSend->setFocusPolicy(Qt::NoFocus);
     }
 }
@@ -459,7 +459,7 @@ void OverviewPage::coinJoinStatus(bool fForce)
         timer->start(1000);
     }
 
-    // Wrap all privatesend related widgets we want to show/hide state based.
+    // Wrap all coinjoin related widgets we want to show/hide state based.
     // Value of the map contains a flag if this widget belongs to the advanced
     // PrivateSend UI option or not. True if it does, false if not.
     std::map<QWidget*, bool> coinJoinWidgets = {
@@ -588,7 +588,7 @@ void OverviewPage::coinJoinStatus(bool fForce)
         ui->labelPrivateSendEnabled->setToolTip(strWarning);
     }
 
-    // check privatesend status and unlock if needed
+    // check coinjoin status and unlock if needed
     if(nBestHeight != walletModel->coinJoin().getCachedBlocks()) {
         // Balance and number of transactions might have changed
         walletModel->coinJoin().setCachedBlocks(nBestHeight);

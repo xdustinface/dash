@@ -11,7 +11,7 @@
 #include <net.h>
 #include <policy/policy.h>
 #include <primitives/transaction.h>
-#include <privatesend/privatesend-client.h>
+#include <coinjoin/coinjoin-client.h>
 #include <script/ismine.h>
 #include <script/standard.h>
 #include <support/allocators/secure.h>
@@ -173,9 +173,9 @@ public:
 class WalletImpl : public Wallet
 {
 public:
-    PrivateSendImpl m_privatesend;
+    PrivateSendImpl m_coinjoin;
 
-    WalletImpl(CWallet& wallet) : m_wallet(wallet), m_privatesend(wallet) {}
+    WalletImpl(CWallet& wallet) : m_wallet(wallet), m_coinjoin(wallet) {}
 
     void markDirty() override
     {
@@ -483,7 +483,7 @@ public:
         return result;
     }
     bool hdEnabled() override { return m_wallet.IsHDEnabled(); }
-    PrivateSend::Client& coinJoin() override { return m_privatesend; }
+    PrivateSend::Client& coinJoin() override { return m_coinjoin; }
     std::unique_ptr<Handler> handleShowProgress(ShowProgressFn fn) override
     {
         return MakeHandler(m_wallet.ShowProgress.connect(fn));

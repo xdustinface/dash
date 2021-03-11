@@ -35,7 +35,7 @@
 #include <config/dash-config.h>
 #endif
 #ifdef ENABLE_WALLET
-#include <privatesend/privatesend-client.h>
+#include <coinjoin/coinjoin-client.h>
 #include <wallet/fees.h>
 #include <wallet/wallet.h>
 #define CHECK_WALLET(x) x
@@ -157,7 +157,7 @@ class NodeImpl : public Node
     LLMQImpl m_llmq;
     MasternodeSyncImpl m_masternodeSync;
 #ifdef ENABLE_WALLET
-    PrivateSendOptionsImpl m_privatesend;
+    PrivateSendOptionsImpl m_coinjoin;
 #endif
 
     void parseParameters(int argc, const char* const argv[]) override
@@ -368,7 +368,7 @@ class NodeImpl : public Node
     LLMQ& llmq() override { return m_llmq; }
     Masternode::Sync& masternodeSync() override { return m_masternodeSync; }
 #ifdef ENABLE_WALLET
-    PrivateSend::Options& coinJoinOptions() override { return m_privatesend; }
+    PrivateSend::Options& coinJoinOptions() override { return m_coinjoin; }
 #endif
 
     std::unique_ptr<Handler> handleInitMessage(InitMessageFn fn) override

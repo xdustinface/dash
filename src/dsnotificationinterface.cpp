@@ -7,9 +7,9 @@
 #include <governance/governance.h>
 #include <masternode/masternode-payments.h>
 #include <masternode/masternode-sync.h>
-#include <privatesend/privatesend.h>
+#include <coinjoin/coinjoin.h>
 #ifdef ENABLE_WALLET
-#include <privatesend/privatesend-client.h>
+#include <coinjoin/coinjoin-client.h>
 #endif // ENABLE_WALLET
 #include <validation.h>
 

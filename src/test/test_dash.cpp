@@ -22,7 +22,7 @@
 #include <evo/deterministicmns.h>
 #include <evo/cbtx.h>
 #include <llmq/quorums_init.h>
-#include <privatesend/privatesend.h>
+#include <coinjoin/coinjoin.h>
 
 void CConnmanTest::AddNode(CNode& node)
 {

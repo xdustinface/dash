@@ -65,7 +65,7 @@ public:
 }
 
 namespace PrivateSend {
-//! Interface for the global privatesend options in src/privatesend
+//! Interface for the global coinjoin options in src/coinjoin
 class Options
 {
 public:

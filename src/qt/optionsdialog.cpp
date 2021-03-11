@@ -190,9 +190,9 @@ void OptionsDialog::setModel(OptionsModel *_model)
 
 
 #ifdef ENABLE_WALLET
-        // If -enableprivatesend was passed in on the command line, set the checkbox
+        // If -enablecoinjoin was passed in on the command line, set the checkbox
         // to the value given via commandline and disable it (make it unclickable).
-        if (strLabel.contains("-enableprivatesend")) {
+        if (strLabel.contains("-enablecoinjoin")) {
             ui->coinJoinEnabled->setChecked(_model->node().coinJoinOptions().isEnabled());
             ui->coinJoinEnabled->setEnabled(false);
         }

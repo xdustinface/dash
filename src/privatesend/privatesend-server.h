@@ -6,7 +6,7 @@
 #define BITCOIN_PRIVATESEND_PRIVATESEND_SERVER_H
 
 #include <net.h>
-#include <privatesend/privatesend.h>
+#include <coinjoin/coinjoin.h>
 
 class CPrivateSendServer;
 class UniValue;

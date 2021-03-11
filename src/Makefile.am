@@ -154,10 +154,10 @@ BITCOIN_CORE_H = \
   evo/providertx.h \
   evo/simplifiedmns.h \
   evo/specialtx.h \
-  privatesend/privatesend.h \
-  privatesend/privatesend-client.h \
-  privatesend/privatesend-server.h \
-  privatesend/privatesend-util.h \
+  coinjoin/coinjoin.h \
+  coinjoin/coinjoin-client.h \
+  coinjoin/coinjoin-server.h \
+  coinjoin/coinjoin-util.h \
   dsnotificationinterface.h \
   governance/governance.h \
   governance/governance-classes.h \
@@ -347,8 +347,8 @@ libdash_server_a_SOURCES = \
   policy/fees.cpp \
   policy/policy.cpp \
   pow.cpp \
-  privatesend/privatesend.cpp \
-  privatesend/privatesend-server.cpp \
+  coinjoin/coinjoin.cpp \
+  coinjoin/coinjoin-server.cpp \
   rest.cpp \
   rpc/blockchain.cpp \
   rpc/masternode.cpp \
@@ -360,7 +360,7 @@ libdash_server_a_SOURCES = \
   rpc/rpcevo.cpp \
   rpc/rpcquorums.cpp \
   rpc/server.cpp \
-  rpc/privatesend.cpp \
+  rpc/coinjoin.cpp \
   rpc/util.cpp \
   script/sigcache.cpp \
   spork.cpp \
@@ -393,8 +393,8 @@ libdash_wallet_a_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
 libdash_wallet_a_SOURCES = \
   interfaces/wallet.cpp \
   keepass.cpp \
-  privatesend/privatesend-client.cpp \
-  privatesend/privatesend-util.cpp \
+  coinjoin/coinjoin-client.cpp \
+  coinjoin/coinjoin-util.cpp \
   wallet/crypter.cpp \
   wallet/db.cpp \
   wallet/fees.cpp \

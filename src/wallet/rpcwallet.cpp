@@ -13,7 +13,7 @@
 #include <net.h>
 #include <policy/feerate.h>
 #include <policy/fees.h>
-#include <privatesend/privatesend-client.h>
+#include <coinjoin/coinjoin-client.h>
 #include <rpc/mining.h>
 #include <rpc/rawtransaction.h>
 #include <rpc/server.h>
@@ -1702,7 +1702,7 @@ void ListTransactions(CWallet * const pwallet, const CWalletTx& wtx, const std::
             if (IsDeprecatedRPCEnabled("accounts")) entry.pushKV("account", strSentAccount);
             MaybePushAddress(entry, s.destination);
             std::map<std::string, std::string>::const_iterator it = wtx.mapValue.find("DS");
-            entry.pushKV("category", (it != wtx.mapValue.end() && it->second == "1") ? "privatesend" : "send");
+            entry.pushKV("category", (it != wtx.mapValue.end() && it->second == "1") ? "coinjoin" : "send");
             entry.pushKV("amount", ValueFromAmount(-s.amount));
             if (pwallet->mapAddressBook.count(s.destination)) {
                 entry.pushKV("label", pwallet->mapAddressBook[s.destination].name);
@@ -2866,7 +2866,7 @@ UniValue settxfee(const JSONRPCRequest& request)
     return true;
 }
 
-UniValue setprivatesendrounds(const JSONRPCRequest& request)
+UniValue setcoinjoinrounds(const JSONRPCRequest& request)
 {
     CWallet* const pwallet = GetWalletForJSONRPCRequest(request);
     if (!EnsureWalletIsAvailable(pwallet, request.fHelp))
@@ -2874,14 +2874,14 @@ UniValue setprivatesendrounds(const JSONRPCRequest& request)
 
     if (request.fHelp || request.params.size() != 1)
         throw std::runtime_error(
-            "setprivatesendrounds rounds\n"
+            "setcoinjoinrounds rounds\n"
             "\nSet the number of rounds for CoinJoin.\n"
             "\nArguments:\n"
             "1. rounds         (numeric, required) The default number of rounds is " + std::to_string(DEFAULT_PRIVATESEND_ROUNDS) +
             " Cannot be more than " + std::to_string(MAX_PRIVATESEND_ROUNDS) + " nor less than " + std::to_string(MIN_PRIVATESEND_ROUNDS) +
             "\nExamples:\n"
-            + HelpExampleCli("setprivatesendrounds", "4")
-            + HelpExampleRpc("setprivatesendrounds", "16")
+            + HelpExampleCli("setcoinjoinrounds", "4")
+            + HelpExampleRpc("setcoinjoinrounds", "16")
         );
 
     int nRounds = request.params[0].get_int();
@@ -2894,7 +2894,7 @@ UniValue setprivatesendrounds(const JSONRPCRequest& request)
     return NullUniValue;
 }
 
-UniValue setprivatesendamount(const JSONRPCRequest& request)
+UniValue setcoinjoinamount(const JSONRPCRequest& request)
 {
     CWallet* const pwallet = GetWalletForJSONRPCRequest(request);
     if (!EnsureWalletIsAvailable(pwallet, request.fHelp))
@@ -2902,14 +2902,14 @@ UniValue setprivatesendamount(const JSONRPCRequest& request)
 
     if (request.fHelp || request.params.size() != 1)
         throw std::runtime_error(
-            "setprivatesendamount amount\n"
+            "setcoinjoinamount amount\n"
             "\nSet the goal amount in " + CURRENCY_UNIT + " for CoinJoin.\n"
             "\nArguments:\n"
             "1. amount         (numeric, required) The default amount is " + std::to_string(DEFAULT_PRIVATESEND_AMOUNT) +
             " Cannot be more than " + std::to_string(MAX_PRIVATESEND_AMOUNT) + " nor less than " + std::to_string(MIN_PRIVATESEND_AMOUNT) +
             "\nExamples:\n"
-            + HelpExampleCli("setprivatesendamount", "500")
-            + HelpExampleRpc("setprivatesendamount", "208")
+            + HelpExampleCli("setcoinjoinamount", "500")
+            + HelpExampleRpc("setcoinjoinamount", "208")
         );
 
     int nAmount = request.params[0].get_int();
@@ -2938,7 +2938,7 @@ UniValue getwalletinfo(const JSONRPCRequest& request)
             "  \"walletname\": xxxxx,             (string) the wallet name\n"
             "  \"walletversion\": xxxxx,     (numeric) the wallet version\n"
             "  \"balance\": xxxxxxx,         (numeric) the total confirmed balance of the wallet in " + CURRENCY_UNIT + "\n"
-            "  \"privatesend_balance\": xxxxxx, (numeric) the CoinJoin balance in " + CURRENCY_UNIT + "\n"
+            "  \"coinjoin_balance\": xxxxxx, (numeric) the CoinJoin balance in " + CURRENCY_UNIT + "\n"
             "  \"unconfirmed_balance\": xxx, (numeric) the total unconfirmed balance of the wallet in " + CURRENCY_UNIT + "\n"
             "  \"immature_balance\": xxxxxx, (numeric) the total immature balance of the wallet in " + CURRENCY_UNIT + "\n"
             "  \"txcount\": xxxxxxx,         (numeric) the total number of transactions in the wallet\n"
@@ -2983,7 +2983,7 @@ UniValue getwalletinfo(const JSONRPCRequest& request)
     obj.pushKV("walletname", pwallet->GetName());
     obj.pushKV("walletversion", pwallet->GetVersion());
     obj.pushKV("balance",       ValueFromAmount(pwallet->GetBalance()));
-    obj.pushKV("privatesend_balance",       ValueFromAmount(pwallet->GetAnonymizedBalance()));
+    obj.pushKV("coinjoin_balance",       ValueFromAmount(pwallet->GetAnonymizedBalance()));
     obj.pushKV("unconfirmed_balance", ValueFromAmount(pwallet->GetUnconfirmedBalance()));
     obj.pushKV("immature_balance",    ValueFromAmount(pwallet->GetImmatureBalance()));
     obj.pushKV("txcount",       (int)pwallet->mapWallet.size());
@@ -4260,8 +4260,8 @@ static const CRPCCommand commands[] =
     { "wallet",             "sendmany",                         &sendmany,                      {"fromaccount|dummy","amounts","minconf","addlocked","comment","subtractfeefrom","use_is","use_ps","conf_target","estimate_mode"} },
     { "wallet",             "sendtoaddress",                    &sendtoaddress,                 {"address","amount","comment","comment_to","subtractfeefromamount","use_is","use_ps","conf_target","estimate_mode"} },
     { "wallet",             "settxfee",                         &settxfee,                      {"amount"} },
-    { "wallet",             "setprivatesendrounds",     &setprivatesendrounds,     {"rounds"} },
-    { "wallet",             "setprivatesendamount",     &setprivatesendamount,     {"amount"} },
+    { "wallet",             "setcoinjoinrounds",     &setcoinjoinrounds,     {"rounds"} },
+    { "wallet",             "setcoinjoinamount",     &setcoinjoinamount,     {"amount"} },
     { "wallet",             "signmessage",                      &signmessage,                   {"address","message"} },
     { "wallet",             "signrawtransactionwithwallet",     &signrawtransactionwithwallet,  {"hexstring","prevtxs","sighashtype"} },
     { "wallet",             "upgradetohd",                      &upgradetohd,                   {"mnemonic", "mnemonicpassphrase", "walletpassphrase"} },

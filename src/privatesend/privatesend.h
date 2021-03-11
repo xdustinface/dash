@@ -362,7 +362,7 @@ public:
 class CPrivateSendBaseSession
 {
 protected:
-    mutable CCriticalSection cs_privatesend;
+    mutable CCriticalSection cs_coinjoin;
 
     std::vector<CPrivateSendEntry> vecEntries; // Masternode/clients entries
 

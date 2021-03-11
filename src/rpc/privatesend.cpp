@@ -4,15 +4,15 @@
 
 #include <validation.h>
 #ifdef ENABLE_WALLET
-#include <privatesend/privatesend-client.h>
+#include <coinjoin/coinjoin-client.h>
 #endif // ENABLE_WALLET
-#include <privatesend/privatesend-server.h>
+#include <coinjoin/coinjoin-server.h>
 #include <rpc/server.h>
 
 #include <univalue.h>
 
 #ifdef ENABLE_WALLET
-UniValue privatesend(const JSONRPCRequest& request)
+UniValue coinjoin(const JSONRPCRequest& request)
 {
     CWallet* const pwallet = GetWalletForJSONRPCRequest(request);
     if (!EnsureWalletIsAvailable(pwallet, request.fHelp))
@@ -20,7 +20,7 @@ UniValue privatesend(const JSONRPCRequest& request)
 
     if (request.fHelp || request.params.size() != 1)
         throw std::runtime_error(
-            "privatesend \"command\"\n"
+            "coinjoin \"command\"\n"
             "\nArguments:\n"
             "1. \"command\"        (string or set of strings, required) The command to execute\n"
             "\nAvailable commands:\n"
@@ -33,11 +33,11 @@ UniValue privatesend(const JSONRPCRequest& request)
         throw JSONRPCError(RPC_INTERNAL_ERROR, "Client-side mixing is not supported on masternodes");
 
     if (!CPrivateSendClientOptions::IsEnabled()) {
-        if (!gArgs.GetBoolArg("-enableprivatesend", true)) {
+        if (!gArgs.GetBoolArg("-enablecoinjoin", true)) {
             // otherwise it's on by default, unless cmd line option says otherwise
-            throw JSONRPCError(RPC_INTERNAL_ERROR, "Mixing is disabled via -enableprivatesend=0 command line option, remove it to enable mixing again");
+            throw JSONRPCError(RPC_INTERNAL_ERROR, "Mixing is disabled via -enablecoinjoin=0 command line option, remove it to enable mixing again");
         } else {
-            // not enableprivatesend=false case,
+            // not enablecoinjoin=false case,
             // most likely something bad happened and we disabled it while running the wallet
             throw JSONRPCError(RPC_INTERNAL_ERROR, "Mixing is disabled due to some internal error");
         }
@@ -70,7 +70,7 @@ UniValue privatesend(const JSONRPCRequest& request)
         return "Mixing was reset";
     }
 
-    return "Unknown command, please see \"help privatesend\"";
+    return "Unknown command, please see \"help coinjoin\"";
 }
 #endif // ENABLE_WALLET
 
@@ -78,15 +78,15 @@ UniValue getpoolinfo(const JSONRPCRequest& request)
 {
     throw std::runtime_error(
             "getpoolinfo\n"
-            "DEPRECATED. Please use getprivatesendinfo instead.\n"
+            "DEPRECATED. Please use getcoinjoininfo instead.\n"
     );
 }
 
-UniValue getprivatesendinfo(const JSONRPCRequest& request)
+UniValue getcoinjoininfo(const JSONRPCRequest& request)
 {
     if (request.fHelp || request.params.size() != 0) {
         throw std::runtime_error(
-                "getprivatesendinfo\n"
+                "getcoinjoininfo\n"
                 "Returns an object containing an information about PrivateSend settings and state.\n"
                 "\nResult (for regular nodes):\n"
                 "{\n"
@@ -122,8 +122,8 @@ UniValue getprivatesendinfo(const JSONRPCRequest& request)
                 "  \"entries_count\": xxx,              (numeric) The number of entries in the mixing session\n"
                 "}\n"
                 "\nExamples:\n"
-                + HelpExampleCli("getprivatesendinfo", "")
-                + HelpExampleRpc("getprivatesendinfo", "")
+                + HelpExampleCli("getcoinjoininfo", "")
+                + HelpExampleRpc("getcoinjoininfo", "")
         );
     }
 
@@ -160,9 +160,9 @@ static const CRPCCommand commands[] =
     { //  category              name                      actor (function)         argNames
         //  --------------------- ------------------------  ---------------------------------
         { "dash",               "getpoolinfo",            &getpoolinfo,            {} },
-        { "dash",               "getprivatesendinfo",     &getprivatesendinfo,     {} },
+        { "dash",               "getcoinjoininfo",     &getcoinjoininfo,     {} },
 #ifdef ENABLE_WALLET
-        { "dash",               "privatesend",            &privatesend,            {} },
+        { "dash",               "coinjoin",            &coinjoin,            {} },
 #endif // ENABLE_WALLET
 };
 

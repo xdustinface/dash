@@ -38,9 +38,9 @@
 #include <masternode/masternode-sync.h>
 #include <masternode/masternode-meta.h>
 #ifdef ENABLE_WALLET
-#include <privatesend/privatesend-client.h>
+#include <coinjoin/coinjoin-client.h>
 #endif // ENABLE_WALLET
-#include <privatesend/privatesend-server.h>
+#include <coinjoin/coinjoin-server.h>
 
 #include <evo/deterministicmns.h>
 #include <evo/mnauth.h>

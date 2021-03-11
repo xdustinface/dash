@@ -6,7 +6,7 @@
 #include <util.h>
 #include <utilmoneystr.h>
 
-#include <privatesend/privatesend.h>
+#include <coinjoin/coinjoin.h>
 
 // Descending order comparator
 struct {
@@ -275,7 +275,7 @@ bool KnapsackSolver(const CAmount& nTargetValue, std::vector<CInputCoin>& vCoins
         nMinChange = 0;
     } else {
         // move denoms down on the list
-        // try not to use denominated coins when not needed, save denoms for privatesend
+        // try not to use denominated coins when not needed, save denoms for coinjoin
         std::sort(vCoins.begin(), vCoins.end(), less_then_denom);
     }
 

@@ -5,7 +5,7 @@
 #include <qt/callback.h>
 #include <qt/clientmodel.h>
 #include <qt/optionsmodel.h>
-#include <privatesend/privatesend-client.h>
+#include <coinjoin/coinjoin-client.h>
 #include <qt/qvalidatedlineedit.h>
 #include <qt/sendcoinsdialog.h>
 #include <qt/sendcoinsentry.h>

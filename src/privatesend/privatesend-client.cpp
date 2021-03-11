@@ -2,7 +2,7 @@
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#include <privatesend/privatesend-client.h>
+#include <coinjoin/coinjoin-client.h>
 
 #include <consensus/validation.h>
 #include <core_io.h>
@@ -794,7 +794,7 @@ bool CPrivateSendClientSession::DoAutomaticDenominating(CConnman& connman, bool 
             return false;
         }
 
-        TRY_LOCK(cs_privatesend, lockDS);
+        TRY_LOCK(cs_coinjoin, lockDS);
         if (!lockDS) {
             strAutoDenomResult = _("Lock is already in place.");
             return false;
@@ -1635,7 +1635,7 @@ bool CPrivateSendClientSession::CreateDenominated(CAmount nBalanceToDenominate, 
         mapDenomCount.insert(std::pair<CAmount, int>(nDenomValue, mixingWallet.CountInputsWithAmount(nDenomValue)));
     }
 
-    // Will generate outputs for the createdenoms up to privatesendmaxdenoms per denom
+    // Will generate outputs for the createdenoms up to coinjoinmaxdenoms per denom
 
     // This works in the way creating PS denoms has traditionally worked, assuming enough funds,
     // it will start with the smallest denom then create 11 of those, then go up to the next biggest denom create 11
@@ -1921,12 +1921,12 @@ void CPrivateSendClientOptions::Init()
     assert(!CPrivateSendClientOptions::_instance);
     static CPrivateSendClientOptions instance;
     LOCK(instance.cs_ps_options);
-    instance.fPrivateSendMultiSession = gArgs.GetBoolArg("-privatesendmultisession", DEFAULT_PRIVATESEND_MULTISESSION);
-    instance.nPrivateSendSessions = std::min(std::max((int)gArgs.GetArg("-privatesendsessions", DEFAULT_PRIVATESEND_SESSIONS), MIN_PRIVATESEND_SESSIONS), MAX_PRIVATESEND_SESSIONS);
-    instance.nPrivateSendRounds = std::min(std::max((int)gArgs.GetArg("-privatesendrounds", DEFAULT_PRIVATESEND_ROUNDS), MIN_PRIVATESEND_ROUNDS), MAX_PRIVATESEND_ROUNDS);
-    instance.nPrivateSendAmount = std::min(std::max((int)gArgs.GetArg("-privatesendamount", DEFAULT_PRIVATESEND_AMOUNT), MIN_PRIVATESEND_AMOUNT), MAX_PRIVATESEND_AMOUNT);
-    instance.nPrivateSendDenomsGoal = std::min(std::max((int)gArgs.GetArg("-privatesenddenomsgoal", DEFAULT_PRIVATESEND_DENOMS_GOAL), MIN_PRIVATESEND_DENOMS_GOAL), MAX_PRIVATESEND_DENOMS_GOAL);
-    instance.nPrivateSendDenomsHardCap = std::min(std::max((int)gArgs.GetArg("-privatesenddenomshardcap", DEFAULT_PRIVATESEND_DENOMS_HARDCAP), MIN_PRIVATESEND_DENOMS_HARDCAP), MAX_PRIVATESEND_DENOMS_HARDCAP);
+    instance.fPrivateSendMultiSession = gArgs.GetBoolArg("-coinjoinmultisession", DEFAULT_PRIVATESEND_MULTISESSION);
+    instance.nPrivateSendSessions = std::min(std::max((int)gArgs.GetArg("-coinjoinsessions", DEFAULT_PRIVATESEND_SESSIONS), MIN_PRIVATESEND_SESSIONS), MAX_PRIVATESEND_SESSIONS);
+    instance.nPrivateSendRounds = std::min(std::max((int)gArgs.GetArg("-coinjoinrounds", DEFAULT_PRIVATESEND_ROUNDS), MIN_PRIVATESEND_ROUNDS), MAX_PRIVATESEND_ROUNDS);
+    instance.nPrivateSendAmount = std::min(std::max((int)gArgs.GetArg("-coinjoinamount", DEFAULT_PRIVATESEND_AMOUNT), MIN_PRIVATESEND_AMOUNT), MAX_PRIVATESEND_AMOUNT);
+    instance.nPrivateSendDenomsGoal = std::min(std::max((int)gArgs.GetArg("-coinjoindenomsgoal", DEFAULT_PRIVATESEND_DENOMS_GOAL), MIN_PRIVATESEND_DENOMS_GOAL), MAX_PRIVATESEND_DENOMS_GOAL);
+    instance.nPrivateSendDenomsHardCap = std::min(std::max((int)gArgs.GetArg("-coinjoindenomshardcap", DEFAULT_PRIVATESEND_DENOMS_HARDCAP), MIN_PRIVATESEND_DENOMS_HARDCAP), MAX_PRIVATESEND_DENOMS_HARDCAP);
     CPrivateSendClientOptions::_instance = &instance;
 }
 

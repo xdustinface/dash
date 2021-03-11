@@ -2,7 +2,7 @@
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#include <privatesend/privatesend.h>
+#include <coinjoin/coinjoin.h>
 
 #include <core_io.h>
 #include <consensus/validation.h>
@@ -148,7 +148,7 @@ bool CPrivateSendBroadcastTx::IsValidStructure()
 void CPrivateSendBaseSession::SetNull()
 {
     // Both sides
-    LOCK(cs_privatesend);
+    LOCK(cs_coinjoin);
     nState = POOL_STATE_IDLE;
     nSessionID = 0;
     nSessionDenom = 0;

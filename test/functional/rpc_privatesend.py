@@ -7,7 +7,7 @@ from test_framework.test_framework import BitcoinTestFramework
 from test_framework.util import assert_equal
 
 '''
-rpc_privatesend.py
+rpc_coinjoin.py
 
 Tests PrivateSend basic RPC
 '''
@@ -17,42 +17,42 @@ class PrivateSendTest(BitcoinTestFramework):
         self.num_nodes = 1
 
     def run_test(self):
-        self.test_privatesend_start_stop()
-        self.test_privatesend_setamount()
-        self.test_privatesend_setrounds()
+        self.test_coinjoin_start_stop()
+        self.test_coinjoin_setamount()
+        self.test_coinjoin_setrounds()
 
-    def test_privatesend_start_stop(self):
+    def test_coinjoin_start_stop(self):
         # Start Mixing
-        self.nodes[0].privatesend("start")
+        self.nodes[0].coinjoin("start")
         # Get PrivateSend info
-        ps_info = self.nodes[0].getprivatesendinfo()
+        ps_info = self.nodes[0].getcoinjoininfo()
         # Ensure that it started properly
         assert_equal(ps_info['enabled'], True)
         assert_equal(ps_info['running'], True)
 
         # Stop mixing
-        self.nodes[0].privatesend("stop")
+        self.nodes[0].coinjoin("stop")
         # Get PrivateSend info
-        ps_info = self.nodes[0].getprivatesendinfo()
+        ps_info = self.nodes[0].getcoinjoininfo()
         # Ensure that it stopped properly
         assert_equal(ps_info['enabled'], True)
         assert_equal(ps_info['running'], False)
 
-    def test_privatesend_setamount(self):
+    def test_coinjoin_setamount(self):
         # Try normal values
-        self.nodes[0].setprivatesendamount(50)
-        ps_info = self.nodes[0].getprivatesendinfo()
+        self.nodes[0].setcoinjoinamount(50)
+        ps_info = self.nodes[0].getcoinjoininfo()
         assert_equal(ps_info['max_amount'], 50)
 
         # Try large values
-        self.nodes[0].setprivatesendamount(1200000)
-        ps_info = self.nodes[0].getprivatesendinfo()
+        self.nodes[0].setcoinjoinamount(1200000)
+        ps_info = self.nodes[0].getcoinjoininfo()
         assert_equal(ps_info['max_amount'], 1200000)
 
-    def test_privatesend_setrounds(self):
+    def test_coinjoin_setrounds(self):
         # Try normal values
-        self.nodes[0].setprivatesendrounds(5)
-        ps_info = self.nodes[0].getprivatesendinfo()
+        self.nodes[0].setcoinjoinrounds(5)
+        ps_info = self.nodes[0].getcoinjoininfo()
         assert_equal(ps_info['max_rounds'], 5)
 
 
