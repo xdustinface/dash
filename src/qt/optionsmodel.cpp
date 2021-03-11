@@ -699,4 +699,11 @@ void OptionsModel::checkAndMigrate()
     if (!GUIUtil::isValidTheme(strActiveTheme)) {
         settings.setValue("theme", GUIUtil::getDefaultTheme());
     }
+
+    // for PrivateSend -> CoinJoin migration
+    if (settings.contains("nPrivateSendRounds") && !settings.contains("nCoinJoinRounds")) {
+        settings.setValue("nCoinJoinRounds", settings.value("nPrivateSendRounds").toInt());
+        settings.remove("nPrivateSendRounds");
+    }
+
 }

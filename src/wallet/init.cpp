@@ -285,6 +285,16 @@ bool WalletInit::ParameterInteraction() const
         return InitError("-coinjoindenomshardcap can't be lower than -coinjoindenomsgoal");
     }
 
+    // for PrivateSend -> CoinJoin migration
+    if (gArgs.IsArgSet("-privatesendrounds")) {
+        int nRoundsDeprecated = gArgs.GetArg("-coinjoinrounds", DEFAULT_COINJOIN_ROUNDS);
+        InitWarning("Warning: -privatesendrounds is deprecated, please use -coinjoinrounds.\n");
+        if (gArgs.SoftSetArg("-coinjoinrounds", itostr(nRoundsDeprecated))) {
+            LogPrintf("%s: parameter interaction: -privatesendrounds=%d -> setting -coinjoinrounds=%d\n", __func__, nRoundsDeprecated, nRoundsDeprecated);
+        }
+        gArgs.ForceRemoveArg("-privatesendrounds");
+    }
+
     return true;
 }
 
