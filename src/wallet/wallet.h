@@ -23,8 +23,8 @@
 #include <wallet/walletdb.h>
 #include <wallet/rpcwallet.h>
 
-#include <governance/governance-object.h>
 #include <coinjoin/coinjoin.h>
+#include <governance/governance-object.h>
 
 #include <algorithm>
 #include <atomic>

@@ -6,12 +6,12 @@
 
 #include <amount.h>
 #include <chain.h>
+#include <coinjoin/coinjoin-client.h>
 #include <consensus/validation.h>
 #include <interfaces/handler.h>
 #include <net.h>
 #include <policy/policy.h>
 #include <primitives/transaction.h>
-#include <coinjoin/coinjoin-client.h>
 #include <script/ismine.h>
 #include <script/standard.h>
 #include <support/allocators/secure.h>

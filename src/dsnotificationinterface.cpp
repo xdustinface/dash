@@ -3,14 +3,14 @@
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #include <chainparams.h>
-#include <dsnotificationinterface.h>
-#include <governance/governance.h>
-#include <masternode/masternode-payments.h>
-#include <masternode/masternode-sync.h>
 #include <coinjoin/coinjoin.h>
 #ifdef ENABLE_WALLET
 #include <coinjoin/coinjoin-client.h>
 #endif // ENABLE_WALLET
+#include <dsnotificationinterface.h>
+#include <governance/governance.h>
+#include <masternode/masternode-payments.h>
+#include <masternode/masternode-sync.h>
 #include <validation.h>
 
 #include <evo/deterministicmns.h>

@@ -13,7 +13,6 @@
 #include <net.h>
 #include <policy/feerate.h>
 #include <policy/fees.h>
-#include <coinjoin/coinjoin-client.h>
 #include <rpc/mining.h>
 #include <rpc/rawtransaction.h>
 #include <rpc/server.h>
@@ -31,6 +30,7 @@
 
 #include <init.h>  // For StartShutdown
 
+#include <coinjoin/coinjoin-client.h>
 #include <llmq/quorums_chainlocks.h>
 #include <llmq/quorums_instantsend.h>
 

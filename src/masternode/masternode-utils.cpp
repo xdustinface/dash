@@ -4,11 +4,11 @@
 
 #include <masternode/masternode-utils.h>
 
-#include <init.h>
-#include <masternode/masternode-sync.h>
 #ifdef ENABLE_WALLET
 #include <coinjoin/coinjoin-client.h>
 #endif
+#include <init.h>
+#include <masternode/masternode-sync.h>
 #include <validation.h>
 
 struct CompareScoreMN

@@ -5,8 +5,8 @@
 #ifndef BITCOIN_COINJOIN_COINJOIN_SERVER_H
 #define BITCOIN_COINJOIN_COINJOIN_SERVER_H
 
-#include <net.h>
 #include <coinjoin/coinjoin.h>
+#include <net.h>
 
 class CCoinJoinServer;
 class UniValue;

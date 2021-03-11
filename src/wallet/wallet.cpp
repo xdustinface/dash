@@ -30,9 +30,9 @@
 #include <wallet/fees.h>
 #include <wallet/walletutil.h>
 
+#include <coinjoin/coinjoin-client.h>
 #include <governance/governance.h>
 #include <keepass.h>
-#include <coinjoin/coinjoin-client.h>
 #include <spork.h>
 
 #include <evo/providertx.h>
