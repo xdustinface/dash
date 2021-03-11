@@ -134,6 +134,10 @@ BITCOIN_CORE_H = \
   checkpoints.h \
   checkqueue.h \
   clientversion.h \
+  coinjoin/coinjoin.h \
+  coinjoin/coinjoin-client.h \
+  coinjoin/coinjoin-server.h \
+  coinjoin/coinjoin-util.h \
   coins.h \
   compat.h \
   compat/byteswap.h \
@@ -154,10 +158,6 @@ BITCOIN_CORE_H = \
   evo/providertx.h \
   evo/simplifiedmns.h \
   evo/specialtx.h \
-  coinjoin/coinjoin.h \
-  coinjoin/coinjoin-client.h \
-  coinjoin/coinjoin-server.h \
-  coinjoin/coinjoin-util.h \
   dsnotificationinterface.h \
   governance/governance.h \
   governance/governance-classes.h \
@@ -299,6 +299,8 @@ libdash_server_a_SOURCES = \
   blockfilter.cpp \
   chain.cpp \
   checkpoints.cpp \
+  coinjoin/coinjoin.cpp \
+  coinjoin/coinjoin-server.cpp \
   consensus/tx_verify.cpp \
   dsnotificationinterface.cpp \
   evo/cbtx.cpp \
@@ -347,8 +349,6 @@ libdash_server_a_SOURCES = \
   policy/fees.cpp \
   policy/policy.cpp \
   pow.cpp \
-  coinjoin/coinjoin.cpp \
-  coinjoin/coinjoin-server.cpp \
   rest.cpp \
   rpc/blockchain.cpp \
   rpc/masternode.cpp \
@@ -391,10 +391,10 @@ endif
 libdash_wallet_a_CPPFLAGS = $(AM_CPPFLAGS) $(BITCOIN_INCLUDES)
 libdash_wallet_a_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
 libdash_wallet_a_SOURCES = \
-  interfaces/wallet.cpp \
-  keepass.cpp \
   coinjoin/coinjoin-client.cpp \
   coinjoin/coinjoin-util.cpp \
+  interfaces/wallet.cpp \
+  keepass.cpp \
   wallet/crypter.cpp \
   wallet/db.cpp \
   wallet/fees.cpp \
