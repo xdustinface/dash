@@ -368,7 +368,7 @@ class NodeImpl : public Node
     LLMQ& llmq() override { return m_llmq; }
     Masternode::Sync& masternodeSync() override { return m_masternodeSync; }
 #ifdef ENABLE_WALLET
-    PrivateSend::Options& privateSendOptions() override { return m_privatesend; }
+    PrivateSend::Options& coinJoinOptions() override { return m_privatesend; }
 #endif
 
     std::unique_ptr<Handler> handleInitMessage(InitMessageFn fn) override

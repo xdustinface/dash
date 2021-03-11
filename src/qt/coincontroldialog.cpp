@@ -658,7 +658,7 @@ void CoinControlDialog::updateView()
     ui->radioTreeMode->setVisible(fNormalMode);
     ui->radioListMode->setVisible(fNormalMode);
 
-    if (!model->node().privateSendOptions().isEnabled()) {
+    if (!model->node().coinJoinOptions().isEnabled()) {
         fHideAdditional = false;
         ui->hideButton->setVisible(false);
     }
@@ -721,7 +721,7 @@ void CoinControlDialog::updateView()
             const interfaces::WalletTxOut& out = std::get<1>(outpair);
             bool fFullyMixed{false};
             CAmount nAmount = out.txout.nValue;
-            bool fPrivateSendAmount = model->node().privateSendOptions().isDenominated(nAmount) || model->node().privateSendOptions().isCollateralAmount(nAmount);
+            bool fPrivateSendAmount = model->node().coinJoinOptions().isDenominated(nAmount) || model->node().coinJoinOptions().isCollateralAmount(nAmount);
 
             if (m_coin_control.IsUsingPrivateSend()) {
                 fFullyMixed = model->isFullyMixed(output);

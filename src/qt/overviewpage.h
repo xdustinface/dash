@@ -37,7 +37,7 @@ public:
     void showOutOfSyncWarning(bool fShow);
 
 public Q_SLOTS:
-    void privateSendStatus(bool fForce = false);
+    void coinJoinStatus(bool fForce = false);
     void setBalance(const interfaces::WalletBalances& balances);
 
 Q_SIGNALS:

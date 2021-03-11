@@ -108,14 +108,14 @@ private:
     QToolBar *appToolBar;
     QToolButton *overviewButton;
     QToolButton *sendCoinsButton;
-    QToolButton *privateSendCoinsButton;
+    QToolButton *coinJoinCoinsButton;
     QToolButton *receiveCoinsButton;
     QToolButton *historyButton;
     QToolButton *masternodeButton;
     QAction* appToolBarLogoAction;
     QAction *quitAction;
     QAction *sendCoinsMenuAction;
-    QAction *privateSendCoinsMenuAction;
+    QAction *coinJoinCoinsMenuAction;
     QAction *usedSendingAddressesAction;
     QAction *usedReceivingAddressesAction;
     QAction *signMessageAction;

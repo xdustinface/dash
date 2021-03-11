@@ -260,7 +260,7 @@ public:
 
     //! Return interface for accessing masternode related handler.
 #ifdef ENABLE_WALLET
-    virtual PrivateSend::Options& privateSendOptions() = 0;
+    virtual PrivateSend::Options& coinJoinOptions() = 0;
 #endif
 
     //! Register handler for init messages.

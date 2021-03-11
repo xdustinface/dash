@@ -56,10 +56,10 @@ static const int PRIVATESEND_KEYS_THRESHOLD_STOP = 50;
 static const int PRIVATESEND_RANDOM_ROUNDS = 3;
 
 // The main object for accessing mixing
-extern std::map<const std::string, std::shared_ptr<CPrivateSendClientManager>> privateSendClientManagers;
+extern std::map<const std::string, std::shared_ptr<CPrivateSendClientManager>> coinJoinClientManagers;
 
 // The object to track mixing queues
-extern CPrivateSendClientQueueManager privateSendClientQueueManager;
+extern CPrivateSendClientQueueManager coinJoinClientQueueManager;
 
 class CPendingDsaRequest
 {

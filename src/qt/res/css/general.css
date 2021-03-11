@@ -1459,14 +1459,14 @@ QWidget .QFrame#framePrivateSend  .QLabel#labelCompletitionText { /* PrivateSend
     margin-right: 10px;
 }
 
-QWidget .QFrame#framePrivateSend  QProgressBar#privateSendProgress { /* PrivateSend Completion */
+QWidget .QFrame#framePrivateSend  QProgressBar#coinJoinProgress { /* PrivateSend Completion */
     min-height: 13px;
     max-height: 13px;
     border-radius: 5px;
     margin-top: 7px;
 }
 
-QWidget .QFrame#framePrivateSend  QProgressBar#privateSendProgress:chunk {
+QWidget .QFrame#framePrivateSend  QProgressBar#coinJoinProgress:chunk {
     border-radius: 5px;
 }
 

@@ -119,8 +119,8 @@ private:
     void checkAndMigrate();
 Q_SIGNALS:
     void displayUnitChanged(int unit);
-    void privateSendEnabledChanged();
-    void privateSendRoundsChanged();
+    void coinJoinEnabledChanged();
+    void coinJoinRoundsChanged();
     void privateSentAmountChanged();
     void advancedPSUIChanged(bool);
     void coinControlFeaturesChanged(bool);

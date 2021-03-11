@@ -43,7 +43,7 @@ UniValue privatesend(const JSONRPCRequest& request)
         }
     }
 
-    auto it = privateSendClientManagers.find(pwallet->GetName());
+    auto it = coinJoinClientManagers.find(pwallet->GetName());
 
     if (request.params[0].get_str() == "start") {
         {
@@ -130,7 +130,7 @@ UniValue getprivatesendinfo(const JSONRPCRequest& request)
     UniValue obj(UniValue::VOBJ);
 
     if (fMasternodeMode) {
-        privateSendServer.GetJsonInfo(obj);
+        coinJoinServer.GetJsonInfo(obj);
         return obj;
     }
 
@@ -139,14 +139,14 @@ UniValue getprivatesendinfo(const JSONRPCRequest& request)
 
     CPrivateSendClientOptions::GetJsonInfo(obj);
 
-    obj.pushKV("queue_size", privateSendClientQueueManager.GetQueueSize());
+    obj.pushKV("queue_size", coinJoinClientQueueManager.GetQueueSize());
 
     CWallet* const pwallet = GetWalletForJSONRPCRequest(request);
     if (!pwallet) {
         return obj;
     }
 
-    privateSendClientManagers.at(pwallet->GetName())->GetJsonInfo(obj);
+    coinJoinClientManagers.at(pwallet->GetName())->GetJsonInfo(obj);
 
     obj.pushKV("keys_left",     pwallet->nKeysLeftSinceAutoBackup);
     obj.push_back(Pair("warnings",      pwallet->nKeysLeftSinceAutoBackup < PRIVATESEND_KEYS_THRESHOLD_WARNING

@@ -12,7 +12,7 @@ class CPrivateSendServer;
 class UniValue;
 
 // The main object for accessing mixing
-extern CPrivateSendServer privateSendServer;
+extern CPrivateSendServer coinJoinServer;
 
 /** Used to keep track of current status of mixing pool
  */

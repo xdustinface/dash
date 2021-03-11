@@ -2333,7 +2333,7 @@ bool AppInitMain()
     }
 
     if (fMasternodeMode) {
-        scheduler.scheduleEvery(std::bind(&CPrivateSendServer::DoMaintenance, std::ref(privateSendServer), std::ref(*g_connman)), 1 * 1000);
+        scheduler.scheduleEvery(std::bind(&CPrivateSendServer::DoMaintenance, std::ref(coinJoinServer), std::ref(*g_connman)), 1 * 1000);
     }
 
     if (gArgs.GetBoolArg("-statsenabled", DEFAULT_STATSD_ENABLE)) {

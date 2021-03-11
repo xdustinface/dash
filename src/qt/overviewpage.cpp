@@ -154,14 +154,14 @@ OverviewPage::OverviewPage(QWidget* parent) :
     ui->labelTransactionsStatus->setText("(" + tr("out of sync") + ")");
 
     // hide PS frame (helps to preserve saved size)
-    // we'll setup and make it visible in privateSendStatus() later
+    // we'll setup and make it visible in coinJoinStatus() later
     ui->framePrivateSend->setVisible(false);
 
     // start with displaying the "out of sync" warnings
     showOutOfSyncWarning(true);
 
     timer = new QTimer(this);
-    connect(timer, SIGNAL(timeout()), this, SLOT(privateSendStatus()));
+    connect(timer, SIGNAL(timeout()), this, SLOT(coinJoinStatus()));
 }
 
 void OverviewPage::handleTransactionClicked(const QModelIndex &index)
@@ -177,7 +177,7 @@ void OverviewPage::handleOutOfSyncWarningClicks()
 
 OverviewPage::~OverviewPage()
 {
-    if(timer) disconnect(timer, SIGNAL(timeout()), this, SLOT(privateSendStatus()));
+    if(timer) disconnect(timer, SIGNAL(timeout()), this, SLOT(coinJoinStatus()));
     delete ui;
 }
 
@@ -269,16 +269,16 @@ void OverviewPage::setWalletModel(WalletModel *model)
         // explicitly update PS frame and transaction list to reflect actual settings
         updateAdvancedPSUI(model->getOptionsModel()->getShowAdvancedPSUI());
 
-        connect(model->getOptionsModel(), SIGNAL(privateSendRoundsChanged()), this, SLOT(updatePrivateSendProgress()));
+        connect(model->getOptionsModel(), SIGNAL(coinJoinRoundsChanged()), this, SLOT(updatePrivateSendProgress()));
         connect(model->getOptionsModel(), SIGNAL(privateSentAmountChanged()), this, SLOT(updatePrivateSendProgress()));
         connect(model->getOptionsModel(), SIGNAL(advancedPSUIChanged(bool)), this, SLOT(updateAdvancedPSUI(bool)));
-        connect(model->getOptionsModel(), &OptionsModel::privateSendEnabledChanged, [=]() {
-            privateSendStatus(true);
+        connect(model->getOptionsModel(), &OptionsModel::coinJoinEnabledChanged, [=]() {
+            coinJoinStatus(true);
         });
 
-        // Disable privateSendClient builtin support for automatic backups while we are in GUI,
-        // we'll handle automatic backups and user warnings in privateSendStatus()
-        walletModel->privateSend().disableAutobackups();
+        // Disable coinJoinClient builtin support for automatic backups while we are in GUI,
+        // we'll handle automatic backups and user warnings in coinJoinStatus()
+        walletModel->coinJoin().disableAutobackups();
 
         connect(ui->togglePrivateSend, SIGNAL(clicked()), this, SLOT(togglePrivateSend()));
 
@@ -321,16 +321,16 @@ void OverviewPage::updatePrivateSendProgress()
     if (ShutdownRequested() || !walletModel || !clientModel || !clientModel->masternodeSync().isBlockchainSynced()) return;
 
     QString strAmountAndRounds;
-    QString strPrivateSendAmount = BitcoinUnits::formatHtmlWithUnit(nDisplayUnit, clientModel->privateSendOptions().getAmount() * COIN, false, BitcoinUnits::separatorAlways);
+    QString strPrivateSendAmount = BitcoinUnits::formatHtmlWithUnit(nDisplayUnit, clientModel->coinJoinOptions().getAmount() * COIN, false, BitcoinUnits::separatorAlways);
 
     if(m_balances.balance == 0)
     {
-        ui->privateSendProgress->setValue(0);
-        ui->privateSendProgress->setToolTip(tr("No inputs detected"));
+        ui->coinJoinProgress->setValue(0);
+        ui->coinJoinProgress->setToolTip(tr("No inputs detected"));
 
         // when balance is zero just show info from settings
         strPrivateSendAmount = strPrivateSendAmount.remove(strPrivateSendAmount.indexOf("."), BitcoinUnits::decimals(nDisplayUnit) + 1);
-        strAmountAndRounds = strPrivateSendAmount + " / " + tr("%n Rounds", "", clientModel->privateSendOptions().getRounds());
+        strAmountAndRounds = strPrivateSendAmount + " / " + tr("%n Rounds", "", clientModel->coinJoinOptions().getRounds());
 
         ui->labelAmountRounds->setToolTip(tr("No inputs detected"));
         ui->labelAmountRounds->setText(strAmountAndRounds);
@@ -342,15 +342,15 @@ void OverviewPage::updatePrivateSendProgress()
     CAmount nMaxToAnonymize = nAnonymizableBalance + m_balances.anonymized_balance;
 
     // If it's more than the anon threshold, limit to that.
-    if (nMaxToAnonymize > clientModel->privateSendOptions().getAmount() * COIN) nMaxToAnonymize = clientModel->privateSendOptions().getAmount() * COIN;
+    if (nMaxToAnonymize > clientModel->coinJoinOptions().getAmount() * COIN) nMaxToAnonymize = clientModel->coinJoinOptions().getAmount() * COIN;
 
     if(nMaxToAnonymize == 0) return;
 
-    if (nMaxToAnonymize >= clientModel->privateSendOptions().getAmount() * COIN) {
+    if (nMaxToAnonymize >= clientModel->coinJoinOptions().getAmount() * COIN) {
         ui->labelAmountRounds->setToolTip(tr("Found enough compatible inputs to mix %1")
                                           .arg(strPrivateSendAmount));
         strPrivateSendAmount = strPrivateSendAmount.remove(strPrivateSendAmount.indexOf("."), BitcoinUnits::decimals(nDisplayUnit) + 1);
-        strAmountAndRounds = strPrivateSendAmount + " / " + tr("%n Rounds", "", clientModel->privateSendOptions().getRounds());
+        strAmountAndRounds = strPrivateSendAmount + " / " + tr("%n Rounds", "", clientModel->coinJoinOptions().getRounds());
     } else {
         QString strMaxToAnonymize = BitcoinUnits::formatHtmlWithUnit(nDisplayUnit, nMaxToAnonymize, false, BitcoinUnits::separatorAlways);
         ui->labelAmountRounds->setToolTip(tr("Not enough compatible inputs to mix <span style='%1'>%2</span>,<br>"
@@ -361,7 +361,7 @@ void OverviewPage::updatePrivateSendProgress()
         strMaxToAnonymize = strMaxToAnonymize.remove(strMaxToAnonymize.indexOf("."), BitcoinUnits::decimals(nDisplayUnit) + 1);
         strAmountAndRounds = "<span style='" + GUIUtil::getThemedStyleQString(GUIUtil::ThemedStyle::TS_ERROR) + "'>" +
                 QString(BitcoinUnits::factor(nDisplayUnit) == 1 ? "" : "~") + strMaxToAnonymize +
-                " / " + tr("%n Rounds", "", clientModel->privateSendOptions().getRounds()) + "</span>";
+                " / " + tr("%n Rounds", "", clientModel->coinJoinOptions().getRounds()) + "</span>";
     }
     ui->labelAmountRounds->setText(strAmountAndRounds);
 
@@ -400,7 +400,7 @@ void OverviewPage::updatePrivateSendProgress()
 
     // apply some weights to them ...
     float denomWeight = 1;
-    float anonNormWeight = clientModel->privateSendOptions().getRounds();
+    float anonNormWeight = clientModel->coinJoinOptions().getRounds();
     float anonFullWeight = 2;
     float fullWeight = denomWeight + anonNormWeight + anonFullWeight;
     // ... and calculate the whole progress
@@ -410,27 +410,27 @@ void OverviewPage::updatePrivateSendProgress()
     float progress = denomPartCalc + anonNormPartCalc + anonFullPartCalc;
     if(progress >= 100) progress = 100;
 
-    ui->privateSendProgress->setValue(progress);
+    ui->coinJoinProgress->setValue(progress);
 
     QString strToolPip = ("<b>" + tr("Overall progress") + ": %1%</b><br/>" +
                           tr("Denominated") + ": %2%<br/>" +
                           tr("Partially mixed") + ": %3%<br/>" +
                           tr("Mixed") + ": %4%<br/>" +
-                          tr("Denominated inputs have %5 of %n rounds on average", "", clientModel->privateSendOptions().getRounds()))
+                          tr("Denominated inputs have %5 of %n rounds on average", "", clientModel->coinJoinOptions().getRounds()))
             .arg(progress).arg(denomPart).arg(anonNormPart).arg(anonFullPart)
             .arg(nAverageAnonymizedRounds);
-    ui->privateSendProgress->setToolTip(strToolPip);
+    ui->coinJoinProgress->setToolTip(strToolPip);
 }
 
 void OverviewPage::updateAdvancedPSUI(bool fShowAdvancedPSUI)
 {
-    if (!walletModel || !clientModel || !clientModel->privateSendOptions().isEnabled()) return;
+    if (!walletModel || !clientModel || !clientModel->coinJoinOptions().isEnabled()) return;
 
     this->fShowAdvancedPSUI = fShowAdvancedPSUI;
-    privateSendStatus(true);
+    coinJoinStatus(true);
 }
 
-void OverviewPage::privateSendStatus(bool fForce)
+void OverviewPage::coinJoinStatus(bool fForce)
 {
     if (!walletModel || !clientModel) return;
 
@@ -445,7 +445,7 @@ void OverviewPage::privateSendStatus(bool fForce)
         return;
     }
 
-    bool fIsEnabled = clientModel->privateSendOptions().isEnabled();
+    bool fIsEnabled = clientModel->coinJoinOptions().isEnabled();
     ui->framePrivateSend->setVisible(fIsEnabled);
     if (!fIsEnabled) {
         SetupTransactionList(NUM_ITEMS_DISABLED);
@@ -462,9 +462,9 @@ void OverviewPage::privateSendStatus(bool fForce)
     // Wrap all privatesend related widgets we want to show/hide state based.
     // Value of the map contains a flag if this widget belongs to the advanced
     // PrivateSend UI option or not. True if it does, false if not.
-    std::map<QWidget*, bool> privateSendWidgets = {
+    std::map<QWidget*, bool> coinJoinWidgets = {
         {ui->labelCompletitionText, true},
-        {ui->privateSendProgress, true},
+        {ui->coinJoinProgress, true},
         {ui->labelSubmittedDenomText, true},
         {ui->labelSubmittedDenom, true},
         {ui->labelAmountAndRoundsText, false},
@@ -484,7 +484,7 @@ void OverviewPage::privateSendStatus(bool fForce)
             }
         }
         // Set visible if: fVisible and not advanced UI element or advanced ui element and advanced ui active
-        for (const auto& it : privateSendWidgets) {
+        for (const auto& it : coinJoinWidgets) {
             it.first->setVisible(fVisible && (!it.second || it.second == fShowAdvancedPSUI));
         }
         fLastVisible = fVisible;
@@ -495,7 +495,7 @@ void OverviewPage::privateSendStatus(bool fForce)
     int nBestHeight = clientModel->node().getNumBlocks();
 
     // We are processing more than 1 block per second, we'll just leave
-    if (nBestHeight > walletModel->privateSend().getCachedBlocks() && GetTime() - nLastDSProgressBlockTime <= 1) return;
+    if (nBestHeight > walletModel->coinJoin().getCachedBlocks() && GetTime() - nLastDSProgressBlockTime <= 1) return;
     nLastDSProgressBlockTime = GetTime();
 
     QString strKeysLeftText(tr("keys left: %1").arg(walletModel->getKeysLeftSinceAutoBackup()));
@@ -504,9 +504,9 @@ void OverviewPage::privateSendStatus(bool fForce)
     }
     ui->labelPrivateSendEnabled->setToolTip(strKeysLeftText);
 
-    if (!walletModel->privateSend().isMixing()) {
-        if (nBestHeight != walletModel->privateSend().getCachedBlocks()) {
-            walletModel->privateSend().setCachedBlocks(nBestHeight);
+    if (!walletModel->coinJoin().isMixing()) {
+        if (nBestHeight != walletModel->coinJoin().getCachedBlocks()) {
+            walletModel->coinJoin().setCachedBlocks(nBestHeight);
             updatePrivateSendProgress();
         }
 
@@ -538,10 +538,10 @@ void OverviewPage::privateSendStatus(bool fForce)
                                    "saved in some safe place</span>!").arg(GUIUtil::getThemedStyleQString(GUIUtil::ThemedStyle::TS_COMMAND)) + "<br><br>" +
                                 tr("Note: You can turn this message off in options.");
             ui->labelPrivateSendEnabled->setToolTip(strWarn);
-            LogPrint(BCLog::PRIVATESEND, "OverviewPage::privateSendStatus -- Very low number of keys left since last automatic backup, warning user and trying to create new backup...\n");
+            LogPrint(BCLog::PRIVATESEND, "OverviewPage::coinJoinStatus -- Very low number of keys left since last automatic backup, warning user and trying to create new backup...\n");
             QMessageBox::warning(this, "CoinJoin", strWarn, QMessageBox::Ok, QMessageBox::Ok);
         } else {
-            LogPrint(BCLog::PRIVATESEND, "OverviewPage::privateSendStatus -- Very low number of keys left since last automatic backup, skipping warning and trying to create new backup...\n");
+            LogPrint(BCLog::PRIVATESEND, "OverviewPage::coinJoinStatus -- Very low number of keys left since last automatic backup, skipping warning and trying to create new backup...\n");
         }
 
         QString strBackupWarning;
@@ -549,7 +549,7 @@ void OverviewPage::privateSendStatus(bool fForce)
         if(!walletModel->autoBackupWallet(strBackupWarning, strBackupError)) {
             if (!strBackupWarning.isEmpty()) {
                 // It's still more or less safe to continue but warn user anyway
-                LogPrint(BCLog::PRIVATESEND, "OverviewPage::privateSendStatus -- WARNING! Something went wrong on automatic backup: %s\n", strBackupWarning.toStdString());
+                LogPrint(BCLog::PRIVATESEND, "OverviewPage::coinJoinStatus -- WARNING! Something went wrong on automatic backup: %s\n", strBackupWarning.toStdString());
 
                 QMessageBox::warning(this, "CoinJoin",
                     tr("WARNING! Something went wrong on automatic backup") + ":<br><br>" + strBackupWarning,
@@ -557,7 +557,7 @@ void OverviewPage::privateSendStatus(bool fForce)
             }
             if (!strBackupError.isEmpty()) {
                 // Things are really broken, warn user and stop mixing immediately
-                LogPrint(BCLog::PRIVATESEND, "OverviewPage::privateSendStatus -- ERROR! Failed to create automatic backup: %s\n", strBackupError.toStdString());
+                LogPrint(BCLog::PRIVATESEND, "OverviewPage::coinJoinStatus -- ERROR! Failed to create automatic backup: %s\n", strBackupError.toStdString());
 
                 QMessageBox::warning(this, "CoinJoin",
                     tr("ERROR! Failed to create automatic backup") + ":<br><br>" + strBackupError + "<br>" +
@@ -567,7 +567,7 @@ void OverviewPage::privateSendStatus(bool fForce)
         }
     }
 
-    QString strEnabled = walletModel->privateSend().isMixing() ? tr("Enabled") : tr("Disabled");
+    QString strEnabled = walletModel->coinJoin().isMixing() ? tr("Enabled") : tr("Disabled");
     // Show how many keys left in advanced PS UI mode only
     if(fShowAdvancedPSUI) strEnabled += ", " + strKeysLeftText;
     ui->labelPrivateSendEnabled->setText(strEnabled);
@@ -589,15 +589,15 @@ void OverviewPage::privateSendStatus(bool fForce)
     }
 
     // check privatesend status and unlock if needed
-    if(nBestHeight != walletModel->privateSend().getCachedBlocks()) {
+    if(nBestHeight != walletModel->coinJoin().getCachedBlocks()) {
         // Balance and number of transactions might have changed
-        walletModel->privateSend().setCachedBlocks(nBestHeight);
+        walletModel->coinJoin().setCachedBlocks(nBestHeight);
         updatePrivateSendProgress();
     }
 
     setWidgetsVisible(true);
 
-    ui->labelSubmittedDenom->setText(QString(walletModel->privateSend().getSessionDenoms().c_str()));
+    ui->labelSubmittedDenom->setText(QString(walletModel->coinJoin().getSessionDenoms().c_str()));
 }
 
 void OverviewPage::togglePrivateSend(){
@@ -611,8 +611,8 @@ void OverviewPage::togglePrivateSend(){
         settings.setValue("hasMixed", "hasMixed");
     }
 
-    if (!walletModel->privateSend().isMixing()) {
-        auto& options = walletModel->node().privateSendOptions();
+    if (!walletModel->coinJoin().isMixing()) {
+        auto& options = walletModel->node().coinJoinOptions();
         const CAmount nMinAmount = options.getSmallestDenomination() + options.getMaxCollateralAmount();
         if(m_balances.balance < nMinAmount) {
             QString strMinAmount(BitcoinUnits::formatWithUnit(nDisplayUnit, nMinAmount));
@@ -629,7 +629,7 @@ void OverviewPage::togglePrivateSend(){
             if(!ctx.isValid())
             {
                 //unlock was cancelled
-                walletModel->privateSend().resetCachedBlocks();
+                walletModel->coinJoin().resetCachedBlocks();
                 QMessageBox::warning(this, "CoinJoin",
                     tr("Wallet is locked and user declined to unlock. Disabling CoinJoin."),
                     QMessageBox::Ok, QMessageBox::Ok);
@@ -640,15 +640,15 @@ void OverviewPage::togglePrivateSend(){
 
     }
 
-    walletModel->privateSend().resetCachedBlocks();
+    walletModel->coinJoin().resetCachedBlocks();
 
-    if (walletModel->privateSend().isMixing()) {
+    if (walletModel->coinJoin().isMixing()) {
         ui->togglePrivateSend->setText(tr("Start CoinJoin"));
-        walletModel->privateSend().resetPool();
-        walletModel->privateSend().stopMixing();
+        walletModel->coinJoin().resetPool();
+        walletModel->coinJoin().stopMixing();
     } else {
         ui->togglePrivateSend->setText(tr("Stop CoinJoin"));
-        walletModel->privateSend().startMixing();
+        walletModel->coinJoin().startMixing();
     }
 }
 
@@ -688,5 +688,5 @@ void OverviewPage::DisablePrivateSendCompletely()
     if (nWalletBackups <= 0) {
         ui->labelPrivateSendEnabled->setText("<span style='" + GUIUtil::getThemedStyleQString(GUIUtil::ThemedStyle::TS_ERROR) + "'>(" + tr("Disabled") + ")</span>");
     }
-    walletModel->privateSend().stopMixing();
+    walletModel->coinJoin().stopMixing();
 }

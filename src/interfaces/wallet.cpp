@@ -131,7 +131,7 @@ class PrivateSendImpl : public PrivateSend::Client
 {
     std::shared_ptr<CPrivateSendClientManager> m_manager;
 public:
-    PrivateSendImpl(CWallet& wallet) : m_manager(privateSendClientManagers.at(wallet.GetName())) {}
+    PrivateSendImpl(CWallet& wallet) : m_manager(coinJoinClientManagers.at(wallet.GetName())) {}
     void resetCachedBlocks() override
     {
         m_manager->nCachedNumBlocks = std::numeric_limits<int>::max();
@@ -483,7 +483,7 @@ public:
         return result;
     }
     bool hdEnabled() override { return m_wallet.IsHDEnabled(); }
-    PrivateSend::Client& privateSend() override { return m_privatesend; }
+    PrivateSend::Client& coinJoin() override { return m_privatesend; }
     std::unique_ptr<Handler> handleShowProgress(ShowProgressFn fn) override
     {
         return MakeHandler(m_wallet.ShowProgress.connect(fn));

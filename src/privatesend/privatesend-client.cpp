@@ -22,8 +22,8 @@
 #include <memory>
 #include <univalue.h>
 
-std::map<const std::string, std::shared_ptr<CPrivateSendClientManager>> privateSendClientManagers;
-CPrivateSendClientQueueManager privateSendClientQueueManager;
+std::map<const std::string, std::shared_ptr<CPrivateSendClientManager>> coinJoinClientManagers;
+CPrivateSendClientQueueManager coinJoinClientQueueManager;
 
 CPrivateSendClientOptions* CPrivateSendClientOptions::_instance{nullptr};
 std::once_flag CPrivateSendClientOptions::onceFlag;
@@ -86,7 +86,7 @@ void CPrivateSendClientQueueManager::ProcessMessage(CNode* pfrom, const std::str
 
         // if the queue is ready, submit if we can
         if (dsq.fReady) {
-            for (auto& pair : privateSendClientManagers) {
+            for (auto& pair : coinJoinClientManagers) {
                 if (pair.second->TrySubmitDenominate(dmn->pdmnState->addr, connman)) {
                     LogPrint(BCLog::PRIVATESEND, "DSQUEUE -- PrivateSend queue (%s) is ready on masternode %s\n", dsq.ToString(), dmn->pdmnState->addr.ToString());
                     return;
@@ -106,7 +106,7 @@ void CPrivateSendClientQueueManager::ProcessMessage(CNode* pfrom, const std::str
 
             LogPrint(BCLog::PRIVATESEND, "DSQUEUE -- new PrivateSend queue (%s) from masternode %s\n", dsq.ToString(), dmn->pdmnState->addr.ToString());
 
-            for (const auto& pair : privateSendClientManagers) {
+            for (const auto& pair : coinJoinClientManagers) {
                 if (pair.second->MarkAlreadyJoinedQueueAsTried(dsq)) {
                     break;
                 }
@@ -670,7 +670,7 @@ void CPrivateSendClientSession::CompletedTransaction(PoolMessage nMessageID)
 
     if (nMessageID == MSG_SUCCESS) {
         LogPrint(BCLog::PRIVATESEND, "CompletedTransaction -- success\n");
-        privateSendClientManagers.at(mixingWallet.GetName())->UpdatedSuccessBlock();
+        coinJoinClientManagers.at(mixingWallet.GetName())->UpdatedSuccessBlock();
         keyHolderStorage.KeepAll();
     } else {
         LogPrint(BCLog::PRIVATESEND, "CompletedTransaction -- error\n");
@@ -1043,7 +1043,7 @@ bool CPrivateSendClientSession::JoinExistingQueue(CAmount nBalanceNeedsAnonymize
 
     // Look through the queues and see if anything matches
     CPrivateSendQueue dsq;
-    while (privateSendClientQueueManager.GetQueueItemAndTry(dsq)) {
+    while (coinJoinClientQueueManager.GetQueueItemAndTry(dsq)) {
         auto dmn = mnList.GetValidMNByCollateral(dsq.masternodeOutpoint);
 
         if (!dmn) {
@@ -1071,7 +1071,7 @@ bool CPrivateSendClientSession::JoinExistingQueue(CAmount nBalanceNeedsAnonymize
             continue;
         }
 
-        privateSendClientManagers.at(mixingWallet.GetName())->AddUsedMasternode(dsq.masternodeOutpoint);
+        coinJoinClientManagers.at(mixingWallet.GetName())->AddUsedMasternode(dsq.masternodeOutpoint);
 
         if (connman.IsMasternodeOrDisconnectRequested(dmn->pdmnState->addr)) {
             LogPrint(BCLog::PRIVATESEND, "CPrivateSendClientSession::JoinExistingQueue -- skipping masternode connection, addr=%s\n", dmn->pdmnState->addr.ToString());
@@ -1114,7 +1114,7 @@ bool CPrivateSendClientSession::StartNewQueue(CAmount nBalanceNeedsAnonymized, C
 
     // otherwise, try one randomly
     while (nTries < 10) {
-        auto dmn = privateSendClientManagers.at(mixingWallet.GetName())->GetRandomNotUsedMasternode();
+        auto dmn = coinJoinClientManagers.at(mixingWallet.GetName())->GetRandomNotUsedMasternode();
 
         if (!dmn) {
             LogPrint(BCLog::PRIVATESEND, "CPrivateSendClientSession::StartNewQueue -- Can't find random masternode!\n");
@@ -1122,7 +1122,7 @@ bool CPrivateSendClientSession::StartNewQueue(CAmount nBalanceNeedsAnonymized, C
             return false;
         }
 
-        privateSendClientManagers.at(mixingWallet.GetName())->AddUsedMasternode(dmn->collateralOutpoint);
+        coinJoinClientManagers.at(mixingWallet.GetName())->AddUsedMasternode(dmn->collateralOutpoint);
 
         // skip next mn payments winners
         if (dmn->pdmnState->nLastPaidHeight + nMnCount < mnList.GetHeight() + 8) {
@@ -1503,7 +1503,7 @@ bool CPrivateSendClientSession::MakeCollateralAmounts(const CompactTallyItem& ta
         return false;
     }
 
-    privateSendClientManagers.at(mixingWallet.GetName())->UpdatedSuccessBlock();
+    coinJoinClientManagers.at(mixingWallet.GetName())->UpdatedSuccessBlock();
 
     LogPrint(BCLog::PRIVATESEND, "CPrivateSendClientSession::%s -- txid: %s\n", __func__, strResult);
 
@@ -1782,7 +1782,7 @@ bool CPrivateSendClientSession::CreateDenominated(CAmount nBalanceToDenominate, 
     }
 
     // use the same nCachedLastSuccessBlock as for DS mixing to prevent race
-    privateSendClientManagers.at(mixingWallet.GetName())->UpdatedSuccessBlock();
+    coinJoinClientManagers.at(mixingWallet.GetName())->UpdatedSuccessBlock();
 
     LogPrint(BCLog::PRIVATESEND, "CPrivateSendClientSession::%s -- txid: %s\n", __func__, strResult);
 
@@ -1875,8 +1875,8 @@ void CPrivateSendClientManager::GetJsonInfo(UniValue& obj) const
 
 void DoPrivateSendMaintenance(CConnman& connman)
 {
-    privateSendClientQueueManager.DoMaintenance();
-    for (auto& pair : privateSendClientManagers) {
+    coinJoinClientQueueManager.DoMaintenance();
+    for (auto& pair : coinJoinClientManagers) {
         pair.second->DoMaintenance(connman);
     }
 }

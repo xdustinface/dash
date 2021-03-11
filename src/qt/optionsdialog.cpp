@@ -193,8 +193,8 @@ void OptionsDialog::setModel(OptionsModel *_model)
         // If -enableprivatesend was passed in on the command line, set the checkbox
         // to the value given via commandline and disable it (make it unclickable).
         if (strLabel.contains("-enableprivatesend")) {
-            ui->privateSendEnabled->setChecked(_model->node().privateSendOptions().isEnabled());
-            ui->privateSendEnabled->setEnabled(false);
+            ui->coinJoinEnabled->setChecked(_model->node().coinJoinOptions().isEnabled());
+            ui->coinJoinEnabled->setEnabled(false);
         }
 #endif
 
@@ -224,9 +224,9 @@ void OptionsDialog::setModel(OptionsModel *_model)
     connect(ui->lang, SIGNAL(valueChanged()), this, SLOT(showRestartWarning()));
     connect(ui->thirdPartyTxUrls, SIGNAL(textChanged(const QString &)), this, SLOT(showRestartWarning()));
 
-    connect(ui->privateSendEnabled, &QCheckBox::clicked, [=](bool fChecked) {
+    connect(ui->coinJoinEnabled, &QCheckBox::clicked, [=](bool fChecked) {
 #ifdef ENABLE_WALLET
-        model->node().privateSendOptions().setEnabled(fChecked);
+        model->node().coinJoinOptions().setEnabled(fChecked);
 #endif
         updatePrivateSendVisibility();
         if (_model != nullptr) {
@@ -239,10 +239,10 @@ void OptionsDialog::setModel(OptionsModel *_model)
 
     // Store the current PrivateSend enabled state to recover it if it gets changed but the dialog gets not accepted but declined.
 #ifdef ENABLE_WALLET
-    fPrivateSendEnabledPrev = model->node().privateSendOptions().isEnabled();
+    fPrivateSendEnabledPrev = model->node().coinJoinOptions().isEnabled();
     connect(this, &OptionsDialog::rejected, [=]() {
-        if (fPrivateSendEnabledPrev != model->node().privateSendOptions().isEnabled()) {
-            ui->privateSendEnabled->click();
+        if (fPrivateSendEnabledPrev != model->node().coinJoinOptions().isEnabled()) {
+            ui->coinJoinEnabled->click();
         }
     });
 #endif
@@ -259,7 +259,7 @@ void OptionsDialog::setMapper()
 #endif
     mapper->addMapping(ui->threadsScriptVerif, OptionsModel::ThreadsScriptVerif);
     mapper->addMapping(ui->databaseCache, OptionsModel::DatabaseCache);
-    mapper->addMapping(ui->privateSendEnabled, OptionsModel::PrivateSendEnabled);
+    mapper->addMapping(ui->coinJoinEnabled, OptionsModel::PrivateSendEnabled);
 
     /* Wallet */
     mapper->addMapping(ui->coinControlFeatures, OptionsModel::CoinControlFeatures);
@@ -267,10 +267,10 @@ void OptionsDialog::setMapper()
     mapper->addMapping(ui->showAdvancedPSUI, OptionsModel::ShowAdvancedPSUI);
     mapper->addMapping(ui->showPrivateSendPopups, OptionsModel::ShowPrivateSendPopups);
     mapper->addMapping(ui->lowKeysWarning, OptionsModel::LowKeysWarning);
-    mapper->addMapping(ui->privateSendMultiSession, OptionsModel::PrivateSendMultiSession);
+    mapper->addMapping(ui->coinJoinMultiSession, OptionsModel::PrivateSendMultiSession);
     mapper->addMapping(ui->spendZeroConfChange, OptionsModel::SpendZeroConfChange);
-    mapper->addMapping(ui->privateSendRounds, OptionsModel::PrivateSendRounds);
-    mapper->addMapping(ui->privateSendAmount, OptionsModel::PrivateSendAmount);
+    mapper->addMapping(ui->coinJoinRounds, OptionsModel::PrivateSendRounds);
+    mapper->addMapping(ui->coinJoinAmount, OptionsModel::PrivateSendAmount);
 
     /* Network */
     mapper->addMapping(ui->mapPortUpnp, OptionsModel::MapPortUPnP);
@@ -343,7 +343,7 @@ void OptionsDialog::on_okButton_clicked()
     appearance->accept();
 #ifdef ENABLE_WALLET
     for (auto& wallet : model->node().getWallets()) {
-        wallet->privateSend().resetCachedBlocks();
+        wallet->coinJoin().resetCachedBlocks();
         wallet->markDirty();
     }
 #endif // ENABLE_WALLET
@@ -436,7 +436,7 @@ void OptionsDialog::updateDefaultProxyNets()
 void OptionsDialog::updatePrivateSendVisibility()
 {
 #ifdef ENABLE_WALLET
-    bool fEnabled = model->node().privateSendOptions().isEnabled();
+    bool fEnabled = model->node().coinJoinOptions().isEnabled();
 #else
     bool fEnabled = false;
 #endif

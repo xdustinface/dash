@@ -381,7 +381,7 @@ void WalletInit::Flush() const
     for (CWallet* pwallet : GetWallets()) {
         if (CPrivateSendClientOptions::IsEnabled()) {
             // Stop PrivateSend, release keys
-            auto it = privateSendClientManagers.find(pwallet->GetName());
+            auto it = coinJoinClientManagers.find(pwallet->GetName());
             it->second->ResetPool();
             it->second->StopMixing();
         }
@@ -421,9 +421,9 @@ void WalletInit::InitPrivateSendSettings() const
     bool fAutoStart = gArgs.GetBoolArg("-privatesendautostart", DEFAULT_PRIVATESEND_AUTOSTART);
     for (auto& pwallet : GetWallets()) {
         if (pwallet->IsLocked()) {
-            privateSendClientManagers.at(pwallet->GetName())->StopMixing();
+            coinJoinClientManagers.at(pwallet->GetName())->StopMixing();
         } else if (fAutoStart) {
-            privateSendClientManagers.at(pwallet->GetName())->StartMixing();
+            coinJoinClientManagers.at(pwallet->GetName())->StartMixing();
         }
     }
     LogPrintf("PrivateSend: autostart=%d, multisession=%d," /* Continued */

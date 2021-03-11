@@ -36,7 +36,7 @@ QList<TransactionRecord> TransactionRecord::decomposeTransaction(interfaces::Wal
     uint256 hash = wtx.tx->GetHash();
     std::map<std::string, std::string> mapValue = wtx.value_map;
     auto node = interfaces::MakeNode();
-    auto& privateSendOptions = node->privateSendOptions();
+    auto& coinJoinOptions = node->coinJoinOptions();
 
     if (nNet > 0 || wtx.is_coinbase)
     {
@@ -132,9 +132,9 @@ QList<TransactionRecord> TransactionRecord::decomposeTransaction(interfaces::Wal
             {
                 sub.idx = parts.size();
                 if(wtx.tx->vin.size() == 1 && wtx.tx->vout.size() == 1
-                    && privateSendOptions.isCollateralAmount(nDebit)
-                    && privateSendOptions.isCollateralAmount(nCredit)
-                    && privateSendOptions.isCollateralAmount(-nNet))
+                    && coinJoinOptions.isCollateralAmount(nDebit)
+                    && coinJoinOptions.isCollateralAmount(nCredit)
+                    && coinJoinOptions.isCollateralAmount(-nNet))
                 {
                     sub.type = TransactionRecord::PrivateSendCollateralPayment;
                 } else {
@@ -143,19 +143,19 @@ QList<TransactionRecord> TransactionRecord::decomposeTransaction(interfaces::Wal
                         CAmount nAmount0 = wtx.tx->vout[0].nValue;
                         CAmount nAmount1 = wtx.tx->vout[1].nValue;
                         // <case1>, see CPrivateSendClientSession::MakeCollateralAmounts
-                        fMakeCollateral = (nAmount0 == privateSendOptions.getMaxCollateralAmount() && !privateSendOptions.isDenominated(nAmount1) && nAmount1 >= privateSendOptions.getMinCollateralAmount()) ||
-                                          (nAmount1 == privateSendOptions.getMaxCollateralAmount() && !privateSendOptions.isDenominated(nAmount0) && nAmount0 >= privateSendOptions.getMinCollateralAmount()) ||
+                        fMakeCollateral = (nAmount0 == coinJoinOptions.getMaxCollateralAmount() && !coinJoinOptions.isDenominated(nAmount1) && nAmount1 >= coinJoinOptions.getMinCollateralAmount()) ||
+                                          (nAmount1 == coinJoinOptions.getMaxCollateralAmount() && !coinJoinOptions.isDenominated(nAmount0) && nAmount0 >= coinJoinOptions.getMinCollateralAmount()) ||
                         // <case2>, see CPrivateSendClientSession::MakeCollateralAmounts
-                                          (nAmount0 == nAmount1 && privateSendOptions.isCollateralAmount(nAmount0));
+                                          (nAmount0 == nAmount1 && coinJoinOptions.isCollateralAmount(nAmount0));
                     } else if (wtx.tx->vout.size() == 1) {
                         // <case3>, see CPrivateSendClientSession::MakeCollateralAmounts
-                        fMakeCollateral = privateSendOptions.isCollateralAmount(wtx.tx->vout[0].nValue);
+                        fMakeCollateral = coinJoinOptions.isCollateralAmount(wtx.tx->vout[0].nValue);
                     }
                     if (fMakeCollateral) {
                         sub.type = TransactionRecord::PrivateSendMakeCollaterals;
                     } else {
                         for (const auto& txout : wtx.tx->vout) {
-                            if (privateSendOptions.isDenominated(txout.nValue)) {
+                            if (coinJoinOptions.isDenominated(txout.nValue)) {
                                 sub.type = TransactionRecord::PrivateSendCreateDenominations;
                                 break; // Done, it's definitely a tx creating mixing denoms, no need to look any further
                             }
@@ -180,9 +180,9 @@ QList<TransactionRecord> TransactionRecord::decomposeTransaction(interfaces::Wal
 
             bool fDone = false;
             if(wtx.tx->vin.size() == 1 && wtx.tx->vout.size() == 1
-                && privateSendOptions.isCollateralAmount(nDebit)
+                && coinJoinOptions.isCollateralAmount(nDebit)
                 && nCredit == 0 // OP_RETURN
-                && privateSendOptions.isCollateralAmount(-nNet))
+                && coinJoinOptions.isCollateralAmount(-nNet))
             {
                 TransactionRecord sub(hash, nTime);
                 sub.idx = 0;

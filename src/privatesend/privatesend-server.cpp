@@ -22,7 +22,7 @@
 
 #include <univalue.h>
 
-CPrivateSendServer privateSendServer;
+CPrivateSendServer coinJoinServer;
 
 void CPrivateSendServer::ProcessMessage(CNode* pfrom, const std::string& strCommand, CDataStream& vRecv, CConnman& connman, bool enable_bip61)
 {
@@ -873,9 +873,9 @@ void CPrivateSendServer::DoMaintenance(CConnman& connman)
 
     if (!masternodeSync.IsBlockchainSynced() || ShutdownRequested()) return;
 
-    privateSendServer.CheckForCompleteQueue(connman);
-    privateSendServer.CheckPool(connman);
-    privateSendServer.CheckTimeout(connman);
+    coinJoinServer.CheckForCompleteQueue(connman);
+    coinJoinServer.CheckPool(connman);
+    coinJoinServer.CheckTimeout(connman);
 }
 
 void CPrivateSendServer::GetJsonInfo(UniValue& obj) const

@@ -93,9 +93,9 @@ BitcoinGUI::BitcoinGUI(interfaces::Node& node, const NetworkStyle* networkStyle,
     masternodeButton(0),
     quitAction(0),
     sendCoinsButton(0),
-    privateSendCoinsButton(0),
+    coinJoinCoinsButton(0),
     sendCoinsMenuAction(0),
-    privateSendCoinsMenuAction(0),
+    coinJoinCoinsMenuAction(0),
     usedSendingAddressesAction(0),
     usedReceivingAddressesAction(0),
     signMessageAction(0),
@@ -374,9 +374,9 @@ void BitcoinGUI::createActions()
     sendCoinsMenuAction->setStatusTip(tr("Send coins to a Dash address"));
     sendCoinsMenuAction->setToolTip(sendCoinsMenuAction->statusTip());
 
-    privateSendCoinsMenuAction = new QAction("&CoinJoin", this);
-    privateSendCoinsMenuAction->setStatusTip(tr("Send CoinJoin funds to a Dash address"));
-    privateSendCoinsMenuAction->setToolTip(privateSendCoinsMenuAction->statusTip());
+    coinJoinCoinsMenuAction = new QAction("&CoinJoin", this);
+    coinJoinCoinsMenuAction->setStatusTip(tr("Send CoinJoin funds to a Dash address"));
+    coinJoinCoinsMenuAction->setToolTip(coinJoinCoinsMenuAction->statusTip());
 
     receiveCoinsMenuAction = new QAction(tr("&Receive"), this);
     receiveCoinsMenuAction->setStatusTip(tr("Request payments (generates QR codes and dash: URIs)"));
@@ -386,8 +386,8 @@ void BitcoinGUI::createActions()
     // can be triggered from the tray menu, and need to show the GUI to be useful.
     connect(sendCoinsMenuAction, SIGNAL(triggered()), this, SLOT(showNormalIfMinimized()));
     connect(sendCoinsMenuAction, SIGNAL(triggered()), this, SLOT(gotoSendCoinsPage()));
-    connect(privateSendCoinsMenuAction, SIGNAL(triggered()), this, SLOT(showNormalIfMinimized()));
-    connect(privateSendCoinsMenuAction, SIGNAL(triggered()), this, SLOT(gotoPrivateSendCoinsPage()));
+    connect(coinJoinCoinsMenuAction, SIGNAL(triggered()), this, SLOT(showNormalIfMinimized()));
+    connect(coinJoinCoinsMenuAction, SIGNAL(triggered()), this, SLOT(gotoPrivateSendCoinsPage()));
     connect(receiveCoinsMenuAction, SIGNAL(triggered()), this, SLOT(showNormalIfMinimized()));
     connect(receiveCoinsMenuAction, SIGNAL(triggered()), this, SLOT(gotoReceiveCoinsPage()));
 
@@ -603,10 +603,10 @@ void BitcoinGUI::createToolBars()
         historyButton->setStatusTip(tr("Browse transaction history"));
         tabGroup->addButton(historyButton);
 
-        privateSendCoinsButton = new QToolButton(this);
-        privateSendCoinsButton->setText(privateSendCoinsMenuAction->text());
-        privateSendCoinsButton->setStatusTip(privateSendCoinsMenuAction->statusTip());
-        tabGroup->addButton(privateSendCoinsButton);
+        coinJoinCoinsButton = new QToolButton(this);
+        coinJoinCoinsButton->setText(coinJoinCoinsMenuAction->text());
+        coinJoinCoinsButton->setStatusTip(coinJoinCoinsMenuAction->statusTip());
+        tabGroup->addButton(coinJoinCoinsButton);
 
         QSettings settings;
         if (settings.value("fShowMasternodesTab").toBool()) {
@@ -619,7 +619,7 @@ void BitcoinGUI::createToolBars()
 
         connect(overviewButton, SIGNAL(clicked()), this, SLOT(gotoOverviewPage()));
         connect(sendCoinsButton, SIGNAL(clicked()), this, SLOT(gotoSendCoinsPage()));
-        connect(privateSendCoinsButton, SIGNAL(clicked()), this, SLOT(gotoPrivateSendCoinsPage()));
+        connect(coinJoinCoinsButton, SIGNAL(clicked()), this, SLOT(gotoPrivateSendCoinsPage()));
         connect(receiveCoinsButton, SIGNAL(clicked()), this, SLOT(gotoReceiveCoinsPage()));
         connect(historyButton, SIGNAL(clicked()), this, SLOT(gotoHistoryPage()));
 
@@ -731,7 +731,7 @@ void BitcoinGUI::setClientModel(ClientModel *_clientModel)
             // initialize the disable state of the tray icon with the current value in the model.
             setTrayIconVisible(optionsModel->getHideTrayIcon());
 
-            connect(optionsModel, SIGNAL(privateSendEnabledChanged()), this, SLOT(updatePrivateSendVisibility()));
+            connect(optionsModel, SIGNAL(coinJoinEnabledChanged()), this, SLOT(updatePrivateSendVisibility()));
         }
     } else {
         // Disable possibility to show main window via action
@@ -810,7 +810,7 @@ void BitcoinGUI::setWalletActionsEnabled(bool enabled)
     if (walletFrame != nullptr) {
         overviewButton->setEnabled(enabled);
         sendCoinsButton->setEnabled(enabled);
-        privateSendCoinsButton->setEnabled(enabled && clientModel->privateSendOptions().isEnabled());
+        coinJoinCoinsButton->setEnabled(enabled && clientModel->coinJoinOptions().isEnabled());
         receiveCoinsButton->setEnabled(enabled);
         historyButton->setEnabled(enabled);
         if (masternodeButton != nullptr) {
@@ -822,9 +822,9 @@ void BitcoinGUI::setWalletActionsEnabled(bool enabled)
 
     sendCoinsMenuAction->setEnabled(enabled);
 #ifdef ENABLE_WALLET
-    privateSendCoinsMenuAction->setEnabled(enabled && clientModel->privateSendOptions().isEnabled());
+    coinJoinCoinsMenuAction->setEnabled(enabled && clientModel->coinJoinOptions().isEnabled());
 #else
-    privateSendCoinsMenuAction->setEnabled(enabled);
+    coinJoinCoinsMenuAction->setEnabled(enabled);
 #endif // ENABLE_WALLET
     receiveCoinsMenuAction->setEnabled(enabled);
 
@@ -854,7 +854,7 @@ void BitcoinGUI::createIconMenu(QMenu *pmenu)
     pmenu->addAction(toggleHideAction);
     pmenu->addSeparator();
     pmenu->addAction(sendCoinsMenuAction);
-    pmenu->addAction(privateSendCoinsMenuAction);
+    pmenu->addAction(coinJoinCoinsMenuAction);
     pmenu->addAction(receiveCoinsMenuAction);
     pmenu->addSeparator();
     pmenu->addAction(signMessageAction);
@@ -1026,7 +1026,7 @@ void BitcoinGUI::gotoSendCoinsPage(QString addr)
 
 void BitcoinGUI::gotoPrivateSendCoinsPage(QString addr)
 {
-    privateSendCoinsButton->setChecked(true);
+    coinJoinCoinsButton->setChecked(true);
     if (walletFrame) walletFrame->gotoPrivateSendCoinsPage(addr);
 }
 
@@ -1144,7 +1144,7 @@ void BitcoinGUI::updateProgressBarVisibility()
 void BitcoinGUI::updatePrivateSendVisibility()
 {
 #ifdef ENABLE_WALLET
-    bool fEnabled = m_node.privateSendOptions().isEnabled();
+    bool fEnabled = m_node.coinJoinOptions().isEnabled();
 #else
     bool fEnabled = false;
 #endif
@@ -1153,10 +1153,10 @@ void BitcoinGUI::updatePrivateSendVisibility()
     // but is still needed for shortcuts to work properly.
     if (appToolBar != nullptr) {
         appToolBar->actions()[4]->setVisible(fEnabled);
-        privateSendCoinsButton->setVisible(fEnabled);
+        coinJoinCoinsButton->setVisible(fEnabled);
         GUIUtil::updateButtonGroupShortcuts(tabGroup);
     }
-    privateSendCoinsMenuAction->setVisible(fEnabled);
+    coinJoinCoinsMenuAction->setVisible(fEnabled);
     showPrivateSendHelpAction->setVisible(fEnabled);
     updateWidth();
 }
@@ -1193,7 +1193,7 @@ void BitcoinGUI::setNumBlocks(int count, const QDateTime& blockDate, const QStri
     bool disableAppNap = !m_node.masternodeSync().isSynced();
 #ifdef ENABLE_WALLET
     for (const auto& wallet : m_node.getWallets()) {
-        disableAppNap |= wallet->privateSend().isMixing();
+        disableAppNap |= wallet->coinJoin().isMixing();
     }
 #endif // ENABLE_WALLET
     if (disableAppNap) {
