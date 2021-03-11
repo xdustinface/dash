@@ -272,19 +272,6 @@ bool WalletInit::ParameterInteraction() const
         LogPrintf("%s: parameter interaction: can't use -hdseed and -mnemonic/-mnemonicpassphrase together, will prefer -seed\n", __func__);
     }
 
-    if (gArgs.IsArgSet("-coinjoindenoms")) {
-        int nDenomsDeprecated = gArgs.GetArg("-coinjoindenoms", DEFAULT_COINJOIN_DENOMS_HARDCAP);
-        InitWarning("Warning: -coinjoindenoms is deprecated, please use -coinjoindenomshardcap or -coinjoindenomsgoal.\n");
-        if (gArgs.SoftSetArg("-coinjoindenomshardcap", itostr(nDenomsDeprecated))) {
-            LogPrintf("%s: parameter interaction: -coinjoindenoms=%d -> setting -coinjoindenomshardcap=%d\n", __func__, nDenomsDeprecated, nDenomsDeprecated);
-        }
-        gArgs.ForceRemoveArg("-coinjoindenoms");
-    }
-
-    if (gArgs.GetArg("-coinjoindenomshardcap", DEFAULT_COINJOIN_DENOMS_HARDCAP) < gArgs.GetArg("-coinjoindenomsgoal", DEFAULT_COINJOIN_DENOMS_GOAL)) {
-        return InitError("-coinjoindenomshardcap can't be lower than -coinjoindenomsgoal");
-    }
-
     // for PrivateSend -> CoinJoin migration
     if (gArgs.IsArgSet("-privatesendrounds")) {
         int nRoundsDeprecated = gArgs.GetArg("-privatesendrounds", DEFAULT_COINJOIN_ROUNDS);
