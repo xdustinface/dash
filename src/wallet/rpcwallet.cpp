@@ -471,7 +471,7 @@ UniValue sendtoaddress(const JSONRPCRequest& request)
 
     if (request.fHelp || request.params.size() < 2 || request.params.size() > 9)
         throw std::runtime_error(
-            "sendtoaddress \"address\" amount ( \"comment\" \"comment_to\" subtractfeefromamount use_is use_ps conf_target \"estimate_mode\")\n"
+            "sendtoaddress \"address\" amount ( \"comment\" \"comment_to\" subtractfeefromamount use_is use_cj conf_target \"estimate_mode\")\n"
             "\nSend an amount to a given address.\n"
             + HelpRequiringPassphrase(pwallet) +
             "\nArguments:\n"
@@ -485,7 +485,7 @@ UniValue sendtoaddress(const JSONRPCRequest& request)
             "5. subtractfeefromamount  (boolean, optional, default=false) The fee will be deducted from the amount being sent.\n"
             "                             The recipient will receive less amount of Dash than you enter in the amount field.\n"
             "6. \"use_is\"             (bool, optional, default=false) Deprecated and ignored\n"
-            "7. \"use_ps\"             (bool, optional, default=false) Use CoinJoin funds only\n"
+            "7. \"use_cj\"             (bool, optional, default=false) Use CoinJoin funds only\n"
             "8. conf_target            (numeric, optional) Confirmation target (in blocks)\n"
             "9. \"estimate_mode\"      (string, optional, default=UNSET) The fee estimate mode, must be one of:\n"
             "       \"UNSET\"\n"
@@ -1119,7 +1119,7 @@ UniValue sendmany(const JSONRPCRequest& request)
 
     std::string help_text;
     if (!IsDeprecatedRPCEnabled("accounts")) {
-        help_text = "sendmany \"\" {\"address\":amount,...} ( minconf addlocked \"comment\" [\"address\",...] subtractfeefrom use_is use_ps conf_target \"estimate_mode\")\n"
+        help_text = "sendmany \"\" {\"address\":amount,...} ( minconf addlocked \"comment\" [\"address\",...] subtractfeefrom use_is use_cj conf_target \"estimate_mode\")\n"
             "\nSend multiple times. Amounts are double-precision floating point numbers."
             "Note that the \"fromaccount\" argument has been removed in V0.17. To use this RPC with a \"fromaccount\" argument, restart\n"
             "dashd with -deprecatedrpc=accounts\n"
@@ -1143,7 +1143,7 @@ UniValue sendmany(const JSONRPCRequest& request)
             "      ,...\n"
             "    ]\n"
             "7. \"use_is\"                (bool, optional, default=false) Deprecated and ignored\n"
-            "8. \"use_ps\"                (bool, optional, default=false) Use CoinJoin funds only\n"
+            "8. \"use_cj\"                (bool, optional, default=false) Use CoinJoin funds only\n"
             "9. conf_target            (numeric, optional) Confirmation target (in blocks)\n"
             "10. \"estimate_mode\"      (string, optional, default=UNSET) The fee estimate mode, must be one of:\n"
             "       \"UNSET\"\n"
@@ -1160,7 +1160,7 @@ UniValue sendmany(const JSONRPCRequest& request)
             "\nAs a json rpc call\n"
             + HelpExampleRpc("sendmany", "\"\", \"{\\\"XwnLY9Tf7Zsef8gMGL2fhWA9ZmMjt4KPwG\\\":0.01,\\\"XuQQkwA4FYkq2XERzMY2CiAZhJTEDAbtcG\\\":0.02}\", 6, false, \"testing\"");
     } else {
-        help_text = "sendmany \"fromaccount\" {\"address\":amount,...} ( minconf addlocked \"comment\" [\"address\",...] subtractfeefrom use_is use_ps conf_target \"estimate_mode\")\n"
+        help_text = "sendmany \"fromaccount\" {\"address\":amount,...} ( minconf addlocked \"comment\" [\"address\",...] subtractfeefrom use_is use_cj conf_target \"estimate_mode\")\n"
             "\nSend multiple times. Amounts are double-precision floating point numbers."
             + HelpRequiringPassphrase(pwallet) + "\n"
             "\nArguments:\n"
@@ -1182,7 +1182,7 @@ UniValue sendmany(const JSONRPCRequest& request)
             "      ,...\n"
             "    ]\n"
             "7. \"use_is\"                (bool, optional, default=false) Deprecated and ignored\n"
-            "8. \"use_ps\"                (bool, optional, default=false) Use CoinJoin funds only\n"
+            "8. \"use_cj\"                (bool, optional, default=false) Use CoinJoin funds only\n"
             "9. conf_target            (numeric, optional) Confirmation target (in blocks)\n"
             "10. \"estimate_mode\"      (string, optional, default=UNSET) The fee estimate mode, must be one of:\n"
             "       \"UNSET\"\n"
@@ -4257,8 +4257,8 @@ static const CRPCCommand commands[] =
     { "wallet",             "listwallets",              &listwallets,              {} },
     { "wallet",             "loadwallet",               &loadwallet,               {"filename"} },
     { "wallet",             "lockunspent",                      &lockunspent,                   {"unlock","transactions"} },
-    { "wallet",             "sendmany",                         &sendmany,                      {"fromaccount|dummy","amounts","minconf","addlocked","comment","subtractfeefrom","use_is","use_ps","conf_target","estimate_mode"} },
-    { "wallet",             "sendtoaddress",                    &sendtoaddress,                 {"address","amount","comment","comment_to","subtractfeefromamount","use_is","use_ps","conf_target","estimate_mode"} },
+    { "wallet",             "sendmany",                         &sendmany,                      {"fromaccount|dummy","amounts","minconf","addlocked","comment","subtractfeefrom","use_is","use_cj","conf_target","estimate_mode"} },
+    { "wallet",             "sendtoaddress",                    &sendtoaddress,                 {"address","amount","comment","comment_to","subtractfeefromamount","use_is","use_cj","conf_target","estimate_mode"} },
     { "wallet",             "settxfee",                         &settxfee,                      {"amount"} },
     { "wallet",             "setcoinjoinrounds",     &setcoinjoinrounds,     {"rounds"} },
     { "wallet",             "setcoinjoinamount",     &setcoinjoinamount,     {"amount"} },
