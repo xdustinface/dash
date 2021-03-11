@@ -287,7 +287,7 @@ bool WalletInit::ParameterInteraction() const
 
     // for PrivateSend -> CoinJoin migration
     if (gArgs.IsArgSet("-privatesendrounds")) {
-        int nRoundsDeprecated = gArgs.GetArg("-coinjoinrounds", DEFAULT_COINJOIN_ROUNDS);
+        int nRoundsDeprecated = gArgs.GetArg("-privatesendrounds", DEFAULT_COINJOIN_ROUNDS);
         InitWarning("Warning: -privatesendrounds is deprecated, please use -coinjoinrounds.\n");
         if (gArgs.SoftSetArg("-coinjoinrounds", itostr(nRoundsDeprecated))) {
             LogPrintf("%s: parameter interaction: -privatesendrounds=%d -> setting -coinjoinrounds=%d\n", __func__, nRoundsDeprecated, nRoundsDeprecated);
