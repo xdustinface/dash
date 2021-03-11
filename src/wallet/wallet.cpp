@@ -3060,7 +3060,9 @@ void CWallet::InitCoinJoinSalt()
     assert(nCoinJoinSalt.IsNull());
 
     WalletBatch batch(*database);
-    batch.ReadCoinJoinSalt(nCoinJoinSalt);
+    if (!batch.ReadCoinJoinSalt(nCoinJoinSalt) && batch.ReadCoinJoinSalt(nCoinJoinSalt, true)) {
+        batch.WriteCoinJoinSalt(nCoinJoinSalt);
+    }
 
     while (nCoinJoinSalt.IsNull()) {
         // We never generated/saved it
