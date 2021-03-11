@@ -272,7 +272,7 @@ bool WalletInit::ParameterInteraction() const
         LogPrintf("%s: parameter interaction: can't use -hdseed and -mnemonic/-mnemonicpassphrase together, will prefer -seed\n", __func__);
     }
 
-    // for PrivateSend -> CoinJoin migration
+    // begin PrivateSend -> CoinJoin migration
     if (gArgs.IsArgSet("-privatesendrounds")) {
         int nRoundsDeprecated = gArgs.GetArg("-privatesendrounds", DEFAULT_COINJOIN_ROUNDS);
         InitWarning("Warning: -privatesendrounds is deprecated, please use -coinjoinrounds.\n");
@@ -288,6 +288,59 @@ bool WalletInit::ParameterInteraction() const
             LogPrintf("%s: parameter interaction: -privatesendamount=%d -> setting -coinjoinamount=%d\n", __func__, nAmountDeprecated, nAmountDeprecated);
         }
         gArgs.ForceRemoveArg("-privatesendamount");
+    }
+    if (gArgs.IsArgSet("-privatesenddenomsgoal")) {
+        int nDenomsGoalDeprecated = gArgs.GetArg("-privatesenddenomsgoal", DEFAULT_COINJOIN_DENOMS_GOAL);
+        InitWarning("Warning: -privatesenddenomsgoal is deprecated, please use -coinjoindenomsgoal.\n");
+        if (gArgs.SoftSetArg("-coinjoindenomsgoal", itostr(nDenomsGoalDeprecated))) {
+            LogPrintf("%s: parameter interaction: -privatesenddenomsgoal=%d -> setting -coinjoindenomsgoal=%d\n", __func__, nDenomsGoalDeprecated, nDenomsGoalDeprecated);
+        }
+        gArgs.ForceRemoveArg("-privatesenddenomsgoal");
+    }
+    if (gArgs.IsArgSet("-privatesenddenomshardcap")) {
+        int nDenomsHardcapDeprecated = gArgs.GetArg("-privatesenddenomshardcap", DEFAULT_COINJOIN_DENOMS_HARDCAP);
+        InitWarning("Warning: -privatesenddenomshardcap is deprecated, please use -coinjoindenomshardcap.\n");
+        if (gArgs.SoftSetArg("-coinjoindenomshardcap", itostr(nDenomsHardcapDeprecated))) {
+            LogPrintf("%s: parameter interaction: -privatesenddenomshardcap=%d -> setting -coinjoindenomshardcap=%d\n", __func__, nDenomsHardcapDeprecated, nDenomsHardcapDeprecated);
+        }
+        gArgs.ForceRemoveArg("-privatesenddenomshardcap");
+    }
+    if (gArgs.IsArgSet("-privatesendsessions")) {
+        int nSessionsDeprecated = gArgs.GetArg("-privatesendsessions", DEFAULT_COINJOIN_SESSIONS);
+        InitWarning("Warning: -privatesendsessions is deprecated, please use -coinjoinsessions.\n");
+        if (gArgs.SoftSetArg("-coinjoinsessions", itostr(nSessionsDeprecated))) {
+            LogPrintf("%s: parameter interaction: -privatesendsessions=%d -> setting -coinjoinsessions=%d\n", __func__, nSessionsDeprecated, nSessionsDeprecated);
+        }
+        gArgs.ForceRemoveArg("-privatesendsessions");
+    }
+    if (gArgs.IsArgSet("-enableprivatesend")) {
+        bool fEnablePSDeprecated = gArgs.GetBoolArg("-enableprivatesend", 0);
+        InitWarning("Warning: -enableprivatesend is deprecated, please use -enablecoinjoin.\n");
+        if (gArgs.SoftSetBoolArg("-enablecoinjoin", fEnablePSDeprecated)) {
+            LogPrintf("%s: parameter interaction: -enableprivatesend=%d -> setting -enablecoinjoin=%d\n", __func__, fEnablePSDeprecated, fEnablePSDeprecated);
+        }
+        gArgs.ForceRemoveArg("-enableprivatesend");
+    }
+    if (gArgs.IsArgSet("-privatesendautostart")) {
+        bool fAutoStartDeprecated = gArgs.GetBoolArg("-privatesendautostart", DEFAULT_COINJOIN_AUTOSTART);
+        InitWarning("Warning: -privatesendautostart is deprecated, please use -coinjoinautostart.\n");
+        if (gArgs.SoftSetBoolArg("-coinjoinautostart", fAutoStartDeprecated)) {
+            LogPrintf("%s: parameter interaction: -privatesendautostart=%d -> setting -coinjoinautostart=%d\n", __func__, fAutoStartDeprecated, fAutoStartDeprecated);
+        }
+        gArgs.ForceRemoveArg("-privatesendautostart");
+    }
+    if (gArgs.IsArgSet("-privatesendmultisession")) {
+        bool fMultiSessionDeprecated = gArgs.GetBoolArg("-privatesendmultisession", DEFAULT_COINJOIN_MULTISESSION);
+        InitWarning("Warning: -privatesendmultisession is deprecated, please use -coinjoinmultisession.\n");
+        if (gArgs.SoftSetBoolArg("-coinjoinmultisession", fMultiSessionDeprecated)) {
+            LogPrintf("%s: parameter interaction: -privatesendmultisession=%d -> setting -coinjoinmultisession=%d\n", __func__, fMultiSessionDeprecated, fMultiSessionDeprecated);
+        }
+        gArgs.ForceRemoveArg("-privatesendmultisession");
+    }
+    // end PrivateSend -> CoinJoin migration
+
+    if (gArgs.GetArg("-coinjoindenomshardcap", DEFAULT_COINJOIN_DENOMS_HARDCAP) < gArgs.GetArg("-coinjoindenomsgoal", DEFAULT_COINJOIN_DENOMS_GOAL)) {
+        return InitError("-coinjoindenomshardcap can't be lower than -coinjoindenomsgoal");
     }
 
     return true;

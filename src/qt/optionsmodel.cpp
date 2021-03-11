@@ -700,7 +700,7 @@ void OptionsModel::checkAndMigrate()
         settings.setValue("theme", GUIUtil::getDefaultTheme());
     }
 
-    // for PrivateSend -> CoinJoin migration
+    // begin PrivateSend -> CoinJoin migration
     if (settings.contains("nPrivateSendRounds") && !settings.contains("nCoinJoinRounds")) {
         settings.setValue("nCoinJoinRounds", settings.value("nPrivateSendRounds").toInt());
         settings.remove("nPrivateSendRounds");
@@ -709,5 +709,21 @@ void OptionsModel::checkAndMigrate()
         settings.setValue("nCoinJoinAmount", settings.value("nPrivateSendAmount").toInt());
         settings.remove("nPrivateSendAmount");
     }
-
+    if (settings.contains("fPrivateSendEnabled") && !settings.contains("fCoinJoinEnabled")) {
+        settings.setValue("fCoinJoinEnabled", settings.value("fPrivateSendEnabled").toBool());
+        settings.remove("fPrivateSendEnabled");
+    }
+    if (settings.contains("fPrivateSendMultiSession") && !settings.contains("fCoinJoinMultiSession")) {
+        settings.setValue("fCoinJoinMultiSession", settings.value("fPrivateSendMultiSession").toBool());
+        settings.remove("fPrivateSendMultiSession");
+    }
+    if (settings.contains("fShowAdvancedPSUI") && !settings.contains("fShowAdvancedCJUI")) {
+        settings.setValue("fShowAdvancedCJUI", settings.value("fShowAdvancedPSUI").toBool());
+        settings.remove("fShowAdvancedPSUI");
+    }
+    if (settings.contains("fShowPrivateSendPopups") && !settings.contains("fShowCoinJoinPopups")) {
+        settings.setValue("fShowCoinJoinPopups", settings.value("fShowPrivateSendPopups").toBool());
+        settings.remove("fShowPrivateSendPopups");
+    }
+    // end PrivateSend -> CoinJoin migration
 }
