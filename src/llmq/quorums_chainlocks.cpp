@@ -19,25 +19,6 @@ namespace llmq
 
 static const std::string CLSIG_REQUESTID_PREFIX = "clsig";
 
-// Used for iterating while signing/verifying CLSIGs via multiple quorums
-struct RequestIdStep
-{
-    int nHeight{-1};
-    int nStep{0};
-
-    RequestIdStep(int _nHeight) : nHeight(_nHeight) {}
-
-    ADD_SERIALIZE_METHODS
-
-    template<typename Stream, typename Operation>
-    inline void SerializationOp(Stream& s, Operation ser_action)
-    {
-        READWRITE(CLSIG_REQUESTID_PREFIX);
-        READWRITE(nHeight);
-        READWRITE(nStep);
-    }
-};
-
 CChainLocksHandler* chainLocksHandler;
 
 bool CChainLockSig::IsNull() const
@@ -216,19 +197,17 @@ bool CChainLocksHandler::VerifyChainLockShare(const CChainLockSig& clsig, const 
     bool fHaveSigner{std::count(clsig.signers.begin(), clsig.signers.end(), true) > 0};
 
     const auto quorums_scanned = llmq::quorumManager->ScanQuorums(llmqType, pindexScan, signingActiveQuorumCount);
-    RequestIdStep requestIdStep{clsig.nHeight};
 
-    for (const auto& quorum : quorums_scanned) {
+    for (size_t i = 0; i < quorums_scanned.size(); ++i) {
+        const CQuorumCPtr& quorum = quorums_scanned[i];
         if (quorum == nullptr) {
             return false;
         }
-        uint256 requestId = ::SerializeHash(requestIdStep);
+        uint256 requestId = ::SerializeHash(std::make_tuple(CLSIG_REQUESTID_PREFIX, clsig.nHeight, quorum->qc.quorumHash));
         if ((!idIn.IsNull() && idIn != requestId)) {
-            ++requestIdStep.nStep;
             continue;
         }
-        if (fHaveSigner && !clsig.signers[requestIdStep.nStep]) {
-            ++requestIdStep.nStep;
+        if (fHaveSigner && !clsig.signers[i]) {
             continue;
         }
         uint256 signHash = CLLMQUtils::BuildSignHash(llmqType, quorum->qc.quorumHash, requestId, clsig.blockHash);
@@ -249,13 +228,12 @@ bool CChainLocksHandler::VerifyChainLockShare(const CChainLockSig& clsig, const 
                 rs->UpdateHash();
                 quorumSigningManager->PushReconstructedRecoveredSig(rs);
             }
-            ret = std::make_pair(requestIdStep.nStep, quorum);
+            ret = std::make_pair(i, quorum);
             return true;
         }
         if (!idIn.IsNull() || fHaveSigner) {
             return false;
         }
-        ++requestIdStep.nStep;
     }
     return false;
 }
@@ -284,24 +262,21 @@ bool CChainLocksHandler::VerifyAggregatedChainLock(const CChainLockSig& clsig, c
     }
 
     const auto quorums_scanned = llmq::quorumManager->ScanQuorums(llmqType, pindexScan, signingActiveQuorumCount);
-    RequestIdStep requestIdStep{clsig.nHeight};
 
-    for (const auto& quorum : quorums_scanned) {
+    for (size_t i = 0; i < quorums_scanned.size(); ++i) {
+        const CQuorumCPtr& quorum = quorums_scanned[i];
         if (quorum == nullptr) {
             return false;
         }
-        if (!clsig.signers[requestIdStep.nStep]) {
-            ++requestIdStep.nStep;
+        if (!clsig.signers[i]) {
             continue;
         }
         quorumPublicKeys.emplace_back(quorum->qc.quorumPublicKey);
-        uint256 requestId = ::SerializeHash(requestIdStep);
+        uint256 requestId = ::SerializeHash(std::make_tuple(CLSIG_REQUESTID_PREFIX, clsig.nHeight, quorum->qc.quorumHash));
         uint256 signHash = CLLMQUtils::BuildSignHash(llmqType, quorum->qc.quorumHash, requestId, clsig.blockHash);
         hashes.emplace_back(signHash);
         LogPrint(BCLog::CHAINLOCKS, "CChainLocksHandler::%s -- CLSIG (%s) requestId=%s, signHash=%s\n",
                 __func__, clsig.ToString(), requestId.ToString(), signHash.ToString());
-
-        ++requestIdStep.nStep;
     }
     return clsig.sig.VerifyInsecureAggregated(quorumPublicKeys, hashes);
 }
@@ -665,18 +640,17 @@ void CChainLocksHandler::TrySignChainTip()
     if (AreMultiQuorumChainLocksEnabled()) {
         // Use multiple ChainLock quorums
         const auto quorums_scanned = llmq::quorumManager->ScanQuorums(llmqType, pindex, signingActiveQuorumCount);
-        RequestIdStep requestIdStep{pindex->nHeight};
-        for (const auto& quorum : quorums_scanned) {
-            uint256 requestId = ::SerializeHash(requestIdStep);
+        for (size_t i = 0; i < quorums_scanned.size(); ++i) {
+            const CQuorumCPtr& quorum = quorums_scanned[i];
             if (quorum == nullptr) {
                 return;
             }
+            uint256 requestId = ::SerializeHash(std::make_tuple(CLSIG_REQUESTID_PREFIX, pindex->nHeight, quorum->qc.quorumHash));
             if (quorumSigningManager->AsyncSignIfMember(llmqType, requestId, pindex->GetBlockHash(), quorum->qc.quorumHash)) {
                 LOCK(cs);
                 lastSignedRequestIds.insert(requestId);
                 lastSignedMsgHash = pindex->GetBlockHash();
             }
-            ++requestIdStep.nStep;
         }
     } else {
         // Use single ChainLock quorum
