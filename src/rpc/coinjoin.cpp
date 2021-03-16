@@ -160,9 +160,9 @@ static const CRPCCommand commands[] =
     { //  category              name                      actor (function)         argNames
         //  --------------------- ------------------------  ---------------------------------
         { "dash",               "getpoolinfo",            &getpoolinfo,            {} },
-        { "dash",               "getcoinjoininfo",     &getcoinjoininfo,     {} },
+        { "dash",               "getcoinjoininfo",        &getcoinjoininfo,        {} },
 #ifdef ENABLE_WALLET
-        { "dash",               "coinjoin",            &coinjoin,            {} },
+        { "dash",               "coinjoin",               &coinjoin,               {} },
 #endif // ENABLE_WALLET
 };
 
